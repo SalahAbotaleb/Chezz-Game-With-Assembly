@@ -1,10 +1,16 @@
 ;DisplayString STR -----displays string location STR
 ;ReadstringMsg PromptMsg,Outputloc----- takes string location promtmsg and displays it then ,puts it in location Outputloc
 ;Readstring Outputloc ----- puts string in location Outputloc
-;Displaynumber MACRO ----- displays number stored in ax as decimal number
-;ReadNumberMsg MACRO PromptMsg,outputloc -----read a number and stores in ax with a message output
-;
-;
+;Displaynumber ----- displays number stored in ax as decimal number
+;ReadNumberMsg PromptMsg,outputloc ----- read a number and stores in ax with a message PromptMsg,also puts it in location Outputloc as ascii
+;ReadNumber outputloc ----- read a number and stores in ax with no message output,also puts it in location Outputloc as ascii,no output msg on screen
+;printnewline ----- goes to the next line
+;returntoconsole ----- used at the end of the program
+;clearscreen ----- clears the screen
+;drawvertline x1,y1,x2,y2,color ----- draws a vertical line from (x1,y1) to (x2,y2) in the color {color}
+;drawHorizline x1,y1,x2,y2,color ----- draws a hosrizontal line from (x1,y1) to (x2,y2) in the color {color}
+;DisplaynumberAtloaction x,y ----- displays number at location (x1,y1)
+;prntSCol ----- not working yet
 ;
 ;
 DisplayString MACRO STR
