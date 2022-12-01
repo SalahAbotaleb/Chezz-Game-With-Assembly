@@ -1,3 +1,12 @@
+;DisplayString STR -----displays string location STR
+;ReadstringMsg PromptMsg,Outputloc----- takes string location promtmsg and displays it then ,puts it in location Outputloc
+;Readstring Outputloc ----- puts string in location Outputloc
+;Displaynumber MACRO ----- displays number stored in ax as decimal number
+;ReadNumberMsg MACRO PromptMsg,outputloc -----read a number and stores in ax with a message output
+;
+;
+;
+;
 DisplayString MACRO STR
 mov ah,9
 mov dx,offset STR
