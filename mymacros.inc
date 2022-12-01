@@ -4,16 +4,26 @@ mov dx,offset STR
 int 21h 
 ENDM STR
 
-Readstring MACRO PromptMsg,Outputloc
+ReadstringMsg MACRO PromptMsg,Outputloc
+push ax
 mov ah,9
 mov dx,offset PromptMsg
 int 21h 
 mov ah,0AH
 mov dx,offset outputloc
 int 21h
+pop ax
+ENDM ReadstringMsg
+
+Readstring MACRO Outputloc
+push ax
+mov ah,0AH
+mov dx,offset outputloc
+int 21h
+pop ax
 ENDM Readstring
 
-Displaynumber MACRO
+Displaynumber MACRO ;displays number stored in ax as decimal number 
 local lbl1,lbl2
 pusha
 
@@ -39,12 +49,17 @@ popa
 
 ENDM Displaynumber
 
-ReadNumber MACRO PromptMsg,outputloc
-push bx
+ReadNumberMsg MACRO PromptMsg,outputloc ;read a number and stores in ax with a message output
+pusha
 
 mov ah,9
 mov dx,offset PromptMsg
 int 21h 
+
+mov ah,2 
+mov dl,' '
+int 21h 
+
 mov ah,0AH
 mov dx,offset outputloc
 int 21h
@@ -64,11 +79,38 @@ add ax,bx
 inc di
 loop lbl1 
  
-pop bx
+pop a
+ENDM ReadNumberMsg
+
+ReadNumber MACRO outputloc ;read a number and stores in ax with no message output
+pusha
+
+
+mov ah,0AH
+mov dx,offset outputloc
+int 21h
+
+mov di,offset outputloc+2
+mov cx,0
+mov cl,outputloc+1 ;to get size of number entered by user
+mov ax,0
+lbl1:
+mov bx,10d
+mul bx
+
+mov bl,[di]
+mov bh,0
+sub bl,'0'
+add ax,bx
+inc di
+loop lbl1 
+ 
+pop a
 ENDM ReadNumber
 
 printnewline MACRO
-    pusha
+    push ax
+    push dx
     mov ah,2 
     mov dl,10
     int 21h
@@ -76,7 +118,8 @@ printnewline MACRO
     mov ah,2 
     mov dl,13
     int 21h
-    popa
+    pop ax
+    pop dx
 ENDM printnewline
 
 returntoconsole MACRO
