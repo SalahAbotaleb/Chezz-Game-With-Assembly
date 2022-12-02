@@ -4,7 +4,7 @@
 
 MSG1  DB  "Please Enter Your Name: $"
 MSG2  DB  13,"Invalid! Re-Enter your Name: $"
-INPUT_NAME DB  30,?,30 DUP($)
+INPUT_NAME DB  30,?,30 DUP('$')
 
 .CODE
 
@@ -34,7 +34,7 @@ MAIN PROC FAR
     MOV CH, 0H                  ; setting CX
     
     FOR:
-        CMP CX, 0
+        CMP CX, 0h
         JE END
 
         MOV BL, [SI]             ; work on BL register to check every character if not alphabet
@@ -61,19 +61,19 @@ MAIN PROC FAR
     END:
 
     
-    MOV AH, 0
+    MOV AH, 0h
     INT 21H                     ; to return the PROGRAM CONTROL TO THE OPERATING SYSTEM
 
     
     
     WRONG:
         MOV AX, 0600H
-        MOV BH, 07
-        MOV CX, 0
+        MOV BH, 07h
+        MOV CX, 0h
         MOV dx, 184FH
         INT 10H                 ; clear sreen
         
-        MOV AH, 9
+        MOV AH, 9h
         LEA DX, MSG2            ; display "Invalid! Re-Enter your Name: "
         INT 21H
         
