@@ -4,3 +4,5 @@
 *.debug 
 *.map
 *.MAP
+*.exe
+*.obj
