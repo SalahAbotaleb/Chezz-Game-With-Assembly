@@ -1,3 +1,4 @@
+include mymacros.inc
 .MODEL SMALL
 .STACK 64
 .DATA
@@ -88,6 +89,6 @@ MAIN PROC FAR
         CMP BL, 5AH             ;   jump to wrong
         JA  WRONG               ; else
         JMP RETURN              ;   jump to return label
-     
+     returntoconsole
 MAIN ENDP    
 END MAIN
