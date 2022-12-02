@@ -9,7 +9,6 @@ MSG2  DB  13,"Invalid! Re-Enter your Name: $"
 INPUT_NAME DB  30,?,30 DUP('$')
 
 .CODE
-
 MAIN PROC FAR
     MOV AX, @DATA
     MOV DS, AX
@@ -64,9 +63,7 @@ MAIN PROC FAR
     ENDD:
 
     
-    MOV AH, 0
-    INT 21H                     ; to return the PROGRAM CONTROL TO THE OPERATING SYSTEM
-
+    returntoconsole
     
     
     WRONG:
@@ -91,6 +88,5 @@ MAIN PROC FAR
         CMP BL, 5AH             ;   jump to wrong
         JA  WRONG               ; else
         JMP RETURN              ;   jump to return label
-     returntoconsole
 MAIN ENDP    
 END MAIN
