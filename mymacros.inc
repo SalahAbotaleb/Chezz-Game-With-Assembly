@@ -11,8 +11,10 @@
 ;drawHorizline x1,y1,x2,y2,color ----- draws a hosrizontal line from (x1,y1) to (x2,y2) in the color {color}
 ;DisplaynumberAtloaction x,y ----- displays number at location (x1,y1)
 ;prntSCol ----- not working yet
-;
-;
+;movecursorlocation x,y,pgn ----- moves cursor to a position x and y and pagenumber (pgn)
+;Gotograpicsmode MACRO ----- changes mode to grapics mode
+;GotoTextmode MACRO ----- changes mode to text mode
+;drawhorizontallineinetextmode x,y,lenght ----- draws a horizontal line in text mode
 DisplayString MACRO STR
 mov ah,9
 mov dx,offset STR
@@ -249,3 +251,54 @@ jnz lbl1
 
 popa
 Endm prntSCol
+
+
+movecursorlocation MACRO x,y,pgn ;moves cursor to a position x and y and pagenumber (pgn)
+pusha
+
+mov bh,pgn
+mov dh,y
+mov dl,x
+mov ah,2h
+int 10h
+
+popa   
+ENDM movecursorlocation
+
+Gotograpicsmode MACRO ;changes mode to grapics mode
+
+pusha
+mov ah, 0h
+mov al, 13h
+int 10h
+popa
+
+ENDM Gotograpicsmode
+
+GotoTextmode MACRO ;changes mode to text mode
+
+pusha
+mov ax, 03h
+int 10h
+popa
+
+ENDM GotoTextmode
+
+drawhorizontallineinetextmode MACRO x,y,lenght ;draws a horizontal line in text mode 
+pusha
+local looper
+
+
+movecursorlocation x,y,pgn 
+
+looper:
+
+
+loop looper
+
+popa
+ENDM
+
+getcursorlocation MACRO ;This function returns cursor location still not done
+    
+ENDM
