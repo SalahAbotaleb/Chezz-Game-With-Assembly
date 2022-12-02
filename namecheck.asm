@@ -35,8 +35,8 @@ MAIN PROC FAR
     MOV CH, 0H                  ; setting CX
     
     FOR:
-        CMP CX, 0h
-        JE END
+        CMP CX, 0
+        JE ENDD
 
         MOV BL, [SI]             ; work on BL register to check every character if not alphabet
         
@@ -59,22 +59,22 @@ MAIN PROC FAR
 
         INC SI
         LOOP FOR     
-    END:
+    ENDD:
 
     
-    MOV AH, 0h
+    MOV AH, 0
     INT 21H                     ; to return the PROGRAM CONTROL TO THE OPERATING SYSTEM
 
     
     
     WRONG:
         MOV AX, 0600H
-        MOV BH, 07h
-        MOV CX, 0h
+        MOV BH, 07
+        MOV CX, 0
         MOV dx, 184FH
         INT 10H                 ; clear sreen
         
-        MOV AH, 9h
+        MOV AH, 9
         LEA DX, MSG2            ; display "Invalid! Re-Enter your Name: "
         INT 21H
         
