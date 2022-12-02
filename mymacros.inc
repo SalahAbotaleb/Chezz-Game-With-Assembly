@@ -145,6 +145,7 @@ returntoconsole MACRO
 ENDM returntoconsole 
 
 clearscreen MACRO 
+pusha
 mov ax,0600h ;clear the screen
 mov bh,07 
 mov cx,0 
@@ -156,7 +157,7 @@ mov ah,2
 mov dx,0 ;move cursor
 mov bh,0 ;move to current screen
 int 10h
-
+popa
 ENDM clearscreen
 
 drawvertline  MACRO x1,y1,x2,y2,color 

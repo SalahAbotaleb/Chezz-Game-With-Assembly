@@ -1,4 +1,5 @@
 include mymacros.inc
+.286
 .MODEL SMALL
 .STACK 64
 .DATA
@@ -13,6 +14,7 @@ MAIN PROC FAR
     MOV AX, @DATA
     MOV DS, AX
      
+    clearscreen 
     MOV AH, 9H
     LEA DX, MSG1                ; display "Please Enter Your Name: "
     INT 21H
