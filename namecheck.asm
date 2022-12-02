@@ -4,7 +4,7 @@
 
 MSG1  DB  "Please Enter Your Name: $"
 MSG2  DB  13,"Invalid! Re-Enter your Name: $"
-INPUT_NAME DB  30,?,30 DUP($)
+INPUT_NAME DB  30,?,30 DUP('$')
 
 .CODE
 
@@ -35,7 +35,7 @@ MAIN PROC FAR
     
     FOR:
         CMP CX, 0
-        JE END
+        JE ENDD
 
         MOV BL, [SI]             ; work on BL register to check every character if not alphabet
         
@@ -58,7 +58,7 @@ MAIN PROC FAR
 
         INC SI
         LOOP FOR     
-    END:
+    ENDD:
 
     
     MOV AH, 0
