@@ -1,4 +1,5 @@
 include mymacros.inc 
+.286
 .MODEL SMALL
 .STACK 64
 .DATA
@@ -12,17 +13,19 @@ MAIN PROC FAR
 mov ax,@DATA
 mov ds,ax
 
-;movecursorlocation 19h,7h,0h    ;moves cursor to the middle of the page 
+GotoTextmode
 
-;DisplayString F1outputmsg       ;prints the f1 message
+movecursorlocation 19h,7h,0h    ;moves cursor to the middle of the page 
 
-;movecursorlocation 19h,0Ah,0h    ;moves cursor to the middle of the page bellow the f1 message
+DisplayString F1outputmsg       ;prints the f1 message
 
-;DisplayString F2outputmsg       ;prints the f2 message
+movecursorlocation 19h,0Ah,0h    ;moves cursor to the middle of the page bellow the f1 message
 
-;movecursorlocation 19h,0Dh,0h    ;moves cursor to the middle of the page bellow the f2 message
+DisplayString F2outputmsg       ;prints the f2 message
 
-;DisplayString escoutputmsg       ;prints the esc message
+movecursorlocation 19h,0Dh,0h    ;moves cursor to the middle of the page bellow the f2 message
+
+DisplayString escoutputmsg       ;prints the esc message
 
 
 returntoconsole
