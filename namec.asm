@@ -47,13 +47,10 @@ MAIN PROC FAR
         CMP BL, 41H              ; if (BL > 'A')
         JAE ALPHABET_CAPITAL    ;   jump to check for (BL < 'Z')
         
-        CMP BL, 30H             ; to check for digits and other character before the 'A'
-        JGE WRONG               ; jump to wrong
-        
         CMP BL, 20H              ; to check for spaces ' '
         JE RETURN 
          
-        CMP BL, 30H             ; to check for other characters in the ascii table
+        CMP BL, 41H             ; to check for other characters in the ascii table
         JL WRONG                ; jump to wrong
         
         RETURN: 
