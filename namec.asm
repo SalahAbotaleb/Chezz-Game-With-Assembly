@@ -51,7 +51,7 @@ MAIN PROC FAR
         JGE WRONG               ; jump to wrong
         
         CMP BL, 20H              ; to check for spaces ' '
-        JMP RETURN 
+        JE RETURN 
          
         CMP BL, 30H             ; to check for other characters in the ascii table
         JL WRONG                ; jump to wrong
@@ -67,11 +67,7 @@ MAIN PROC FAR
     
     
     WRONG:
-        MOV AX, 0600H
-        MOV BH, 07
-        MOV CX, 0
-        MOV dx, 184FH
-        INT 10H                 ; clear sreen
+        clearscreen
         
         MOV AH, 9
         LEA DX, MSG2            ; display "Invalid! Re-Enter your Name: "
