@@ -17,9 +17,11 @@
 ;drawhorizontallineinetextmode y ----- draws a horizontal line in text mode across the screen
 ;getcursorlocation MACRO ----- This function returns cursor location 
 DisplayString MACRO STR
+push ax
 mov ah,9
 mov dx,offset STR
 int 21h 
+pop ax
 ENDM STR
 
 ReadstringMsg MACRO PromptMsg,Outputloc
