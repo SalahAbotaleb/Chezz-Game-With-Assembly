@@ -288,16 +288,13 @@ ENDM GotoTextmode
 
 drawhorizontallineinetextmode MACRO y ;draws a horizontal line in text mode across the screen
 pusha
-local hos
+movecursorlocation -1,22D,0H
 
+mov cx,81d
 
-movecursorlocation 0,y,0H
+;lOCAL????????????
 
-mov cx,80d
-
-local hos
-hos:
-
+hos:                    
 pusha
 mov ah,2H
 mov dl,2dh
