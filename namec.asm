@@ -41,7 +41,7 @@ SUBPROG1 PROC FAR
     MOV CL, INPUT_NAME+1        ; get the length of string from actual size in variable name (input_name)
     MOV CH, 0H                  ; setting CX
 
-    MOV BL, [SI]
+    MOV BL, [SI]                ; check if input is spaces
     CMP BL, 20H
     JE WRONG
     
