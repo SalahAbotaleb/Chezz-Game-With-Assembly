@@ -34,6 +34,10 @@ MAIN PROC FAR
     LEA SI, INPUT_NAME+2        ; for iterating over every character in string
     MOV CL, INPUT_NAME+1        ; get the length of string from actual size in variable name (input_name)
     MOV CH, 0H                  ; setting CX
+
+    MOV BL, [SI]
+    CMP BL, 20H
+    JE WRONG
     
     FOR:
         CMP CX, 0
@@ -42,16 +46,16 @@ MAIN PROC FAR
         MOV BL, [SI]             ; work on BL register to check every character if not alphabet
         
         CMP BL, 61H              ; if (BL > 'a')
-        JAE ALPHABET_SMALL      ;   jump to check for (BL < 'z')
+        JAE ALPHABET_SMALL       ;   jump to check for (BL < 'z')
         
         CMP BL, 41H              ; if (BL > 'A')
-        JAE ALPHABET_CAPITAL    ;   jump to check for (BL < 'Z')
+        JAE ALPHABET_CAPITAL     ;   jump to check for (BL < 'Z')
         
         CMP BL, 20H              ; to check for spaces ' '
         JE RETURN 
          
-        CMP BL, 41H             ; to check for other characters in the ascii table
-        JL WRONG                ; jump to wrong
+        CMP BL, 41H              ; to check for other characters in the ascii table
+        JL WRONG                 ; jump to wrong
         
         RETURN: 
 
