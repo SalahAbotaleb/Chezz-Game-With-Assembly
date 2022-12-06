@@ -1,17 +1,23 @@
+EXTRN MSG1:BYTE
+EXTRN MSG2:BYTE
+EXTRN INPUT_NAME:BYTE
+
+PUBLIC SUBPROG1
+
 include mymacros.inc
 .286
 .MODEL SMALL
 .STACK 64
 .DATA
 
-MSG1  DB  "Please Enter Your Name: $"
-MSG2  DB  13,"Invalid! Re-Enter your Name: $"
-INPUT_NAME DB  30,?,30 DUP('$')
+;MSG1  DB  "Please Enter Your Name: $"
+;MSG2  DB  13,"Invalid! Re-Enter your Name: $"
+;INPUT_NAME DB  30,?,30 DUP('$')
 
 .CODE
-MAIN PROC FAR
-    MOV AX, @DATA
-    MOV DS, AX
+SUBPROG1 PROC FAR
+    ;MOV AX, @DATA
+    ;MOV DS, AX
      
     clearscreen 
     MOV AH, 9H
@@ -63,8 +69,8 @@ MAIN PROC FAR
         LOOP FOR     
     ENDD:
 
-    
-    returntoconsole
+    RET
+    ;returntoconsole
     
     
     WRONG:
@@ -85,5 +91,7 @@ MAIN PROC FAR
         CMP BL, 5AH             ;   jump to wrong
         JA  WRONG               ; else
         JMP RETURN              ;   jump to return label
-MAIN ENDP    
-END MAIN
+
+    RET
+SUBPROG1 ENDP    
+END SUBPROG1

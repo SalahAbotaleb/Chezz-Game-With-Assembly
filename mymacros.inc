@@ -14,11 +14,14 @@
 ;movecursorlocation x,y,pgn ----- moves cursor to a position x and y and pagenumber (pgn)
 ;Gotograpicsmode MACRO ----- changes mode to grapics mode
 ;GotoTextmode MACRO ----- changes mode to text mode
-;drawhorizontallineinetextmode x,y,lenght ----- draws a horizontal line in text mode
+;drawhorizontallineinetextmode y ----- draws a horizontal line in text mode across the screen
+;getcursorlocation MACRO ----- This function returns cursor location 
 DisplayString MACRO STR
+push ax
 mov ah,9
 mov dx,offset STR
 int 21h 
+pop ax
 ENDM STR
 
 ReadstringMsg MACRO PromptMsg,Outputloc
@@ -285,21 +288,32 @@ popa
 
 ENDM GotoTextmode
 
-drawhorizontallineinetextmode MACRO x,y,lenght ;draws a horizontal line in text mode 
+drawhorizontallineinetextmode MACRO y ;draws a horizontal line in text mode across the screen
 pusha
-local looper
+movecursorlocation -1,22D,0H
 
+mov cx,81d
 
-movecursorlocation x,y,pgn 
+;lOCAL????????????
 
-looper:
+hos:                    
+pusha
+mov ah,2H
+mov dl,2dh
+int 21h
+popa
 
-
-loop looper
+loop hos
 
 popa
-ENDM
+ENDM drawhorizontallineinetextmode 
 
-getcursorlocation MACRO ;This function returns cursor location still not done
-    
-ENDM
+getcursorlocation MACRO ;This function returns cursor location 
+
+push ax
+mov ah,3h
+mov bh,0h
+int 10h
+pop ax
+
+ENDM getcursorlocation
