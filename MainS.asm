@@ -27,6 +27,8 @@ movecursorlocation 19h,0Dh,0h    ;moves cursor to the middle of the page bellow 
 
 DisplayString escoutputmsg       ;prints the esc message
 
+drawhorizontallineinetextmode 175d  ;prints a line at row 175
+
 
 returntoconsole
 
