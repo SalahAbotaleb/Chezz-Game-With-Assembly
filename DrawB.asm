@@ -39,7 +39,6 @@ queenFilename DB 'queen.bin',0
 
 
 
-chickenFilehandle DW ?
 filehandle DW ?
 
 boardData DB boardWidth*boardHeight dup(0)
@@ -135,7 +134,6 @@ MAIN PROC FAR
     initchezz  soliderData,6,5,0,chezzP,chezzT
     initchezz  soliderData,6,6,0,chezzP,chezzT
     initchezz  soliderData,6,7,0,chezzP,chezzT
-    ;deletechezzD  0,0,chezzP,chezzT,tmpX,tmpY,0h,PrimaryC,SecondaryC
 
     mov row,0
     mov col,0
@@ -147,7 +145,7 @@ MAIN PROC FAR
     lea di,chezzT
     DrawPieceDB  0EH,0EH,[si],0,0,0h,row,col,begr,begc,endr,endc,res
 
-    ;deletechezzD 0,0,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
+    ;deletechezzD 0,2,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
     right:
     MOV AH , 0
     INT 16h
