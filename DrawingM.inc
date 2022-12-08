@@ -361,7 +361,8 @@ add ax,c
 
 add si,ax
 add di,ax
-mov [di],-1
+mov bl,-1
+mov [di],bl
 
 add si,ax
 mov ax,-1
