@@ -147,8 +147,9 @@ MAIN PROC FAR
 
     ;pic,row,col,t,chezzP,chezzT
 
-    
-	initchezz  rookData,0,0,12h,chezzP,chezzT
+    initchezzC PrimaryC,SecondaryC,chezzC,res
+	
+    initchezz  rookData,0,0,12h,chezzP,chezzT
     initchezz  rookData,0,7,12h,chezzP,chezzT
 
     initchezz  horseData,0,1,14h,chezzP,chezzT
@@ -241,8 +242,9 @@ MAIN PROC FAR
 
 ;calling function to choose a piece
     mov success,0 
-   choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-
+    
+    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
+   
     cmp success,0
     je suc
     mov selected,1

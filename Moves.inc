@@ -1,11 +1,12 @@
 include DrawingM.inc
+include mymacros.inc
 
 movepiece MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,playertpye,row,col,begr,begc,endr,endc,res
     
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
 ;chezzP is the piece array
@@ -18,7 +19,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
 ;success is the success flag
 ;wnkingQ means tha the piece is not white king 
 
-
+    
     mov ax,prevR
     mov bx,prevC
 
@@ -94,8 +95,12 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     wnknightQ:
     ;check if piece is pawn
     cmp ax,5
-    JnE wnpawnQ
-    ;TODO call pawn function
+    JE skipwpawn
+    jmp far ptr wnpawnQ
+    skipwpawn:
+    
+    Highpawn PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success,begr,begc,endr,endc,res
+     
     jmp far ptr leave
     wnpawnQ:
     jmp far ptr leave
@@ -253,9 +258,11 @@ ENDM Highbishop
 
 
 
+;dont compare memory locations
+Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success,begr,begc,endr,endc,res
+    local blackpawn,notstartingpos,somethingintheway1,somethingintheway2,blackpawns,whitepawns,whitepawn,notstartingpos2,somethingintheway3,somethingintheway4,whitepawns2
+    ;s is short for skip
 
-Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success
-    local blackpawn,notstartingpos,somethingintheway1,somethingintheway2
     mov ax,row
     mov bx,col
 
@@ -269,30 +276,73 @@ Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,ta
     add ax,ax
     add si,ax  
     mov ax,[di]
-
-
-    cmp playertpye,0
-    JnE blackpawn
+ 
+    mov dx,0 
+    mov dl,playertpye
+    cmp dx,0
+  
+    JE blackpawns
+    jmp far ptr blackpawn
+    blackpawns:
     ;white pawn
     ;check if pawn is in starting position
-    sub ax,8h
+    sub di,9h ;i dont know why it works for 9 it was supposed to work for 8
+    mov ax,[di]
+    add di,9h
     ;seeing if there is something in front of the pawn
+    ;reach here
+    
     cmp ax,-1
-    JnE somethingintheway1
-    mov chezzC+di,moveavailc;might not work
+    JE somethingintheway1s
+    jmp far ptr somethingintheway1
+    somethingintheway1s:
+    
+    ;mov chezzC+di,moveavailc;might not work
+    pusha 
+    mov di,offset chezzC
+    mov ax,8
+    mov bx,row
+    mul bl
+    add ax,col
+    mov di,ax
+    push ax
+    mov al,moveavailc
+    mov [di],al;might not work
+    pop ax
+    popa 
     push bx
     mov bx,row
     sub bx,1
-    DrawPieceDB moveavailc,moveavailc,0,0,0,0fh,bx,col,begr,begc,endr,endc,res
+
+    DrawPieceDB moveavailc,moveavailc,0,0,0,0fh,bx,col,begr,begc,endr,endc,res 
     pop bx
 
-    cmp row,7
-    JnE notstartingpos
+    mov ax,row
+    cmp ax,6h
+    JE notstartingposs
+    jmp far ptr notstartingpos
+    notstartingposs:
     ;check if pawn can move 2 spaces
-    sub ax,8h
+    
+    sub di,16d
+    mov ax,[di]
+    add di,16d
     cmp ax,-1
-    JnE somethingintheway2
-    mov chezzC+di,moveavailc;might not work
+    JE somethingintheway2s
+    jmp far ptr somethingintheway2
+    somethingintheway2s:
+    pusha 
+    mov di,offset chezzC
+    mov ax,8
+    mov bx,row
+    mul bl
+    add ax,col
+    add di,ax
+    push ax
+    mov al,moveavailc
+    mov [di],al;might not work
+    pop ax
+    popa 
     push bx
     mov bx,row
     sub bx,2
