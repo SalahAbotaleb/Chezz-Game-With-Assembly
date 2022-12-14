@@ -4,7 +4,7 @@ movepiece MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,playertpye,row,col,b
     
 ENDM movepiece
 
-choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success
+choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
     local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
@@ -173,3 +173,63 @@ ENDM choosepiece
 HighRook MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success
 
 ENDM HighRook
+
+
+
+
+
+
+
+
+
+Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success
+    local blackpawn,notstartingpos,somethingintheway1,somethingintheway2
+    mov ax,row
+    mov bx,col
+
+    lea si,chezzP
+    lea di,chezzT
+    mov ax,8
+    mov bx,row
+    mul bl
+    add ax,col
+    add di,ax
+    add ax,ax
+    add si,ax  
+    mov ax,[di]
+
+
+    cmp playertpye,0
+    JnE blackpawn
+    ;white pawn
+    ;check if pawn is in starting position
+    sub ax,8h
+    ;seeing if there is something in front of the pawn
+    cmp ax,-1
+    JnE somethingintheway1
+    mov chezzC+di,moveavailc;might not work
+    push bx
+    mov bx,row
+    sub bx,1
+    DrawPieceDB moveavailc,moveavailc,0,0,0,0fh,bx,col,begr,begc,endr,endc,res
+    pop bx
+
+    cmp row,7
+    JnE notstartingpos
+    ;check if pawn can move 2 spaces
+    sub ax,8h
+    cmp ax,-1
+    JnE somethingintheway2
+    mov chezzC+di,moveavailc;might not work
+    push bx
+    mov bx,row
+    sub bx,2
+    DrawPieceDB moveavailc,moveavailc,0,0,0,0fh,bx,col,begr,begc,endr,endc,res
+    pop bx
+
+    somethingintheway2:
+    notstartingpos:
+    somethingintheway1:
+    blackpawn:
+
+ENDM Highpawn
