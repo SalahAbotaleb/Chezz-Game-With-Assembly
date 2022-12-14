@@ -209,7 +209,7 @@ MAIN PROC FAR
     ;deletechezzD 0,2,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
 
     ;Q means the user wants to select
-     Q:
+    Q:
     MOV AH,1;every time looping we check here whether a key was selected or not
     INT 16h
     push ax
@@ -271,7 +271,9 @@ MAIN PROC FAR
 
     down:
     cmp ah,1FH   ;down condition
-    JNE Q ;if no key is pressed here we go to the beggining of the loop again
+    JE skipthis
+    jmp far ptr Q                   ;if no key is pressed here we go to the beggining of the loop again
+    skipthis:
     inc row
 
     validate:
