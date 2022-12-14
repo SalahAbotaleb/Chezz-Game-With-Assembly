@@ -493,7 +493,7 @@ DrawPieceDB MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col
     exit:popa
 ENDM DrawPieceDB
 
-initchezzC PrimaryC,SecondaryC,chezzC,res
+initchezzC MACRO PrimaryC,SecondaryC,chezzC,res
 local redo,sec,con,exit
 pusha
 lea si,chezzC
@@ -516,12 +516,12 @@ cmp res,0
 jnz sec 
 mov bx,0
 mov bl,PrimaryC
-mov [si],PrimaryC
+mov [si],bl
 jmp con
 sec:
 mov bx,0
 mov bl,SecondaryC
-mov [si],bx
+mov [si],bl
 con:
 inc si
 inc dx
@@ -530,7 +530,6 @@ jne redo
 mov dx,0
 inc cx
 cmp cx,8
-jz exit
-exit:
+jnz redo
 popa
-ENDM
+ENDM initchezzC
