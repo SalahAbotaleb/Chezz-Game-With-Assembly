@@ -314,7 +314,7 @@ Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,ta
     mov bx,row
     sub bx,1
 
-    DrawPieceDB moveavailc,moveavailc,0,0,0,0fh,bx,col,begr,begc,endr,endc,res 
+    DrawPieceDB moveavailc,moveavailc,[si],0,0,0fh,bx,col,begr,begc,endr,endc,res 
     pop bx
 
     mov ax,row

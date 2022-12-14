@@ -198,7 +198,6 @@ MAIN PROC FAR
     initchezz  soliderData,6,7,05h,chezzP,chezzT
 
 
-
     mov row,0
     mov col,0
 
