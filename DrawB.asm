@@ -241,8 +241,9 @@ MAIN PROC FAR
 
 ;calling function to choose a piece
     mov success,0 
-   choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-
+    
+    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
+   
     cmp success,0
     je suc
     mov selected,1
