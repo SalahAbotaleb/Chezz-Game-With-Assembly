@@ -211,12 +211,13 @@ MAIN PROC FAR
      Q:
     MOV AH,1;every time looping we check here whether a key was selected or not
     INT 16h
-    
     push ax
+    jz noflush
     mov ah,0Ch
     INT 21h
+    
+    noflush:
     pop ax
-
     cmp ah,10h  ;press Q condition
     JE doQ
     jmp far ptr right
