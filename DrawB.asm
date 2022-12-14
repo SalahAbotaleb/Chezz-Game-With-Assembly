@@ -147,8 +147,9 @@ MAIN PROC FAR
 
     ;pic,row,col,t,chezzP,chezzT
 
-    
-	initchezz  rookData,0,0,12h,chezzP,chezzT
+    ;initchezzC PrimaryC,SecondaryC,chezzC,res
+	
+    initchezz  rookData,0,0,12h,chezzP,chezzT
     initchezz  rookData,0,7,12h,chezzP,chezzT
 
     initchezz  horseData,0,1,14h,chezzP,chezzT
