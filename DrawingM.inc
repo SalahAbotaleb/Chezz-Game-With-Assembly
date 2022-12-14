@@ -492,6 +492,44 @@ DrawPieceDB MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col
     ;************end drawing the pixels
     exit:popa
 ENDM DrawPieceDB
-;initchezzC 
 
-;ENDM
+initchezzC MACRO PrimaryC,SecondaryC,chezzC,res
+local redo,sec,con,exit
+pusha
+lea si,chezzC
+mov cx,0
+mov dx,0
+;cx is pointing to row 
+;dx is pointing to colomn
+
+redo:
+mov res,0
+mov ax,cx
+mov bx,2
+div bl
+xor res,ah
+mov ax,dx
+mov bx,2
+div bl
+xor res,ah
+cmp res,0
+jnz sec 
+mov bx,0
+mov bl,PrimaryC
+mov [si],bl
+jmp con
+sec:
+mov bx,0
+mov bl,SecondaryC
+mov [si],bl
+con:
+inc si
+inc dx
+cmp dx,8
+jne redo
+mov dx,0
+inc cx
+cmp cx,8
+jnz redo
+popa
+ENDM initchezzC
