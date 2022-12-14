@@ -241,7 +241,7 @@ MAIN PROC FAR
 
 ;calling function to choose a piece
     mov success,0 
-    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
+   choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
 
     cmp success,0
     je suc
@@ -271,7 +271,9 @@ MAIN PROC FAR
 
     down:
     cmp ah,1FH   ;down condition
-    JNE Q ;if no key is pressed here we go to the beggining of the loop again
+    JE skipthis 
+    jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
+    skipthis:
     inc row
 
     validate:
