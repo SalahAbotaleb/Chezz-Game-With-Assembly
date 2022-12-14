@@ -1,5 +1,6 @@
 include mymacros.inc
 include DrawingM.inc
+include Moves.inc
 .286
 .Model Small
 .Stack 64
@@ -26,9 +27,31 @@ prevC DW 0
 
 piecew EQU 25
 pieceh EQU 25
+;colors 
+;0  Black
+;1  blue
+;2  green
+;3  Aqua
+;4  Red
+;5  Purple
+;6  brown
+;7  light gray
+;8  dark Gray,
+;9  Light Blue.
+;A  Light Green
+;B  Light Aqua
+;C  Light Red
+;D  Light Purple
+;E  Yellow
+;F  White
 
-PrimaryC DB 6h
-SecondaryC DB 0Bh
+
+PrimaryC DB 7h
+SecondaryC DB 08h
+
+moveavailc DB 0Ah
+takeavailc db 4h 
+
 boardFilename DB 'chessB.bin', 0
 rookFilename DB 'rook.bin',0
 horseFilename DB 'horse.bin',0
@@ -54,6 +77,15 @@ errormsg db 'canot laod image file$'
 chezzP DW 64 dup(-1)
 chezzT DB 64 dup(-1)
 
+;///////////////////////////////////////////
+playertpye DB 0 ;0 for white 1 for Black
+;you need to set player type
+selected DB 0
+
+success DB 0 ;0 for fail 1 for success
+
+
+;///////////////////////////////////////////
 .Code
 MAIN PROC FAR
     MOV AX , @DATA
@@ -114,51 +146,51 @@ MAIN PROC FAR
     ;pic,row,col,t,chezzP,chezzT
 
     
-	initchezz  rookData,0,0,12,chezzP,chezzT
-    initchezz  rookData,0,7,12,chezzP,chezzT
+	initchezz  rookData,0,0,12h,chezzP,chezzT
+    initchezz  rookData,0,7,12h,chezzP,chezzT
 
-    initchezz  horseData,0,1,14,chezzP,chezzT
-    initchezz  horseData,0,6,14,chezzP,chezzT
+    initchezz  horseData,0,1,14h,chezzP,chezzT
+    initchezz  horseData,0,6,14h,chezzP,chezzT
     
-    initchezz  bishopData,0,2,13,chezzP,chezzT
-    initchezz  bishopData,0,5,13,chezzP,chezzT
+    initchezz  bishopData,0,2,13h,chezzP,chezzT
+    initchezz  bishopData,0,5,13h,chezzP,chezzT
     
-    initchezz  queenData,0,3,11,chezzP,chezzT
+    initchezz  queenData,0,3,11h,chezzP,chezzT
     
-    initchezz  kingData,0,4,10,chezzP,chezzT
+    initchezz  kingData,0,4,10h,chezzP,chezzT
     
-    initchezz  soliderData,1,0,15,chezzP,chezzT
-    initchezz  soliderData,1,1,15,chezzP,chezzT
-    initchezz  soliderData,1,2,15,chezzP,chezzT
-    initchezz  soliderData,1,3,15,chezzP,chezzT
-    initchezz  soliderData,1,4,15,chezzP,chezzT
-    initchezz  soliderData,1,5,15,chezzP,chezzT
-    initchezz  soliderData,1,6,15,chezzP,chezzT
-    initchezz  soliderData,1,7,15,chezzP,chezzT
+    initchezz  soliderData,1,0,15h,chezzP,chezzT
+    initchezz  soliderData,1,1,15h,chezzP,chezzT
+    initchezz  soliderData,1,2,15h,chezzP,chezzT
+    initchezz  soliderData,1,3,15h,chezzP,chezzT
+    initchezz  soliderData,1,4,15h,chezzP,chezzT
+    initchezz  soliderData,1,5,15h,chezzP,chezzT
+    initchezz  soliderData,1,6,15h,chezzP,chezzT
+    initchezz  soliderData,1,7,15h,chezzP,chezzT
 
 
 
-    initchezz  rookData,7,0,02,chezzP,chezzT
-    initchezz  rookData,7,7,02,chezzP,chezzT
+    initchezz  rookData,7,0,02h,chezzP,chezzT
+    initchezz  rookData,7,7,02h,chezzP,chezzT
 
-    initchezz  horseData,7,1,04,chezzP,chezzT
-    initchezz  horseData,7,6,04,chezzP,chezzT
+    initchezz  horseData,7,1,04h,chezzP,chezzT
+    initchezz  horseData,7,6,04h,chezzP,chezzT
 
-    initchezz  bishopData,7,2,03,chezzP,chezzT
-    initchezz  bishopData,7,5,03,chezzP,chezzT
+    initchezz  bishopData,7,2,03h,chezzP,chezzT
+    initchezz  bishopData,7,5,03h,chezzP,chezzT
 
-    initchezz  queenData,7,3,01,chezzP,chezzT
+    initchezz  queenData,7,3,01h,chezzP,chezzT
 
-    initchezz  kingData,7,4,00,chezzP,chezzT
+    initchezz  kingData,7,4,00h,chezzP,chezzT
 
-    initchezz  soliderData,6,0,05,chezzP,chezzT
-    initchezz  soliderData,6,1,05,chezzP,chezzT
-    initchezz  soliderData,6,2,05,chezzP,chezzT
-    initchezz  soliderData,6,3,05,chezzP,chezzT
-    initchezz  soliderData,6,4,05,chezzP,chezzT
+    initchezz  soliderData,6,0,05h,chezzP,chezzT
+    initchezz  soliderData,6,1,05h,chezzP,chezzT
+    initchezz  soliderData,6,2,05h,chezzP,chezzT
+    initchezz  soliderData,6,3,05h,chezzP,chezzT
+    initchezz  soliderData,6,4,05h,chezzP,chezzT
     initchezz  soliderData,6,5,05,chezzP,chezzT
-    initchezz  soliderData,6,6,05,chezzP,chezzT
-    initchezz  soliderData,6,7,05,chezzP,chezzT
+    initchezz  soliderData,6,6,05h,chezzP,chezzT
+    initchezz  soliderData,6,7,05h,chezzP,chezzT
 
 
 
@@ -173,29 +205,64 @@ MAIN PROC FAR
     DrawPieceDB  0EH,0EH,[si],0,0,0h,row,col,begr,begc,endr,endc,res
 
     ;deletechezzD 0,2,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
-    right:
+
+    ;Q means the user wants to select
+     Q:
     MOV AH , 0
     INT 16h
    
-    cmp ah,4Dh  ;right condition
+    cmp ah,10h  ;right condition
+    JE doQ
+    jmp far ptr right
+    doQ:
+
+   
+
+
+    cmp selected,0
+    jne movepiece1
+    jmp far ptr choosepiece1 
+    movepiece1:
+
+;calling function to move a piece
+
+    movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+
+    jmp far ptr validate
+    choosepiece1:
+
+;calling function to choose a piece
+    mov success,0 
+    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,playertpye,moveavailc,takeavailc,prevR,prevC,success
+
+    cmp success,0
+    je suc
+    mov selected,1
+    suc:
+    jmp validate
+
+    ;///////////////////////////////////////////////////////
+    right:
+   
+    cmp ah,20h  ;right condition
     JNE left
     inc col
     jmp validate
     
     left:
-    cmp ah,04BH  ;left condition
+    cmp ah,01EH  ;left condition
     JNE up
     dec col
     jmp validate
 
     up:
-    cmp ah,048H  ;up condition
+    cmp ah,011H  ;up condition
     JNE down
     dec row
     jmp validate
 
     down:
-    cmp ah,50H   ;down condition
+    cmp ah,1FH   ;down condition
     JNE validate
     inc row
     validate:
@@ -218,18 +285,30 @@ MAIN PROC FAR
     int 21h 
     mov ax,prevR
     mov bx,prevC
+
+
+
     mov row,ax
     mov col,bx
     
     draw:
     mov bx,0
     mov bl,[di]
+
+    shr bl,1
+    shr bl,1
+    shr bl,1
+    shr bl,1
+    ;we are moving the color bit to the lsb
+
     cmp bl,1
     JE BlackP
     jmp far ptr whiteP
     blackP:DrawPieceDB  PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
     jmp contDr
     whiteP:DrawPieceDB  PrimaryC,SecondaryC,[si],0,0,0Fh,prevR,prevC,begr,begc,endr,endc,res
+    
+    ;PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
     
     contDr:
     mov ax,row
@@ -251,13 +330,20 @@ MAIN PROC FAR
     
     mov bx,0
     mov bl,[di]
+
+    shr bl,1
+    shr bl,1
+    shr bl,1
+    shr bl,1
+    ;we are moving the color bit to the lsb
+
     cmp bl,1
     JE Black
     jmp far ptr white
     Black:DrawPieceDB  0EH,0EH,[si],0,0,0h,row,col,begr,begc,endr,endc,res
-    jmp right
+    jmp Q
     white:DrawPieceDB  0EH,0EH,[si],0,0,0Fh,row,col,begr,begc,endr,endc,res
-    jmp right
+    jmp Q
 
     ;Press any key to exit
     returntoconsole
