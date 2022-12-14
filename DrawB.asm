@@ -49,6 +49,8 @@ pieceh EQU 25
 PrimaryC DB 7h
 SecondaryC DB 08h
 
+tmpdb db ?
+
 moveavailc DB 0Ah
 takeavailc db 4h 
 
@@ -209,9 +211,10 @@ MAIN PROC FAR
 
     ;deletechezzD 0,2,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
 
+; /**************************************************/
     ;Q means the user wants to select
      Q:
-    MOV AH,1;every time looping we check here whether a key was selected or not
+    MOV AH,0;every time looping we check here whether a key was selected or not
     INT 16h
     push ax
     jz noflush
@@ -326,9 +329,18 @@ MAIN PROC FAR
     cmp bl,1
     JE BlackP
     jmp far ptr whiteP
-    blackP:DrawPieceDB  PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+    mov bx,0
+    blackP:
+     getdb prevR,prevC
+     mov al,chezzC[bx]
+     mov tmpdb,al
+    DrawPieceDB  tmpdb,tmpdb,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
     jmp contDr
-    whiteP:DrawPieceDB  PrimaryC,SecondaryC,[si],0,0,0Fh,prevR,prevC,begr,begc,endr,endc,res
+    whiteP:
+     getdb prevR,prevC
+     mov al,chezzC[bx]
+     mov tmpdb,al
+    DrawPieceDB  tmpdb,tmpdb,[si],0,0,0Fh,prevR,prevC,begr,begc,endr,endc,res
     
     ;PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
     
