@@ -492,6 +492,6 @@ DrawPieceDB MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col
     ;************end drawing the pixels
     exit:popa
 ENDM DrawPieceDB
-initchezzC 
+;initchezzC 
 
-ENDM
+;ENDM
