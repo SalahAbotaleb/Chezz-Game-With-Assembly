@@ -98,42 +98,69 @@ MAIN PROC FAR
     DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,6,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,7,begr,begc,endr,endc,res
 
-    ;1 for black 
-    ;0 for white
-    
-	initchezz  rookData,0,0,1,chezzP,chezzT
-    initchezz  rookData,0,7,1,chezzP,chezzT
-    initchezz  horseData,0,1,1,chezzP,chezzT
-    initchezz  horseData,0,6,1,chezzP,chezzT
-    initchezz  bishopData,0,2,1,chezzP,chezzT
-    initchezz  bishopData,0,5,1,chezzP,chezzT
-    initchezz  queenData,0,3,1,chezzP,chezzT
-    initchezz  kingData,0,4,1,chezzP,chezzT
-    initchezz  soliderData,1,0,1,chezzP,chezzT
-    initchezz  soliderData,1,1,1,chezzP,chezzT
-    initchezz  soliderData,1,2,1,chezzP,chezzT
-    initchezz  soliderData,1,3,1,chezzP,chezzT
-    initchezz  soliderData,1,4,1,chezzP,chezzT
-    initchezz  soliderData,1,5,1,chezzP,chezzT
-    initchezz  soliderData,1,6,1,chezzP,chezzT
-    initchezz  soliderData,1,7,1,chezzP,chezzT
+    ;1x for black 
+    ;0x for white
+    ;0 for king
+    ;1 for queen
+    ;2 for rook
+    ;3 for bishop
+    ;4 for horse
+    ;5 for solider/pawn
+    ;    | 0         | 1          | 2         | 3          | 4         | 5         |
+    ;------------------------------------------------
+    ; 0  |white king|white queen |white  rook |white bishop|white horse|white  pawn|
+    ; 1  |black king|black queen |black  rook |black bishop|black horse|black  pawn|
 
-    initchezz  rookData,7,0,0,chezzP,chezzT
-    initchezz  rookData,7,7,0,chezzP,chezzT
-    initchezz  horseData,7,1,0,chezzP,chezzT
-    initchezz  horseData,7,6,0,chezzP,chezzT
-    initchezz  bishopData,7,2,0,chezzP,chezzT
-    initchezz  bishopData,7,5,0,chezzP,chezzT
-    initchezz  queenData,7,3,0,chezzP,chezzT
-    initchezz  kingData,7,4,0,chezzP,chezzT
-    initchezz  soliderData,6,0,0,chezzP,chezzT
-    initchezz  soliderData,6,1,0,chezzP,chezzT
-    initchezz  soliderData,6,2,0,chezzP,chezzT
-    initchezz  soliderData,6,3,0,chezzP,chezzT
-    initchezz  soliderData,6,4,0,chezzP,chezzT
-    initchezz  soliderData,6,5,0,chezzP,chezzT
-    initchezz  soliderData,6,6,0,chezzP,chezzT
-    initchezz  soliderData,6,7,0,chezzP,chezzT
+    ;pic,row,col,t,chezzP,chezzT
+
+    
+	initchezz  rookData,0,0,12,chezzP,chezzT
+    initchezz  rookData,0,7,12,chezzP,chezzT
+
+    initchezz  horseData,0,1,14,chezzP,chezzT
+    initchezz  horseData,0,6,14,chezzP,chezzT
+    
+    initchezz  bishopData,0,2,13,chezzP,chezzT
+    initchezz  bishopData,0,5,13,chezzP,chezzT
+    
+    initchezz  queenData,0,3,11,chezzP,chezzT
+    
+    initchezz  kingData,0,4,10,chezzP,chezzT
+    
+    initchezz  soliderData,1,0,15,chezzP,chezzT
+    initchezz  soliderData,1,1,15,chezzP,chezzT
+    initchezz  soliderData,1,2,15,chezzP,chezzT
+    initchezz  soliderData,1,3,15,chezzP,chezzT
+    initchezz  soliderData,1,4,15,chezzP,chezzT
+    initchezz  soliderData,1,5,15,chezzP,chezzT
+    initchezz  soliderData,1,6,15,chezzP,chezzT
+    initchezz  soliderData,1,7,15,chezzP,chezzT
+
+
+
+    initchezz  rookData,7,0,02,chezzP,chezzT
+    initchezz  rookData,7,7,02,chezzP,chezzT
+
+    initchezz  horseData,7,1,04,chezzP,chezzT
+    initchezz  horseData,7,6,04,chezzP,chezzT
+
+    initchezz  bishopData,7,2,03,chezzP,chezzT
+    initchezz  bishopData,7,5,03,chezzP,chezzT
+
+    initchezz  queenData,7,3,01,chezzP,chezzT
+
+    initchezz  kingData,7,4,00,chezzP,chezzT
+
+    initchezz  soliderData,6,0,05,chezzP,chezzT
+    initchezz  soliderData,6,1,05,chezzP,chezzT
+    initchezz  soliderData,6,2,05,chezzP,chezzT
+    initchezz  soliderData,6,3,05,chezzP,chezzT
+    initchezz  soliderData,6,4,05,chezzP,chezzT
+    initchezz  soliderData,6,5,05,chezzP,chezzT
+    initchezz  soliderData,6,6,05,chezzP,chezzT
+    initchezz  soliderData,6,7,05,chezzP,chezzT
+
+
 
     mov row,0
     mov col,0
