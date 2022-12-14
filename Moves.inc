@@ -4,7 +4,7 @@ movepiece MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,playertpye,row,col,b
     
 ENDM movepiece
 
-choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,playertpye,moveavailc,takeavailc,prevR,prevC,success
+choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success
     local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
@@ -169,3 +169,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,playertpye,moveavailc,takeav
 
     leave:
 ENDM choosepiece
+
+HighRook MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success
+
+ENDM HighRook
