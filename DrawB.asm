@@ -79,6 +79,7 @@ chezzT DB 64 dup(-1)
 
 ;///////////////////////////////////////////
 playertpye DB 0 ;0 for white 1 for Black
+;probably serial port
 ;you need to set player type
 selected DB 0
 
@@ -208,7 +209,7 @@ MAIN PROC FAR
 
     ;Q means the user wants to select
      Q:
-    MOV AH , 0
+    MOV AH,1;salah shoof el heta deh
     INT 16h
    
     cmp ah,10h  ;right condition

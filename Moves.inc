@@ -39,9 +39,9 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,playertpye,moveavailc,takeav
     jmp far ptr leave
     Q1:
     ;check if player is white ;kinda racist
-    cmp playertpye,0
+    cmp playertpye,0;probably serial port
     JE whiteQ
-    jmp blackQ
+    jmp far ptr blackQ
     whiteQ:
     ;white player
     ;check if piece is white
