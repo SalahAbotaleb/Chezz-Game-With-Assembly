@@ -175,7 +175,79 @@ HighRook MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,ta
 ENDM HighRook
 
 
+Highbishop MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,urow,drow,rcol,lcol,success
+    local blackbishop,blockW,highlight,terminate
 
+    ;cmp playertpye,0
+    ;JnE blackbishop
+    mov ax,row
+    mov urow,ax
+    mov cx,row
+    mov drow,cx
+    mov bx,Col
+    mov rcol,bx
+    mov dx,col
+    mov lcol,dx
+
+
+    highlight:
+    pusha
+    inc urow
+    mov ax,urow
+    cmp ax,8h
+    JAE terminate
+    dec drow
+    mov cx,drow
+    cmp cx,0h
+    JB terminate
+    inc rcol
+    mov bx,rcol
+    cmp bx,8h
+    JAE terminate
+    dec lcol
+    mov dx,lcol
+    cmp dx,0h
+    JB terminate
+    popa
+    
+
+    lea si,chezzP
+    lea di,chezzT
+    mov ax,8h
+    mul bl
+    add ax,col
+    add di,ax
+    add ax,ax
+    add si,ax
+    mov ax,[di]
+
+    cmp ax,-1
+    JnE blockW
+    mov ax,moveavailc
+    mov bx,8
+    mul bl
+    add ax,col
+    mov [ax],1
+    jmp highlight
+
+    blockW:
+
+
+
+
+
+
+
+
+
+
+ 
+  
+    block:
+    terminate:
+  
+
+ENDM Highbishop
 
 
 
