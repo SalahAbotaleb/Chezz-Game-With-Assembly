@@ -533,3 +533,26 @@ cmp cx,8
 jnz redo
 popa
 ENDM initchezzC
+
+getdb MACRO row,col
+push ax
+;places in bx the offset in the array
+    mov al,8
+    mov bx,row
+    mul bl
+    add ax,col
+    mov bx,ax
+pop ax 
+ENDM getdb
+
+getdW MACRO row,col
+push ax
+;places in bx the offset in the array
+    mov al,8
+    mov bx,row
+    mul bl
+    add ax,col
+    add ax,ax
+    mov bx,ax
+pop ax 
+ENDM getdW
