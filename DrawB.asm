@@ -209,7 +209,7 @@ MAIN PROC FAR
 
     ;Q means the user wants to select
      Q:
-    MOV AH,1;salah shoof el heta deh
+    MOV AH,1;every time looping we check here whether a key was selected or not
     INT 16h
    
     cmp ah,10h  ;right condition
@@ -227,14 +227,14 @@ MAIN PROC FAR
 
 ;calling function to move a piece
 
-    movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+    ;movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
 
     jmp far ptr validate
     choosepiece1:
 
 ;calling function to choose a piece
     mov success,0 
-    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,playertpye,moveavailc,takeavailc,prevR,prevC,success
+    ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,playertpye,moveavailc,takeavailc,prevR,prevC,success
 
     cmp success,0
     je suc
@@ -264,8 +264,9 @@ MAIN PROC FAR
 
     down:
     cmp ah,1FH   ;down condition
-    JNE validate
+    JNE Q ;if no key is pressed here we go to the beggining of the loop again
     inc row
+
     validate:
     mov ax,row
     mov bx,col
@@ -293,6 +294,15 @@ MAIN PROC FAR
     mov col,bx
     
     draw:
+    mov ax,row
+    mov bx,col
+    cmp prevR,ax
+    jne nredraw ;no redraw if the user still on same cell
+    cmp prevC,bx
+    jne nredraw
+    jmp far ptr Q
+
+    nredraw:
     mov bx,0
     mov bl,[di]
 
@@ -342,9 +352,9 @@ MAIN PROC FAR
     JE Black
     jmp far ptr white
     Black:DrawPieceDB  0EH,0EH,[si],0,0,0h,row,col,begr,begc,endr,endc,res
-    jmp Q
+    jmp far ptr Q
     white:DrawPieceDB  0EH,0EH,[si],0,0,0Fh,row,col,begr,begc,endr,endc,res
-    jmp Q
+    jmp far ptr Q
 
     ;Press any key to exit
     returntoconsole
