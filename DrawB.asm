@@ -76,6 +76,7 @@ errormsg db 'canot laod image file$'
 
 chezzP DW 64 dup(-1)
 chezzT DB 64 dup(-1)
+chezzC DB 64 dup(-1)
 
 ;///////////////////////////////////////////
 playertpye DB 0 ;0 for white 1 for Black
@@ -233,14 +234,14 @@ MAIN PROC FAR
 
 ;calling function to move a piece
 
-    ;movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+    movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
 
     jmp far ptr validate
     choosepiece1:
 
 ;calling function to choose a piece
     mov success,0 
-    ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,playertpye,moveavailc,takeavailc,prevR,prevC,success
+    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success
 
     cmp success,0
     je suc
