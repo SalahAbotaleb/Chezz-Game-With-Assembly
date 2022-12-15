@@ -345,6 +345,12 @@ MAIN PROC FAR
         kill 6,4
 
         initchezz  horseData,4,2,14h,chezzP,chezzT
+        ;number,row,col,numcolor,backc
+        drawtim  1,5,0,0bh,PrimaryC;not this is not primary color but rather the color of the background
+      
+        drawtim  3,0,5,0bh,PrimaryC
+        drawtim  2,0,6,0bh,PrimaryC
+        drawtim  1,0,4,0bh,PrimaryC
     ; drawSelf 4,4
 	; drawup 4,4,10
     ; Drawdown 4,4,10
@@ -424,7 +430,7 @@ MAIN PROC FAR
 
     ;calling function to choose a piece
     mov success,0 
-    
+    ;uncomment this line to make the game playable
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
     selectp row,col
     cmp success,0
