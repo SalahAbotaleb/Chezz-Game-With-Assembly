@@ -349,7 +349,7 @@ popa
 ENDM deletechezz
 
 deletechezzD MACRO r,c,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
-local sec,con,
+local sec,con
 ;-1 means empty location
 pusha
 lea si,chezzP
@@ -395,7 +395,7 @@ popa
 ENDM deletechezzD
 
 
-DrawPieceDB MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
+DrawPieceDB MACRO PrimaryC,SecondaryC,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
     local drawLoop,noerror,lblprim,lblsec,filter,contin,Nempty,exit,sec,con
     ;primaryC is primary Color for the board which is at top left coener 
     ;secondaryC is secondart color next to first square 
@@ -448,7 +448,8 @@ DrawPieceDB MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col
     
     mov res,cl
 
-    mov ax,[si]
+    getdw row,col
+    mov ax,chezzP[bx]
     cmp ax,-1
     JNZ Nempty
     mov ax,0
@@ -463,7 +464,9 @@ DrawPieceDB MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col
     jmp exit
     
     Nempty:
-    mov BX , dataloc ; BL contains index at the current drawn pixel
+    getdw row,col
+    mov bx,chezzP[bx]
+    ;mov BX , dataloc ; BL contains index at the current drawn pixel
     MOV CX,begc
     MOV DX,begr
     MOV AH,0ch

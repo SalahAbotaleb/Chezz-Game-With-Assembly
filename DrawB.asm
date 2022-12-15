@@ -98,7 +98,7 @@ playertpye DB 0 ;0 for white 1 for Black
 success DB 0 ;0 for fail 1 for success
 
 ;///////////////////////////////////////////
-head DB 0
+head DW 0
 storage DB 64 dup(-1)
 
 
@@ -110,7 +110,6 @@ MAIN PROC FAR
     MOV AH, 0
     MOV AL, 13h
     INT 10h
-    deselect
 	DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
 	DrawPiece  PrimaryC,SecondaryC,RookFilename,filehandle,rookData,0,0,0h,0,0,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0h,0,7,begr,begc,endr,endc,res
@@ -159,11 +158,8 @@ MAIN PROC FAR
     ;------------------------------------------------
     ; 0  |white king|white queen |white  rook |white bishop|white horse|white  pawn|
     ; 1  |black king|black queen |black  rook |black bishop|black horse|black  pawn|
-
     ;pic,row,col,t,chezzP,chezzT
-
     initchezzC PrimaryC,SecondaryC,chezzC,res
-	
     initchezz  rookData,0,0,12h,chezzP,chezzT
     initchezz  rookData,0,7,12h,chezzP,chezzT
 
@@ -210,6 +206,32 @@ MAIN PROC FAR
     initchezz  soliderData,6,6,05h,chezzP,chezzT
     initchezz  soliderData,6,7,05h,chezzP,chezzT
 
+    
+    ;/******************test area***************************/
+   
+	
+    getdb  1,0
+    mov chezzC[bx],9
+    mov al,chezzC[bx]
+    mov tmpdb,al
+    getdW 1,0
+    DrawPieceDB  9,9,0,0,0h,1,0,begr,begc,endr,endc,res
+
+    getdb  2,0
+    mov chezzC[bx],9
+    mov al,chezzC[bx]
+    mov tmpdb,al
+    getdw  2,0
+    DrawPieceDB  9,9,0,0,0h,2,0,begr,begc,endr,endc,res
+
+    getdb  3,0
+    mov chezzC[bx],9
+    mov al,chezzC[bx]
+    mov tmpdb,al
+    getdw  3,0
+    DrawPieceDB  9,9,0,0,0h,3,0,begr,begc,endr,endc,res
+    
+    ;/******************end of test area***************************/
 
     mov row,0
     mov col,0
@@ -219,7 +241,7 @@ MAIN PROC FAR
     
     lea si,chezzP
     lea di,chezzT
-    DrawPieceDB  0EH,0EH,[si],0,0,0h,row,col,begr,begc,endr,endc,res
+    DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
 
     ;deletechezzD 0,2,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
 
@@ -345,13 +367,13 @@ MAIN PROC FAR
      getdb prevR,prevC
      mov al,chezzC[bx]
      mov tmpdb,al
-    DrawPieceDB  tmpdb,tmpdb,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+    DrawPieceDB  tmpdb,tmpdb,0,0,0h,prevR,prevC,begr,begc,endr,endc,res
     jmp contDr
     whiteP:
      getdb prevR,prevC
      mov al,chezzC[bx]
      mov tmpdb,al
-    DrawPieceDB  tmpdb,tmpdb,[si],0,0,0Fh,prevR,prevC,begr,begc,endr,endc,res
+    DrawPieceDB  tmpdb,tmpdb,0,0,0Fh,prevR,prevC,begr,begc,endr,endc,res
     
     ;PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
     
@@ -385,9 +407,9 @@ MAIN PROC FAR
     cmp bl,1
     JE Black
     jmp far ptr white
-    Black:DrawPieceDB  0EH,0EH,[si],0,0,0h,row,col,begr,begc,endr,endc,res
+    Black:DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
     jmp far ptr Q
-    white:DrawPieceDB  0EH,0EH,[si],0,0,0Fh,row,col,begr,begc,endr,endc,res
+    white:DrawPieceDB  0EH,0EH,0,0,0Fh,row,col,begr,begc,endr,endc,res
     jmp far ptr Q
 
     ;Press any key to exit
