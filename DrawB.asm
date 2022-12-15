@@ -120,6 +120,7 @@ MAIN PROC FAR
     MOV AH, 0
     MOV AL, 13h
     INT 10h
+
 	DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
 	DrawPiece  PrimaryC,SecondaryC,RookFilename,filehandle,rookData,0,0,0h,0,0,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0h,0,7,begr,begc,endr,endc,res
@@ -193,7 +194,7 @@ MAIN PROC FAR
     initchezz  soliderData,1,6,15h,chezzP,chezzT
     initchezz  soliderData,1,7,15h,chezzP,chezzT
 
-
+    ;/****************************************************************************************/
 
     initchezz  rookData,7,0,02h,chezzP,chezzT
     initchezz  rookData,7,7,02h,chezzP,chezzT
@@ -293,13 +294,14 @@ MAIN PROC FAR
     movepiece1:
 
 ;calling function to move a piece
-    movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+    ;movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
     deselectp
     jmp far ptr validate
     choosepiece1:
 
     ;calling function to choose a piece
     mov success,0 
+    
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
     selectp row,col
     cmp success,0
