@@ -690,6 +690,10 @@ exit:
 popa
 ENDM Drawup
 
+
+;/**************************************************************************/
+
+
 Drawdown MACRO row,col,steps
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
 ;steps is max number
@@ -887,6 +891,9 @@ jmp far ptr lop
 exit:
 popa
 ENDM Drawright
+
+;/************************************************************/
+
 
 Drawleft MACRO row,col,steps
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
