@@ -99,7 +99,7 @@ chezzN DB 64 dup(-1) ;numbering of each piece
 Timer  DB 32 dup(-1)
 
 ;///////////////////////////////////////////
-playertpye DB 1 ;0 for white 1 for Black
+playertpye DB 0 ;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -340,7 +340,7 @@ MAIN PROC FAR
 
     
     ;/******************test area***************************/
-        replace 6,6,5,4
+        replace 6,7,5,4
         initchezz  bishopData,3,4,03h,chezzP,chezzT
         kill 6,4
 
