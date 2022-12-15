@@ -262,7 +262,7 @@ ENDM Highbishop
 
 ;dont compare memory locations
 Highpawn MACRO row,col,playertpye,success
-    local continuemove,exit,white,black,whitefirstmove,blackfirstmove,whitenotfirstmove,blacknotfirstmove,noenemyonleftup,noenemyonrightup,enemyonleftup,enemyonrightup,whsip1,whskip2,cnowhite
+    local exit,white,black,whitefirstmove,blackfirstmove,whitenotfirstmove,blacknotfirstmove,noenemyonleftup,noenemyonrightup,enemyonleftup,enemyonrightup,whsip1,whskip2,cnowhite,dofrblock,dosecmove,dosecmove2
    
     mov success,1
     drawSelf row,col
@@ -279,8 +279,8 @@ Highpawn MACRO row,col,playertpye,success
     mov tmpr,ax
     mov tmpc,cx
     getdb tmpr,tmpc
-    mov dx,chezzT[bx]
-    cmp dx,-1
+    mov dl,chezzT[bx]
+    cmp dl,-1
     jne enemyonleftup
     jmp far ptr noenemyonleftup
     enemyonleftup:
@@ -288,31 +288,71 @@ Highpawn MACRO row,col,playertpye,success
     DrawLUD row,col,1h
 
     noenemyonleftup:
+    mov ax,row
+    mov cx,col
     dec ax
     inc cx
     mov tmpr,ax
     mov tmpc,cx
     getdb tmpr,tmpc
-    mov dx,chezzT[bx]
-    cmp dx,-1
+    mov dl,chezzT[bx]
+    cmp dl,-1
     jne enemyonrighttup
     jmp far ptr noenemyonrighttup
     enemyonrighttup:
+    
     DrawRUD row,col,1
     noenemyonrighttup:
     ;end takes
+    ;start of first block move for white
+    mov ax,row
     cmp ax,6h
     je whitefirstmove
     jmp far ptr whitenotfirstmove
     whitefirstmove:
     ;this is the first move for this pawn
+    mov ax,row
+    dec ax
+    dec ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dosecmove
+    jmp far ptr whitenotfirstmove
+    dosecmove:
+    
+    mov ax,row
+    dec ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dosecmove2
+    jmp far ptr exit
+    dosecmove2:
+    drawup row,col,2
 
 
     whitenotfirstmove:
+    mov ax,row
+    dec ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dofrblock
+    jmp far ptr whitenotfirstmove
+    dofrblock:
+    drawup row,col,1
     ;this is not first move for this pawn
-
+    drawup row,col,1
     jmp white
     black:
+
+
+
+
 
 
 
