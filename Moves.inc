@@ -180,7 +180,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     jmp far ptr wnpawnQ
     wpawn:
     
-    ;Highpawn row,col,playertpye,success
+    Highpawn row,col,playertpye,success
      
     jmp far ptr leave
     wnpawnQ:
