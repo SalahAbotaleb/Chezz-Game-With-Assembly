@@ -313,8 +313,13 @@ Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,ta
     push bx
     mov bx,row
     sub bx,1
-
-    DrawPieceDB moveavailc,moveavailc,[si],0,0,0fh,bx,col,begr,begc,endr,endc,res 
+    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
+    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
+    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
+    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
+    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
+    DrawPieceDB moveavailc,moveavailc,0,0,0,0fh,bx,col,begr,begc,endr,endc,res
+    ;there is here a problem must send [si] for current location to draw 
     pop bx
 
     mov ax,row
@@ -355,3 +360,66 @@ Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,ta
     blackpawn:
 
 ENDM Highpawn
+selcectp MACRO r,c
+mov dx,r
+mov selectedr,r
+mov dx,c
+mov selectedc,c
+mov selected,1
+ENDM selectp
+
+deselect MACRO
+local lbl
+pusha
+;this function deselect a selected piece and removes highlights of squares
+mov selectedr,-1
+mov selectedc,-1
+mov selected,0
+
+lbl:
+mov bx,0
+;/**recoloring highlighted cells and redrawing**/
+lea si,chezzC
+mov cx,0
+mov dx,0
+;cx is pointing to row 
+;dx is pointing to colomn
+
+redo:
+mov res,0
+mov ax,cx
+mov bx,2
+div bl
+xor res,ah
+mov ax,dx
+mov bx,2
+div bl
+xor res,ah
+cmp res,0
+jnz sec 
+mov bx,0
+mov bl,PrimaryC
+mov [si],bl
+jmp con
+sec:
+mov bx,0
+mov bl,SecondaryC
+mov [si],bl
+con:
+inc si
+inc dx
+cmp dx,8
+jne redo
+mov dx,0
+inc cx
+cmp cx,8
+jnz redo
+
+;/**end of recoloring and redrawing**/
+inc bx
+cmp bl,head
+jne lbl
+
+mov head,0
+popa
+ENDM deselect
