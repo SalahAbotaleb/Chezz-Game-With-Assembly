@@ -1476,6 +1476,22 @@ mov chezzP[BX],-1
     sec:mov al,SecondaryC
     mov chezzC[BX],al
     con:mov res,al
-    Drawsquare c,r,begr,begc,res
+    Drawsquare c,r,begr,begc,res ;to be removed
 popa
 ENDM kill
+
+replace MACRO oldr,oldc,newr,newc
+local sec,con
+;-1 means empty location
+pusha
+
+getdb newr,newc
+mov al,chezzT[BX]
+mov nexttype,al
+dec nexttype
+and nexttype,0Fh
+
+Drawsquare oldr,oldc,begr,begc,res ;removing the old square
+DrawPieceDB  PrimaryC,SecondaryC,0,0,nexttype,newr,newc,begr,begc,endr,endc,res ;drawing the piece at the new location
+popa
+ENDM replace

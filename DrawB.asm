@@ -1,11 +1,10 @@
 include mymacros.inc
 include DrawingM.inc
 include Moves.inc
+.Model MEDIUM
 .286
-.Model Small
 .Stack 64
 .Data
-
 
 boardWidth EQU 200
 boardHeight EQU 200
@@ -111,6 +110,11 @@ success DB 0 ;0 for fail 1 for success
 head DW 0
 storage DB 64 dup(-1)
 
+;/******DRAW PIECE FUNCTION WRAPPER********/
+
+
+
+;/*****************************************/
 
 ;///////////////////////////////////////////
 .Code
@@ -220,6 +224,7 @@ MAIN PROC FAR
 
     
     ;/******************test area***************************/
+        replace 6,6,5,4
         initchezz  bishopData,4,4,03h,chezzP,chezzT
         kill 6,4
     ; drawSelf 4,4
