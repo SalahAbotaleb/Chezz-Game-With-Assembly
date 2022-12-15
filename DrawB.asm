@@ -99,7 +99,7 @@ chezzN DB 64 dup(-1) ;numbering of each piece
 Timer  DB 32 dup(-1)
 
 ;///////////////////////////////////////////
-playertpye DB 0 ;0 for white 1 for Black
+playertpye DB 1 ;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -344,7 +344,7 @@ MAIN PROC FAR
         initchezz  bishopData,3,4,03h,chezzP,chezzT
         kill 6,4
 
-        initchezz  horseData,3,3,04h,chezzP,chezzT
+        initchezz  horseData,4,1,14h,chezzP,chezzT
     ; drawSelf 4,4
 	; drawup 4,4,10
     ; Drawdown 4,4,10
