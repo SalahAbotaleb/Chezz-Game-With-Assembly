@@ -22,6 +22,9 @@ tmpy DW 0
 row DW 0
 col DW 0
 
+killW DB 0
+killB DB 0
+
 prevR DW 0
 prevC DW 0
 
@@ -93,7 +96,6 @@ errormsg db 'canot laod image file$'
 chezzP DW 64 dup(-1)
 chezzT DB 64 dup(-1)
 chezzC DB 64 dup(-1)
-
 ;///////////////////////////////////////////
 playertpye DB 0 ;0 for white 1 for Black
 ;probably serial port
@@ -213,15 +215,15 @@ MAIN PROC FAR
 
     
     ;/******************test area***************************/
-    drawSelf 4,4
-	drawup 4,4,10
-    Drawdown 4,4,10
-    Drawleft 4,4,10
-    Drawright 4,4,10
-    DrawRDD 4,4,10
-    DrawLDD 4,4,10
-    DrawLUD 4,4,10
-    DrawRUD 4,4,10
+    ; drawSelf 4,4
+	; drawup 4,4,10
+    ; Drawdown 4,4,10
+    ; Drawleft 4,4,10
+    ; Drawright 4,4,10
+    ; DrawRDD 4,4,10
+    ; DrawLDD 4,4,10
+    ; DrawLUD 4,4,10
+    ; DrawRUD 4,4,10
 
     initchezz  soliderData,4,4,05h,chezzP,chezzT
     ; getdb  1,0
@@ -285,14 +287,13 @@ MAIN PROC FAR
     movepiece1:
 
 ;calling function to move a piece
-    ;movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+    movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
     deselectp
     jmp far ptr validate
     choosepiece1:
 
     ;calling function to choose a piece
     mov success,0 
-    
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
     selectp row,col
     cmp success,0
