@@ -365,7 +365,7 @@ ENDM Highpawn
 
 ;/**************************************************************************/
 
-selcectp MACRO r,c
+selectp MACRO r,c
 mov dx,r
 mov selectedr,dx
 mov dx,c
@@ -376,13 +376,17 @@ ENDM selectp
 ;/**************************************************************************/
 
 deselectp MACRO
-local lbl,sec,con,exit,white,black,cont1
+local lbl,sec,con,exit,white,black,cont1,resume
 pusha
 ;this function deselect a selected piece and removes highlights of squares
 mov selectedr,-1
 mov selectedc,-1
 mov selected,0
 
+cmp head,0
+jne resume
+jmp far ptr exit
+resume:
 mov di,0
 ;/**recoloring highlighted cells and redrawing**/
 
