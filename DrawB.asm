@@ -341,8 +341,10 @@ MAIN PROC FAR
     
     ;/******************test area***************************/
         replace 6,6,5,4
-        initchezz  bishopData,4,4,03h,chezzP,chezzT
+        initchezz  bishopData,3,4,03h,chezzP,chezzT
         kill 6,4
+
+        initchezz  horseData,3,3,04h,chezzP,chezzT
     ; drawSelf 4,4
 	; drawup 4,4,10
     ; Drawdown 4,4,10

@@ -125,7 +125,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     jmp far ptr wnkingQ
     wking:
     ;TODO call king function
-
+    HighKing row,col
     jmp far ptr leave
     wnkingQ:
     ;check if piece is queen
@@ -170,11 +170,10 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     wknight:
    
     ;TODO call knight function
-   
+    HighKnight row,col
     jmp far ptr leave
     wnknightQ:
     ;check if piece is pawn
-
     cmp ax,5
     JE wpawn
     jmp far ptr wnpawnQ
@@ -202,7 +201,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     bking:
 
     ;TODO call king function
-
+    HighKing row,col
     jmp far ptr leave
     bnkingQ:
     ;check if piece is queen
@@ -249,11 +248,10 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     bknight:
 
     ;TODO call knight function
-
+    HighKnight row,col
     jmp far ptr leave
     bnknightQ:
     ;check if piece is pawn
-    
     cmp ax,5
     JE bpawn
     jmp far ptr bnpawnQ
@@ -271,6 +269,22 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
 ENDM choosepiece
 
 ;/**************************************************************************/
+
+HighKing MACRO row,col
+
+drawSelf row,col
+Drawup row,col,1
+Drawdown row,col,1
+Drawleft row,col,1
+Drawright row,col,1
+DrawLDD row,col,1
+DrawRUD row,col,1
+DrawLUD row,col,1
+DrawRDD row,col,1
+
+;castling ?
+
+ENDM HighKing
 
 HighQueen MACRO row,col,steps
 
@@ -315,6 +329,13 @@ ENDM HighBishop
 
 ;/**************************************************************************/
 
+HighKnight MACRO row,col
+
+DrawKnight row,col
+
+
+
+ENDM HighKnight
 
 ;dont compare memory locations
 Highpawn MACRO row,col,playertpye,success
