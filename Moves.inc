@@ -180,6 +180,9 @@ HighRook MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,ta
 ENDM HighRook
 
 
+;/**************************************************************************/
+
+
 Highbishop MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,urow,drow,rcol,lcol,success
     local blackbishop,blockW,highlight,terminate
 
@@ -254,8 +257,7 @@ Highbishop MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,
 
 ENDM Highbishop
 
-
-
+;/**************************************************************************/
 
 
 ;dont compare memory locations
@@ -360,6 +362,9 @@ Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,ta
     blackpawn:
 
 ENDM Highpawn
+
+;/**************************************************************************/
+
 selcectp MACRO r,c
 mov dx,r
 mov selectedr,r
@@ -367,6 +372,8 @@ mov dx,c
 mov selectedc,c
 mov selected,1
 ENDM selectp
+
+;/**************************************************************************/
 
 deselect MACRO
 local lbl
@@ -377,15 +384,19 @@ mov selectedc,-1
 mov selected,0
 
 lbl:
-mov bx,0
+mov di,0
 ;/**recoloring highlighted cells and redrawing**/
-lea si,chezzC
-mov cx,0
-mov dx,0
+
+mov cl,storage[di]
+inc di
+mov dl,storage[di]
+
+getdb cl,dl  
+mov si,ax
+
 ;cx is pointing to row 
 ;dx is pointing to colomn
 
-redo:
 mov res,0
 mov ax,cx
 mov bx,2
@@ -405,19 +416,14 @@ sec:
 mov bx,0
 mov bl,SecondaryC
 mov [si],bl
-con:
-inc si
-inc dx
-cmp dx,8
-jne redo
-mov dx,0
-inc cx
-cmp cx,8
-jnz redo
 
+getdW cl,dl
+mov si,ax
+DrawPieceDB  PrimaryC,SecondaryC,[si],0,0,0h,cx,dx,begr,begc,endr,endc,res 
 ;/**end of recoloring and redrawing**/
-inc bx
-cmp bl,head
+inc di
+mov cx,di
+cmp cl,head
 jne lbl
 
 mov head,0
