@@ -22,8 +22,8 @@ tmpy DW 0
 row DW 0
 col DW 0
 
-killW DB 0
-killB DB 0
+killWC DB 0 ;counter for killed white
+killBC DB 0 ;counter for killed black
 
 prevR DW 0
 prevC DW 0
@@ -96,6 +96,9 @@ errormsg db 'canot laod image file$'
 chezzP DW 64 dup(-1)
 chezzT DB 64 dup(-1)
 chezzC DB 64 dup(-1)
+chezzN DB 64 dup(-1) ;numbering of each piece
+Timer  DB 32 dup(-1)
+
 ;///////////////////////////////////////////
 playertpye DB 0 ;0 for white 1 for Black
 ;probably serial port
@@ -117,6 +120,7 @@ MAIN PROC FAR
     MOV AH, 0
     MOV AL, 13h
     INT 10h
+
 	DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
 	DrawPiece  PrimaryC,SecondaryC,RookFilename,filehandle,rookData,0,0,0h,0,0,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0h,0,7,begr,begc,endr,endc,res
@@ -166,6 +170,7 @@ MAIN PROC FAR
     ; 0  |white king|white queen |white  rook |white bishop|white horse|white  pawn|
     ; 1  |black king|black queen |black  rook |black bishop|black horse|black  pawn|
     ;pic,row,col,t,chezzP,chezzT
+    initchezzN PrimaryC,SecondaryC,chezzN
     initchezzC PrimaryC,SecondaryC,chezzC,res
     initchezz  rookData,0,0,12h,chezzP,chezzT
     initchezz  rookData,0,7,12h,chezzP,chezzT
@@ -189,7 +194,7 @@ MAIN PROC FAR
     initchezz  soliderData,1,6,15h,chezzP,chezzT
     initchezz  soliderData,1,7,15h,chezzP,chezzT
 
-
+    ;/****************************************************************************************/
 
     initchezz  rookData,7,0,02h,chezzP,chezzT
     initchezz  rookData,7,7,02h,chezzP,chezzT
@@ -215,18 +220,20 @@ MAIN PROC FAR
 
     
     ;/******************test area***************************/
-    drawSelf 4,4
-	drawup 4,4,10
-    Drawdown 4,4,10
-    Drawleft 4,4,10
-    Drawright 4,4,10
-    DrawRDD 4,4,10
-    DrawLDD 4,4,10
-    DrawLUD 4,4,10
-    DrawRUD 4,4,10
+        initchezz  bishopData,4,4,03h,chezzP,chezzT
+        kill 6,4
+    ; drawSelf 4,4
+	; drawup 4,4,10
+    ; Drawdown 4,4,10
+    ; Drawleft 4,4,10
+    ; Drawright 4,4,10
+    ; DrawRDD 4,4,10
+    ; DrawLDD 4,4,10
+    ; DrawLUD 4,4,10
+    ; DrawRUD 4,4,10
 
     initchezz  soliderData,3,3,15h,chezzP,chezzT
-    initchezz  soliderData,2,2,5h,chezzP,chezzT
+    ; initchezz  soliderData,2,2,5h,chezzP,chezzT
     ; getdb  1,0
     ; mov chezzC[bx],9
     ; mov al,chezzC[bx]
@@ -288,13 +295,14 @@ MAIN PROC FAR
     movepiece1:
 
 ;calling function to move a piece
-    movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+    ;movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
     deselectp
     jmp far ptr validate
     choosepiece1:
 
     ;calling function to choose a piece
     mov success,0 
+    
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
     selectp row,col
     cmp success,0
