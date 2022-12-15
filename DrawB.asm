@@ -344,7 +344,7 @@ MAIN PROC FAR
         initchezz  bishopData,3,4,03h,chezzP,chezzT
         kill 6,4
 
-        initchezz  horseData,4,1,14h,chezzP,chezzT
+        initchezz  horseData,4,2,14h,chezzP,chezzT
     ; drawSelf 4,4
 	; drawup 4,4,10
     ; Drawdown 4,4,10
