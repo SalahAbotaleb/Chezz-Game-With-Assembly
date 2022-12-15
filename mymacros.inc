@@ -321,8 +321,7 @@ ENDM getcursorlocation
 
 insert MACRO row,col
 pusha
-mov bx,0
-mov bl,head
+mov bx,head
 mov ax,0
 mov cx,0
 
@@ -331,7 +330,7 @@ mov cl,col
 
 mov storage[bx],al ;moving row
 inc head
-mov bl,head
+mov bx,head
 mov storage[bx],cl ;moving col
 inc head
 
@@ -347,14 +346,13 @@ je exit
 
 dec head
 
-mov bx,0
-mov bl,head
+mov bx,head
 mov ax,0
 mov cx,0
 
 mov cl,storage[bx] ;retrieving row
 dec head
-mov bl,head
+mov bx,head
 mov al,storage[bx] ;retrieving col
 
 mov row,al
