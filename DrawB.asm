@@ -53,7 +53,12 @@ SecondaryC DB 08h
 tmpdb db ?
 tmpdbr db ?
 tmpdbc db ?
-
+tmptype db ?
+currtype db ?
+nexttype db ?
+tmpr dw ?
+tmpc dw ?
+tmpdb2 db ?
 ;selected variables and colors
 selectedr DW -1
 selectedc DW -1
@@ -208,31 +213,39 @@ MAIN PROC FAR
 
     
     ;/******************test area***************************/
-   
-	
-    getdb  1,0
-    mov chezzC[bx],9
-    mov al,chezzC[bx]
-    mov tmpdb,al
-    getdW 1,0
-    DrawPieceDB  9,9,0,0,0h,1,0,begr,begc,endr,endc,res
+    drawSelf 4,4
+	drawup 4,4,10
+    Drawdown 4,4,10
+    Drawleft 4,4,10
+    Drawright 4,4,10
+    DrawRDD 4,4,10
+    DrawLDD 4,4,10
+    DrawLUD 4,4,10
+    DrawRUD 4,4,10
 
-    getdb  2,0
-    mov chezzC[bx],9
-    mov al,chezzC[bx]
-    mov tmpdb,al
-    getdw  2,0
-    DrawPieceDB  9,9,0,0,0h,2,0,begr,begc,endr,endc,res
+    ; getdb  1,0
+    ; mov chezzC[bx],9
+    ; mov al,chezzC[bx]
+    ; mov tmpdb,al
+    ; getdW 1,0
+    ; DrawPieceDB  9,9,0,0,0h,1,0,begr,begc,endr,endc,res
 
-    getdb  3,0
-    mov chezzC[bx],9
-    mov al,chezzC[bx]
-    mov tmpdb,al
-    getdw  3,0
-    DrawPieceDB  9,9,0,0,0h,3,0,begr,begc,endr,endc,res
-    insert 3,0
-    insert 2,0
-    insert 1,0
+    ; getdb  2,0
+    ; mov chezzC[bx],9
+    ; mov al,chezzC[bx]
+    ; mov tmpdb,al
+    ; getdw  2,0
+    ; DrawPieceDB  9,9,0,0,0h,2,0,begr,begc,endr,endc,res
+
+    ; getdb  3,0
+    ; mov chezzC[bx],9
+    ; mov al,chezzC[bx]
+    ; mov tmpdb,al
+    ; getdw  3,0
+    ; DrawPieceDB  9,9,0,0,0h,3,0,begr,begc,endr,endc,res
+    ; insert 3,0
+    ; insert 2,0
+    ; insert 1,0
     ;/******************end of test area***************************/
 
     mov row,0

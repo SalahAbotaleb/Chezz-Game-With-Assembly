@@ -376,7 +376,7 @@ ENDM selectp
 ;/**************************************************************************/
 
 deselectp MACRO
-local lbl,sec,con,exit
+local lbl,sec,con,exit,white,black,cont1
 pusha
 ;this function deselect a selected piece and removes highlights of squares
 mov selectedr,-1
@@ -422,7 +422,16 @@ mov chezzC[si],bl
 con:
 mov tmpx,cx
 mov tmpy,dx
-DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,tmpx,tmpy,begr,begc,endr,endc,res 
+mov al,chezzT[si]
+cmp al,0Ah
+jbe white
+jmp far ptr black
+white:
+DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,tmpx,tmpy,begr,begc,endr,endc,res
+jmp far ptr cont1
+black:
+DrawPieceDB  PrimaryC,SecondaryC,0,0,0,tmpx,tmpy,begr,begc,endr,endc,res
+cont1:
 ;/**end of recoloring and redrawing**/
 cmp di,head
 je exit
