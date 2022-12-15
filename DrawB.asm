@@ -46,8 +46,8 @@ pieceh EQU 25
 ;F  White
 
 
-PrimaryC DB 7h
-SecondaryC DB 08h
+PrimaryC DB 6h
+SecondaryC DB 7h
 
 ;temp variables first general, second for row, tird for col
 tmpdb db ?
