@@ -49,7 +49,15 @@ pieceh EQU 25
 PrimaryC DB 7h
 SecondaryC DB 08h
 
+;temp variables first general, second for row, tird for col
 tmpdb db ?
+tmpdbr db ?
+tmpdbc db ?
+
+;selected variables and colors
+selectedr DW -1
+selectedc DW -1
+selected DB 0
 
 moveavailc DB 0Ah
 takeavailc db 4h 
@@ -76,6 +84,7 @@ kingData DB piecew*pieceh dup(0)
 soliderData DB piecew*pieceh dup(0)
 errormsg db 'canot laod image file$'
 
+;chezzP array of pointer for chezz pictures, chezzT array of type of each piece, chezzT array for chezz box color
 chezzP DW 64 dup(-1)
 chezzT DB 64 dup(-1)
 chezzC DB 64 dup(-1)
@@ -84,9 +93,13 @@ chezzC DB 64 dup(-1)
 playertpye DB 0 ;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
-selected DB 0
+
 
 success DB 0 ;0 for fail 1 for success
+
+;///////////////////////////////////////////
+head DB 0
+storage DB 64 dup(-1)
 
 
 ;///////////////////////////////////////////
@@ -94,10 +107,10 @@ success DB 0 ;0 for fail 1 for success
 MAIN PROC FAR
     MOV AX , @DATA
     MOV DS , AX
-    
     MOV AH, 0
     MOV AL, 13h
     INT 10h
+    deselect
 	DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
 	DrawPiece  PrimaryC,SecondaryC,RookFilename,filehandle,rookData,0,0,0h,0,0,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0h,0,7,begr,begc,endr,endc,res
@@ -212,7 +225,8 @@ MAIN PROC FAR
 
 ; /**************************************************/
     ;Q means the user wants to select
-     Q:
+    
+    Q:
     MOV AH,0;every time looping we check here whether a key was selected or not
     INT 16h
     push ax
@@ -228,8 +242,6 @@ MAIN PROC FAR
     doQ:
 
    
-
-
     cmp selected,0
     jne movepiece1
     jmp far ptr choosepiece1 
