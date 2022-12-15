@@ -301,7 +301,7 @@ Drawsquare MACRO x,y,tmpx,tmpy,color
     popa
 ENDM Drawsquare
 
-initchezz MACRO pic,row,col,t,chezzP,chezzT
+initchezz MACRO pic,row,col,t,chezzP,chezzT,n
 ;-1 means empty location
 ;t for type
 pusha
@@ -1390,3 +1390,85 @@ jmp far ptr lop
 exit:
 popa
 ENDM DrawRDD
+
+initchezzN MACRO PrimaryC,SecondaryC,chezzN
+local redo,sec,con,exit
+pusha
+lea si,chezzN
+mov cx,0
+mov dx,0
+mov bx,0
+;cx is pointing to row 
+;dx is pointing to colomn
+
+redo:
+cmp cx,1
+ja next
+mov [si],bl
+jmp con
+next: cmp cx,6
+jb con
+mov ax,bx
+sub ax,32
+mov [si],ax
+
+con:inc bx
+inc si
+inc dx
+cmp dx,8
+jne redo
+mov dx,0
+inc cx
+cmp cx,8
+jnz redo
+
+popa
+ENDM initchezzC
+
+
+kill MACRO r,c
+local sec,con
+;-1 means empty location
+pusha
+
+getdb r,c
+mov chezzC[BX],-1
+mov chezzT[BX],-1
+mov ax,0
+mov al,chezzN[BX]
+mov chezzN[BX],-1
+mov bx,ax
+mov timer[BX],-1
+
+getdW r,c
+mov chezzP[BX],-1
+
+ mov cx,0
+    mov ah,0
+    mov ax,r
+    mov bx,2
+    div bl
+    xor cl,ah
+
+    mov ah,0
+    mov ax,c
+    mov bx,2
+    div bl
+    xor cl,ah
+    
+    mov res,cl
+
+    getdb r,c
+
+    mov ax,0
+    cmp res,0
+    jnz sec 
+    mov al,PrimaryC
+    mov chezzC[BX],al
+    jmp con
+    sec:mov al,SecondaryC
+    mov chezzC[BX],al
+    con:mov res,al
+    Drawsquare c,r,begr,begc,res
+popa
+ENDM kill
