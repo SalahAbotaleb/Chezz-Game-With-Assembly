@@ -6,7 +6,7 @@ movepiece MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,playertpye,row,col,b
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
 ;chezzP is the piece array
@@ -55,15 +55,18 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     mov ax,[di]
     and ax,0fh
     cmp ax,0
-    JnE wnkingQ
-    
+    JE wking
+    jmp far ptr wnkingQ
+    wking:
     ;TODO call king function
 
     jmp far ptr leave
     wnkingQ:
     ;check if piece is queen
     cmp ax,1
-    JnE wnueenQ
+    JE wqueen
+    jmp far ptr wnueenQ
+    wqueen:
 
     ;TODO call queen function
 
@@ -71,36 +74,46 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     wnueenQ:
     ;check if piece is rook
     cmp ax,2
-    JnE wnrookQ
-
+    JE wrook
+    jmp far ptr wnrookQ
+    wrook:         
+    
     ;TODO call rook function
     
     jmp far ptr leave
     wnrookQ:
     ;check if piece is bishop
     cmp ax,3
-    JnE wnbishopQ
+    JE wbishop
+    jmp far ptr wnbishopQ
+    wbishop:
 
     ;TODO call bishop function
+   
+    Highbishop row,col,10
 
     jmp far ptr leave
     wnbishopQ:
     ;check if piece is knight
+
     cmp ax,4
-    JnE wnknightQ
+    JE wknight
+    jmp far ptr wnknightQ
+    wknight:
    
     ;TODO call knight function
    
     jmp far ptr leave
     wnknightQ:
     ;check if piece is pawn
+
     cmp ax,5
-    JE skipwpawn
+    JE wpawn
     jmp far ptr wnpawnQ
-    skipwpawn:
+    wpawn:
     
-    Highpawn PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success,begr,begc,endr,endc,res
-     
+    ;Highpawn PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success,begr,begc,endr,endc,res
+
     jmp far ptr leave
     wnpawnQ:
     jmp far ptr leave
@@ -116,23 +129,31 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     mov ax,[di]
     and ax,0fh
     cmp ax,0
-    JnE bnkingQ
+    JE bking
+    jmp far ptr bnkingQ
+    bking:
 
     ;TODO call king function
 
     jmp far ptr leave
     bnkingQ:
     ;check if piece is queen
+
     cmp ax,1
-    JnE bnqueenQ
-    
+    JE bqueen
+    jmp far ptr bnqueenQ
+    bqueen:
+
     ;TODO call queen function
 
     jmp far ptr leave
     bnqueenQ:
     ;check if piece is rook
+    
     cmp ax,2
-    JnE bnrookQ
+    JE brook
+    jmp far ptr bnrookQ
+    brook:
     
     ;TODO call rook function
 
@@ -140,36 +161,38 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     bnrookQ:
     ;check if piece is bishop
     cmp ax,3
-    JnE bnbishopQ
+    JE bbishop
+    jmp far ptr bnbishopQ
+    bbishop:
 
     ;TODO call bishop function
+    Highbishop row,col,10
     
     jmp far ptr leave
     bnbishopQ:
     ;check if piece is knight
+    
     cmp ax,4
-    JnE bnknightQ
+    JE bknight
+    jmp far ptr bnknightQ
+    bknight:
 
     ;TODO call knight function
 
     jmp far ptr leave
     bnknightQ:
     ;check if piece is pawn
+    
     cmp ax,5
-    JnE bnpawnQ
+    JE bpawn
+    jmp far ptr bnpawnQ
+    bpawn:
 
     ;TODO call pawn function
 
     jmp far ptr leave
     bnpawnQ:
     jmp far ptr leave
-
-
-        
-
-
-
-
 
 
     leave:
@@ -183,77 +206,14 @@ ENDM HighRook
 ;/**************************************************************************/
 
 
-Highbishop MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,urow,drow,rcol,lcol,success
-    local blackbishop,blockW,highlight,terminate
+Highbishop MACRO row,col,steps
 
-    ;cmp playertpye,0
-    ;JnE blackbishop
-    mov ax,row
-    mov urow,ax
-    mov cx,row
-    mov drow,cx
-    mov bx,Col
-    mov rcol,bx
-    mov dx,col
-    mov lcol,dx
+drawSelf row,col
+DrawLDD row,col,steps
+DrawRUD row,col,steps
+DrawLUD row,col,steps
+DrawRDD row,col,steps
 
-
-    highlight:
-    pusha
-    inc urow
-    mov ax,urow
-    cmp ax,8h
-    JAE terminate
-    dec drow
-    mov cx,drow
-    cmp cx,0h
-    JB terminate
-    inc rcol
-    mov bx,rcol
-    cmp bx,8h
-    JAE terminate
-    dec lcol
-    mov dx,lcol
-    cmp dx,0h
-    JB terminate
-    popa
-    
-
-    lea si,chezzP
-    lea di,chezzT
-    mov ax,8h
-    mul bl
-    add ax,col
-    add di,ax
-    add ax,ax
-    add si,ax
-    mov ax,[di]
-
-    cmp ax,-1
-    JnE blockW
-    mov ax,moveavailc
-    mov bx,8
-    mul bl
-    add ax,col
-    mov [ax],1
-    jmp highlight
-
-    blockW:
-
-
-
-
-
-
-
-
-
-
- 
-  
-    block:
-    terminate:
-  
 
 ENDM Highbishop
 
