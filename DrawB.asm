@@ -213,15 +213,15 @@ MAIN PROC FAR
 
     
     ;/******************test area***************************/
-    drawSelf 4,4
-	drawup 4,4,10
-    Drawdown 4,4,10
-    Drawleft 4,4,10
-    Drawright 4,4,10
-    DrawRDD 4,4,10
-    DrawLDD 4,4,10
-    DrawLUD 4,4,10
-    DrawRUD 4,4,10
+    ; drawSelf 4,4
+	; drawup 4,4,10
+    ; Drawdown 4,4,10
+    ; Drawleft 4,4,10
+    ; Drawright 4,4,10
+    ; DrawRDD 4,4,10
+    ; DrawLDD 4,4,10
+    ; DrawLUD 4,4,10
+    ; DrawRUD 4,4,10
 
     ; getdb  1,0
     ; mov chezzC[bx],9
