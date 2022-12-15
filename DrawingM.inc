@@ -582,8 +582,8 @@ jmp far ptr whiteP
     mov ax,row
     mov cx,col
 
-    mov tmpdbr,cl
-    mov tmpdbc,al
+    mov tmpdbr,al
+    mov tmpdbc,cl
     insert tmpdbr,tmpdbc
 popa
 ENDM drawSelf
