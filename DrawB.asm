@@ -277,7 +277,6 @@ MAIN PROC FAR
     JE doQ
     jmp far ptr right
     doQ:
-    deselectp
    
     cmp selected,0
     jne movepiece1
@@ -285,20 +284,18 @@ MAIN PROC FAR
     movepiece1:
 
 ;calling function to move a piece
-
-    movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
-
+    ;movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
+    deselectp
     jmp far ptr validate
     choosepiece1:
 
-;calling function to choose a piece
+    ;calling function to choose a piece
     mov success,0 
     
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-   
+    selectp row,col
     cmp success,0
     je suc
-    mov selected,1
     suc:
     jmp validate
 
