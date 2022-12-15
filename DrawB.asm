@@ -189,7 +189,7 @@ MAIN PROC FAR
 
 
 
-    initchezz  rookData,7,0,02h,chezzP,chezzT
+    initchezz  rookData,4,4,02h,chezzP,chezzT
     initchezz  rookData,7,7,02h,chezzP,chezzT
 
     initchezz  horseData,7,1,04h,chezzP,chezzT
