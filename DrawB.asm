@@ -225,6 +225,7 @@ MAIN PROC FAR
     DrawLUD 4,4,10
     DrawRUD 4,4,10
 
+    initchezz  soliderData,4,4,05h,chezzP,chezzT
     ; getdb  1,0
     ; mov chezzC[bx],9
     ; mov al,chezzC[bx]

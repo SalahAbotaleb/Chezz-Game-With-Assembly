@@ -581,6 +581,7 @@ jmp far ptr whiteP
     
     mov ax,row
     mov cx,col
+
     mov tmpdbr,cl
     mov tmpdbc,al
     insert tmpdbr,tmpdbc
