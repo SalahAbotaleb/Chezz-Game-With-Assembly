@@ -230,7 +230,9 @@ MAIN PROC FAR
     mov tmpdb,al
     getdw  3,0
     DrawPieceDB  9,9,0,0,0h,3,0,begr,begc,endr,endc,res
-    
+    insert 3,0
+    insert 2,0
+    insert 1,0
     ;/******************end of test area***************************/
 
     mov row,0
@@ -249,7 +251,7 @@ MAIN PROC FAR
     ;Q means the user wants to select
     
     Q:
-    MOV AH,0;every time looping we check here whether a key was selected or not
+    MOV AH,1;every time looping we check here whether a key was selected or not
     INT 16h
     push ax
     jz noflush
@@ -262,7 +264,7 @@ MAIN PROC FAR
     JE doQ
     jmp far ptr right
     doQ:
-
+    deselectp
    
     cmp selected,0
     jne movepiece1
