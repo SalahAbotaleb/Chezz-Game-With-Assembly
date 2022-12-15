@@ -1362,64 +1362,64 @@ lop:
 ;loop number 0
 cmp dx,0
 jne l1
-mov ax,row
-mov cx,col
+mov cx,row
+mov ax,col
 sub ax,1
 sub cx,2
 l1:
 ;loop number 1
 cmp dx,1
 jne l2
-mov ax,row
-mov cx,col
+mov cx,row
+mov ax,col
 sub ax,2
 sub cx,1
 l2:
 ;loop number 2
 cmp dx,2
 jne l3
-mov ax,row
-mov cx,col
+mov cx,row
+mov ax,col
 add ax,1
 sub cx,2
 l3:
 ;loop number 3
 cmp dx,3
 jne l4
-mov ax,row
-mov cx,col
+mov cx,row
+mov ax,col
 add ax,2
 sub cx,1
 l4:
 ;loop number 4
 cmp dx,4
 jne l5
-mov ax,row
-mov cx,col
+mov cx,row
+mov ax,col
 add ax,2
 add cx,1
 l5:
 ;loop number 5
 cmp dx,5
 jne l6
-mov ax,row
-mov cx,col
+mov cx,row
+mov ax,col
 add ax,1
 add cx,2
 l6:
 ;loop number 6
 cmp dx,6
 jne l7
-mov ax,row
-mov cx,col
+mov cx,row
+mov ax,col
 sub ax,1
 add cx,2
 l7:
 ;loop number 7
 cmp dx,7
 jne l8
-mov ax,row
-mov cx,col
+mov cx,row
+mov ax,col
 sub ax,2
 add cx,1
 l8:
