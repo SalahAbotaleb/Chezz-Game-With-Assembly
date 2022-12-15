@@ -1,8 +1,74 @@
 include DrawingM.inc
 include mymacros.inc
 
-movepiece MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,playertpye,row,col,begr,begc,endr,endc,res
-    
+movepiece MACRO row,col
+local lbl,sec,con,exit,white,black,cont1,resume
+pusha
+;this function deselect a selected piece and removes highlights of squares
+mov selectedr,-1
+mov selectedc,-1
+mov selected,0
+
+cmp head,0
+jne resume
+jmp far ptr exit
+resume:
+mov di,0
+;/**recoloring highlighted cells and redrawing**/
+
+mov cx,0
+mov dx,0
+lbl:
+mov cl,storage[di]
+inc di
+mov dl,storage[di]
+inc di
+
+getdb cx,dx  
+mov si,bx
+
+;cx is pointing to row 
+;dx is pointing to colomn
+
+mov res,0
+mov ax,cx
+mov bx,2
+div bl
+xor res,ah
+mov ax,dx
+mov bx,2
+div bl
+xor res,ah
+cmp res,0
+jnz sec 
+mov bx,0
+mov bl,PrimaryC
+mov chezzC[si],bl
+jmp con
+sec:
+mov bx,0
+mov bl,SecondaryC
+mov chezzC[si],bl
+con:
+mov tmpx,cx
+mov tmpy,dx
+mov al,chezzT[si]
+cmp al,0Ah
+jbe white
+jmp far ptr black
+white:
+DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,tmpx,tmpy,begr,begc,endr,endc,res
+jmp far ptr cont1
+black:
+DrawPieceDB  PrimaryC,SecondaryC,0,0,0,tmpx,tmpy,begr,begc,endr,endc,res
+cont1:
+;/**end of recoloring and redrawing**/
+cmp di,head
+je exit
+jmp far ptr lbl
+exit:
+mov head,0
+popa    
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
