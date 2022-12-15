@@ -135,6 +135,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     wqueen:
 
     ;TODO call queen function
+    HighQueen row,col,10
 
     jmp far ptr leave
     wnueenQ:
@@ -157,7 +158,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
 
     ;TODO call bishop function
    
-    Highbishop row,col,10
+    HighBishop row,col,10
 
     jmp far ptr leave
     wnbishopQ:
@@ -212,6 +213,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     bqueen:
 
     ;TODO call queen function
+    HighQueen row,col,10
 
     jmp far ptr leave
     bnqueenQ:
@@ -235,7 +237,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     bbishop:
 
     ;TODO call bishop function
-    Highbishop row,col,10
+    HighBishop row,col,10
     
     jmp far ptr leave
     bnbishopQ:
@@ -267,6 +269,24 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     leave:
 ENDM choosepiece
 
+;/**************************************************************************/
+
+HighQueen MACRO row,col,steps
+
+drawSelf row,col
+Drawup row,col,steps
+Drawdown row,col,steps
+Drawleft row,col,steps
+Drawright row,col,steps
+DrawLDD row,col,steps
+DrawRUD row,col,steps
+DrawLUD row,col,steps
+DrawRDD row,col,steps
+
+ENDM HighQueen
+
+;/**************************************************************************/
+
 HighRook MACRO row,col,steps
 
 drawSelf row,col
@@ -281,7 +301,7 @@ ENDM HighRook
 ;/**************************************************************************/
 
 
-Highbishop MACRO row,col,steps
+HighBishop MACRO row,col,steps
 
 drawSelf row,col
 DrawLDD row,col,steps
@@ -290,7 +310,7 @@ DrawLUD row,col,steps
 DrawRDD row,col,steps
 
 
-ENDM Highbishop
+ENDM HighBishop
 
 ;/**************************************************************************/
 
