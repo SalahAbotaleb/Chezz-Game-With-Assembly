@@ -1,8 +1,74 @@
 include DrawingM.inc
 include mymacros.inc
 
-movepiece MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,playertpye,row,col,begr,begc,endr,endc,res
-    
+movepiece MACRO row,col
+local lbl,sec,con,exit,white,black,cont1,resume
+pusha
+;this function deselect a selected piece and removes highlights of squares
+mov selectedr,-1
+mov selectedc,-1
+mov selected,0
+
+cmp head,0
+jne resume
+jmp far ptr exit
+resume:
+mov di,0
+;/**recoloring highlighted cells and redrawing**/
+
+mov cx,0
+mov dx,0
+lbl:
+mov cl,storage[di]
+inc di
+mov dl,storage[di]
+inc di
+
+getdb cx,dx  
+mov si,bx
+
+;cx is pointing to row 
+;dx is pointing to colomn
+
+mov res,0
+mov ax,cx
+mov bx,2
+div bl
+xor res,ah
+mov ax,dx
+mov bx,2
+div bl
+xor res,ah
+cmp res,0
+jnz sec 
+mov bx,0
+mov bl,PrimaryC
+mov chezzC[si],bl
+jmp con
+sec:
+mov bx,0
+mov bl,SecondaryC
+mov chezzC[si],bl
+con:
+mov tmpx,cx
+mov tmpy,dx
+mov al,chezzT[si]
+cmp al,0Ah
+jbe white
+jmp far ptr black
+white:
+DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,tmpx,tmpy,begr,begc,endr,endc,res
+jmp far ptr cont1
+black:
+DrawPieceDB  PrimaryC,SecondaryC,0,0,0,tmpx,tmpy,begr,begc,endr,endc,res
+cont1:
+;/**end of recoloring and redrawing**/
+cmp di,head
+je exit
+jmp far ptr lbl
+exit:
+mov head,0
+popa    
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
@@ -231,7 +297,7 @@ ENDM Highbishop
 
 ;dont compare memory locations
 Highpawn MACRO row,col,playertpye,success
-    local continuemove,exit,white,black,whitefirstmove,blackfirstmove,whitenotfirstmove,blacknotfirstmove,noenemyonleftup,noenemyonrightup,enemyonleftup,enemyonrightup,whsip1,whskip2,cnowhite
+    local exit,white,black,whitefirstmove,blackfirstmove,whitenotfirstmove,blacknotfirstmove,noenemyonleftup,noenemyonrightup,enemyonleftup,enemyonrightup,whsip1,whskip2,cnowhite,dofrblock,dosecmove,dosecmove2
    
     mov success,1
     drawSelf row,col
@@ -248,8 +314,8 @@ Highpawn MACRO row,col,playertpye,success
     mov tmpr,ax
     mov tmpc,cx
     getdb tmpr,tmpc
-    mov dx,chezzT[bx]
-    cmp dx,-1
+    mov dl,chezzT[bx]
+    cmp dl,-1
     jne enemyonleftup
     jmp far ptr noenemyonleftup
     enemyonleftup:
@@ -257,31 +323,71 @@ Highpawn MACRO row,col,playertpye,success
     DrawLUD row,col,1h
 
     noenemyonleftup:
+    mov ax,row
+    mov cx,col
     dec ax
     inc cx
     mov tmpr,ax
     mov tmpc,cx
     getdb tmpr,tmpc
-    mov dx,chezzT[bx]
-    cmp dx,-1
+    mov dl,chezzT[bx]
+    cmp dl,-1
     jne enemyonrighttup
     jmp far ptr noenemyonrighttup
     enemyonrighttup:
+    
     DrawRUD row,col,1
     noenemyonrighttup:
     ;end takes
+    ;start of first block move for white
+    mov ax,row
     cmp ax,6h
     je whitefirstmove
     jmp far ptr whitenotfirstmove
     whitefirstmove:
     ;this is the first move for this pawn
+    mov ax,row
+    dec ax
+    dec ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dosecmove
+    jmp far ptr whitenotfirstmove
+    dosecmove:
+    
+    mov ax,row
+    dec ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dosecmove2
+    jmp far ptr exit
+    dosecmove2:
+    drawup row,col,2
 
 
     whitenotfirstmove:
+    mov ax,row
+    dec ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dofrblock
+    jmp far ptr whitenotfirstmove
+    dofrblock:
+    drawup row,col,1
     ;this is not first move for this pawn
-
+    drawup row,col,1
     jmp white
     black:
+
+
+
+
 
 
 
