@@ -578,8 +578,10 @@ jmp far ptr whiteP
     whiteP:
     DrawPieceDB  0Ah,0Ah,0,0,0Fh,row,col,begr,begc,endr,endc,res
     contDr:
-    mov ax,col
-    mov cx,row
+    
+    mov ax,row
+    mov cx,col
+
     mov tmpdbr,cl
     mov tmpdbc,al
     insert tmpdbr,tmpdbc
