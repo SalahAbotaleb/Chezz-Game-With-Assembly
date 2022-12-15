@@ -1340,6 +1340,178 @@ exit:
 popa
 ENDM DrawRDD
 
+DrawKnight MACRO row,col
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5,l1,l2,l3,l4,l5,l6,l7,l8,endl
+;DRAW all knight moves
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov cx,row
+mov ax,col
+mov dx,0
+lop:
+;loop number 0
+cmp dx,0
+jne l1
+mov cx,row
+mov ax,col
+sub ax,1
+sub cx,2
+l1:
+;loop number 1
+cmp dx,1
+jne l2
+mov cx,row
+mov ax,col
+sub ax,2
+sub cx,1
+l2:
+;loop number 2
+cmp dx,2
+jne l3
+mov cx,row
+mov ax,col
+add ax,1
+sub cx,2
+l3:
+;loop number 3
+cmp dx,3
+jne l4
+mov cx,row
+mov ax,col
+add ax,2
+sub cx,1
+l4:
+;loop number 4
+cmp dx,4
+jne l5
+mov cx,row
+mov ax,col
+add ax,2
+add cx,1
+l5:
+;loop number 5
+cmp dx,5
+jne l6
+mov cx,row
+mov ax,col
+add ax,1
+add cx,2
+l6:
+;loop number 6
+cmp dx,6
+jne l7
+mov cx,row
+mov ax,col
+sub ax,1
+add cx,2
+l7:
+;loop number 7
+cmp dx,7
+jne l8
+mov cx,row
+mov ax,col
+sub ax,2
+add cx,1
+l8:
+push dx
+cmp cx,0
+jae cont1
+jmp far ptr endl
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr endl
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr endl
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr endl
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr endl
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+and nexttype,0Fh
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr endl
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+and nexttype,0Fh
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+endl:
+pop dx
+inc dx
+cmp dx,8
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM DrawKnight
+
+
+
+
+
+
+
+
 initchezzN MACRO PrimaryC,SecondaryC,chezzN
 local redo,sec,con,exit
 pusha

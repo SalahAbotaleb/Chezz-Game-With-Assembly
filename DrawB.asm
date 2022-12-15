@@ -99,7 +99,7 @@ chezzN DB 64 dup(-1) ;numbering of each piece
 Timer  DB 32 dup(-1)
 
 ;///////////////////////////////////////////
-playertpye DB 0 ;0 for white 1 for Black
+playertpye DB 1 ;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -341,8 +341,44 @@ MAIN PROC FAR
     
     ;/******************test area***************************/
         replace 6,6,5,4
-        ;initchezz  bishopData,4,4,03h,chezzP,chezzT
-        ;kill 6,4
+        initchezz  bishopData,3,4,03h,chezzP,chezzT
+        kill 6,4
+
+        initchezz  horseData,4,1,14h,chezzP,chezzT
+    ; drawSelf 4,4
+	; drawup 4,4,10
+    ; Drawdown 4,4,10
+    ; Drawleft 4,4,10
+    ; Drawright 4,4,10
+    ; DrawRDD 4,4,10
+    ; DrawLDD 4,4,10
+    ; DrawLUD 4,4,10
+    ; DrawRUD 4,4,10
+
+    ; initchezz  soliderData,2,2,5h,chezzP,chezzT
+    ; getdb  1,0
+    ; mov chezzC[bx],9
+    ; mov al,chezzC[bx]
+    ; mov tmpdb,al
+    ; getdW 1,0
+    ; DrawPieceDB  9,9,0,0,0h,1,0,begr,begc,endr,endc,res
+
+    ; getdb  2,0
+    ; mov chezzC[bx],9
+    ; mov al,chezzC[bx]
+    ; mov tmpdb,al
+    ; getdw  2,0
+    ; DrawPieceDB  9,9,0,0,0h,2,0,begr,begc,endr,endc,res
+
+    ; getdb  3,0
+    ; mov chezzC[bx],9
+    ; mov al,chezzC[bx]
+    ; mov tmpdb,al
+    ; getdw  3,0
+    ; DrawPieceDB  9,9,0,0,0h,3,0,begr,begc,endr,endc,res
+    ; insert 3,0
+    ; insert 2,0
+    ; insert 1,0
     ;/******************end of test area***************************/
 
     mov row,0
