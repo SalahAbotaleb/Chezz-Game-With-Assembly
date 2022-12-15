@@ -255,6 +255,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     bpawn:
 
     ;TODO call pawn function
+    Highpawn row,col,playertpye,success
 
     jmp far ptr leave
     bnpawnQ:
@@ -288,7 +289,7 @@ ENDM Highbishop
 
 ;dont compare memory locations
 Highpawn MACRO row,col,playertpye,success
-    local exit,white,black,whitefirstmove,blackfirstmove,whitenotfirstmove,blacknotfirstmove,noenemyonleftup,noenemyonrightup,enemyonleftup,enemyonrightup,whsip1,whskip2,cnowhite,dofrblock,dosecmove,dosecmove2
+    local exit,white,black,whitefirstmove,blackfirstmove,whitenotfirstmove,blacknotfirstmove,noenemyonleftup,noenemyonrighttup,enemyonleftup,enemyonrighttup,noenemyonleftdown,noenemyonrighttdown,enemyonleftdown,enemyonrighttdown,dofrblock,dofrblockb,dosecmove,dosecmoveb,dosecmove2,dosecmoveb2,CONWHITE
    
     mov success,1
     drawSelf row,col
@@ -368,20 +369,97 @@ Highpawn MACRO row,col,playertpye,success
     mov dl,chezzT[bx]
     cmp dl,-1
     je dofrblock
-    jmp far ptr whitenotfirstmove
+    jmp far ptr black
     dofrblock:
     drawup row,col,1
     ;this is not first move for this pawn
     drawup row,col,1
     jmp white
     black:
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    mov ax,row
+    mov cx,col
+    ;takes
+    inc ax
+    dec cx
+    mov tmpr,ax
+    mov tmpc,cx
+    getdb tmpr,tmpc
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    jne enemyonleftdown
+    jmp far ptr noenemyonleftdown
+    enemyonleftdown:
+
+    DrawLDD row,col,1h
+ 
+
+    noenemyonleftdown:
+    mov ax,row
+    mov cx,col
+    inc ax
+    inc cx
+    mov tmpr,ax
+    mov tmpc,cx
+    getdb tmpr,tmpc
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    jne enemyonrighttdown
+    jmp far ptr noenemyonrighttdown
+    enemyonrighttdown:
+    
+    DrawRDD row,col,1
+    noenemyonrighttdown:
+    ;end takes
+    ;start of first block move for black
+    mov ax,row
+    cmp ax,1h
+    je blackfirstmove
+    jmp far ptr blacknotfirstmove
+    blackfirstmove:
+    ;this is the first move for this pawn
+    mov ax,row
+    inc ax
+    inc ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dosecmoveb
+    jmp far ptr blacknotfirstmove
+    dosecmoveb:
+    
+    mov ax,row
+    inc ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dosecmoveb2
+    jmp far ptr exit
+    dosecmoveb2:
+    Drawdown row,col,2
+
+
+    blacknotfirstmove:
+    mov ax,row
+    inc ax
+    mov tmpr,ax
+    getdb tmpr,col
+    mov dl,chezzT[bx]
+    cmp dl,-1
+    je dofrblockb
+    jmp far ptr white
+    dofrblockb:
+    Drawdown row,col,1
+    ;this is not first move for this pawn
+    
 
 
 
 
 
-
-
+;;;;;;;;;;;;;;;;;;;;;
 
     white:
     exit:
