@@ -559,3 +559,812 @@ push ax
     mov bx,ax
 pop ax 
 ENDM getdW
+
+
+drawSelf MACRO row,col
+local typ,typ2,contDr,blackP,whiteP
+;steps is max number
+pusha
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+mov chezzC[bx],0Ah
+cmp ax,0Ah
+ja blackP
+jmp far ptr whiteP
+    blackP:
+    DrawPieceDB  0Ah,0Ah,0,0,0h,row,col,begr,begc,endr,endc,res
+    jmp far ptr contDr
+    whiteP:
+    DrawPieceDB  0Ah,0Ah,0,0,0Fh,row,col,begr,begc,endr,endc,res
+    contDr:
+    insert row,col
+popa
+ENDM drawSelf
+
+;/**************************************************************************/
+
+
+Drawup MACRO row,col,steps
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
+;steps is max number
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov dx,0 ;counter
+mov cx,row
+mov ax,col
+lop:
+dec cx
+cmp cx,0
+jae cont1
+jmp far ptr exit
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr exit
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr exit
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr exit
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr exit
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr exit
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+inc dx
+cmp dx,steps
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM Drawup
+
+Drawdown MACRO row,col,steps
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
+;steps is max number
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov dx,0 ;counter
+mov cx,row
+mov ax,col
+lop:
+inc cx
+cmp cx,0
+jae cont1
+jmp far ptr exit
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr exit
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr exit
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr exit
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr exit
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr exit
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+inc dx
+cmp dx,steps
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM Drawdown
+
+Drawright MACRO row,col,steps
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
+;steps is max number
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov dx,0 ;counter
+mov cx,row
+mov ax,col
+lop:
+inc ax
+cmp cx,0
+jae cont1
+jmp far ptr exit
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr exit
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr exit
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr exit
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr exit
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr exit
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+inc dx
+cmp dx,steps
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM Drawright
+
+Drawleft MACRO row,col,steps
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
+;steps is max number
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov dx,0 ;counter
+mov cx,row
+mov ax,col
+lop:
+dec ax
+cmp cx,0
+jae cont1
+jmp far ptr exit
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr exit
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr exit
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr exit
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr exit
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr exit
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+inc dx
+cmp dx,steps
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM Drawleft
+
+DrawRUD MACRO row,col,steps
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
+;steps is max number
+;DRAW RIGHT UP DIAGONAL
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov dx,0 ;counter
+mov cx,row
+mov ax,col
+lop:
+inc ax
+dec cx
+cmp cx,0
+jae cont1
+jmp far ptr exit
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr exit
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr exit
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr exit
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr exit
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr exit
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+inc dx
+cmp dx,steps
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM DrawRUD
+
+DrawLDD MACRO row,col,steps
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
+;steps is max number
+;DRAW LEFT DOWN DIAGONAL
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov dx,0 ;counter
+mov cx,row
+mov ax,col
+lop:
+inc cx
+dec ax
+cmp cx,0
+jae cont1
+jmp far ptr exit
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr exit
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr exit
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr exit
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr exit
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr exit
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+inc dx
+cmp dx,steps
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM DrawLDD
+
+DrawLUD MACRO row,col,steps
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
+;steps is max number
+;DRAW LEFT UP DIAGONAL
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov dx,0 ;counter
+mov cx,row
+mov ax,col
+lop:
+dec ax
+dec cx
+cmp cx,0
+jae cont1
+jmp far ptr exit
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr exit
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr exit
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr exit
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr exit
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr exit
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+inc dx
+cmp dx,steps
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM DrawLUP
+
+DrawRDD MACRO row,col,steps
+local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
+;steps is max number
+;DRAW RIGHT DOWN DIAGONAL
+pusha
+
+getdb row,col
+mov ax,0
+mov al,chezzT[bx]
+cmp ax,0Ah
+ja typ ;to be removed if needed
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+mov dx,0 ;counter
+mov cx,row
+mov ax,col
+lop:
+inc ax
+inc cx
+cmp cx,0
+jae cont1
+jmp far ptr exit
+
+cont1:
+cmp cx,8
+jb cont2
+jmp far ptr exit
+
+cont2:
+cmp ax,0
+jae cont3
+jmp far ptr exit
+
+cont3:
+cmp ax,8
+jb cont4
+jmp far ptr exit
+
+cont4:
+mov tmpr,cx
+mov tmpc,ax
+
+getdb tmpr,tmpc
+mov ax,0
+mov al,chezzT[bx]
+cmp al,-1
+jne cont5
+jmp far ptr highlightG
+cont5:cmp ax,0Ah
+ja typn ;to be removed if needed
+mov nexttype,0
+jmp typn2
+typn:
+mov nexttype,1
+typn2:
+mov bx,0
+mov bl,currtype
+mov bh,nexttype
+xor bl,bh
+cmp bl,0
+jne highlightR
+jmp far ptr exit
+highlightR:
+getdb tmpr,tmpc
+mov chezzC[bx],4h
+dec nexttype
+DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+jmp far ptr exit
+
+highlightG:
+getdb tmpr,tmpc
+mov chezzC[bx],0Ah
+dec nexttype
+DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
+
+mov ax,tmpc
+mov cx,tmpr
+mov tmpdbr,cl
+mov tmpdbc,al
+insert tmpdbr,tmpdbc
+
+inc dx
+cmp dx,steps
+je exit
+jmp far ptr lop
+exit:
+popa
+ENDM DrawRDD
