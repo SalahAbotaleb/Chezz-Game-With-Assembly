@@ -72,7 +72,7 @@ popa
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
 ;chezzP is the piece array
@@ -121,15 +121,18 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     mov ax,[di]
     and ax,0fh
     cmp ax,0
-    JnE wnkingQ
-    
+    JE wking
+    jmp far ptr wnkingQ
+    wking:
     ;TODO call king function
 
     jmp far ptr leave
     wnkingQ:
     ;check if piece is queen
     cmp ax,1
-    JnE wnueenQ
+    JE wqueen
+    jmp far ptr wnueenQ
+    wqueen:
 
     ;TODO call queen function
 
@@ -137,35 +140,45 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     wnueenQ:
     ;check if piece is rook
     cmp ax,2
-    JnE wnrookQ
-
+    JE wrook
+    jmp far ptr wnrookQ
+    wrook:         
+    
     ;TODO call rook function
     
     jmp far ptr leave
     wnrookQ:
     ;check if piece is bishop
     cmp ax,3
-    JnE wnbishopQ
+    JE wbishop
+    jmp far ptr wnbishopQ
+    wbishop:
 
     ;TODO call bishop function
+   
+    Highbishop row,col,10
 
     jmp far ptr leave
     wnbishopQ:
     ;check if piece is knight
+
     cmp ax,4
-    JnE wnknightQ
+    JE wknight
+    jmp far ptr wnknightQ
+    wknight:
    
     ;TODO call knight function
    
     jmp far ptr leave
     wnknightQ:
     ;check if piece is pawn
+
     cmp ax,5
-    JE skipwpawn
+    JE wpawn
     jmp far ptr wnpawnQ
-    skipwpawn:
+    wpawn:
     
-    Highpawn PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success,begr,begc,endr,endc,res
+    Highpawn row,col,playertpye,success
      
     jmp far ptr leave
     wnpawnQ:
@@ -182,23 +195,31 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     mov ax,[di]
     and ax,0fh
     cmp ax,0
-    JnE bnkingQ
+    JE bking
+    jmp far ptr bnkingQ
+    bking:
 
     ;TODO call king function
 
     jmp far ptr leave
     bnkingQ:
     ;check if piece is queen
+
     cmp ax,1
-    JnE bnqueenQ
-    
+    JE bqueen
+    jmp far ptr bnqueenQ
+    bqueen:
+
     ;TODO call queen function
 
     jmp far ptr leave
     bnqueenQ:
     ;check if piece is rook
+    
     cmp ax,2
-    JnE bnrookQ
+    JE brook
+    jmp far ptr bnrookQ
+    brook:
     
     ;TODO call rook function
 
@@ -206,36 +227,38 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     bnrookQ:
     ;check if piece is bishop
     cmp ax,3
-    JnE bnbishopQ
+    JE bbishop
+    jmp far ptr bnbishopQ
+    bbishop:
 
     ;TODO call bishop function
+    Highbishop row,col,10
     
     jmp far ptr leave
     bnbishopQ:
     ;check if piece is knight
+    
     cmp ax,4
-    JnE bnknightQ
+    JE bknight
+    jmp far ptr bnknightQ
+    bknight:
 
     ;TODO call knight function
 
     jmp far ptr leave
     bnknightQ:
     ;check if piece is pawn
+    
     cmp ax,5
-    JnE bnpawnQ
+    JE bpawn
+    jmp far ptr bnpawnQ
+    bpawn:
 
     ;TODO call pawn function
 
     jmp far ptr leave
     bnpawnQ:
     jmp far ptr leave
-
-
-        
-
-
-
-
 
 
     leave:
@@ -249,77 +272,14 @@ ENDM HighRook
 ;/**************************************************************************/
 
 
-Highbishop MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,urow,drow,rcol,lcol,success
-    local blackbishop,blockW,highlight,terminate
+Highbishop MACRO row,col,steps
 
-    ;cmp playertpye,0
-    ;JnE blackbishop
-    mov ax,row
-    mov urow,ax
-    mov cx,row
-    mov drow,cx
-    mov bx,Col
-    mov rcol,bx
-    mov dx,col
-    mov lcol,dx
+drawSelf row,col
+DrawLDD row,col,steps
+DrawRUD row,col,steps
+DrawLUD row,col,steps
+DrawRDD row,col,steps
 
-
-    highlight:
-    pusha
-    inc urow
-    mov ax,urow
-    cmp ax,8h
-    JAE terminate
-    dec drow
-    mov cx,drow
-    cmp cx,0h
-    JB terminate
-    inc rcol
-    mov bx,rcol
-    cmp bx,8h
-    JAE terminate
-    dec lcol
-    mov dx,lcol
-    cmp dx,0h
-    JB terminate
-    popa
-    
-
-    lea si,chezzP
-    lea di,chezzT
-    mov ax,8h
-    mul bl
-    add ax,col
-    add di,ax
-    add ax,ax
-    add si,ax
-    mov ax,[di]
-
-    cmp ax,-1
-    JnE blockW
-    mov ax,moveavailc
-    mov bx,8
-    mul bl
-    add ax,col
-    mov [ax],1
-    jmp highlight
-
-    blockW:
-
-
-
-
-
-
-
-
-
-
- 
-  
-    block:
-    terminate:
-  
 
 ENDM Highbishop
 
@@ -327,106 +287,64 @@ ENDM Highbishop
 
 
 ;dont compare memory locations
-Highpawn MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,Row,Col,success,begr,begc,endr,endc,res
-    local blackpawn,notstartingpos,somethingintheway1,somethingintheway2,blackpawns,whitepawns,whitepawn,notstartingpos2,somethingintheway3,somethingintheway4,whitepawns2
-    ;s is short for skip
-
+Highpawn MACRO row,col,playertpye,success
+    local continuemove,exit,white,black,whitefirstmove,blackfirstmove,whitenotfirstmove,blacknotfirstmove,noenemyonleftup,noenemyonrightup,enemyonleftup,enemyonrightup,whsip1,whskip2,cnowhite
+   
+    mov success,1
+    drawSelf row,col
+    mov al,playertpye
+    cmp al,0
+    je conwhite
+    jmp far ptr black
+    conwhite:
     mov ax,row
-    mov bx,col
+    mov cx,col
+    ;takes
+    dec ax
+    dec cx
+    mov tmpr,ax
+    mov tmpc,cx
+    getdb tmpr,tmpc
+    mov dx,chezzT[bx]
+    cmp dx,-1
+    jne enemyonleftup
+    jmp far ptr noenemyonleftup
+    enemyonleftup:
 
-    lea si,chezzP
-    lea di,chezzT
-    mov ax,8
-    mov bx,row
-    mul bl
-    add ax,col
-    add di,ax
-    add ax,ax
-    add si,ax  
-    mov ax,[di]
- 
-    mov dx,0 
-    mov dl,playertpye
-    cmp dx,0
-  
-    JE blackpawns
-    jmp far ptr blackpawn
-    blackpawns:
-    ;white pawn
-    ;check if pawn is in starting position
-    sub di,9h ;i dont know why it works for 9 it was supposed to work for 8
-    mov ax,[di]
-    add di,9h
-    ;seeing if there is something in front of the pawn
-    ;reach here
-    
-    cmp ax,-1
-    JE somethingintheway1s
-    jmp far ptr somethingintheway1
-    somethingintheway1s:
-    
-    ;mov chezzC+di,moveavailc;might not work
-    pusha 
-    mov di,offset chezzC
-    mov ax,8
-    mov bx,row
-    mul bl
-    add ax,col
-    mov di,ax
-    push ax
-    mov al,moveavailc
-    mov [di],al;might not work
-    pop ax
-    popa 
-    push bx
-    mov bx,row
-    sub bx,1
-    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
-    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
-    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
-    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
-    ;//////////erooooooooooooooooooooooooooor//////////////////// salah
-    DrawPieceDB moveavailc,moveavailc,0,0,0fh,bx,col,begr,begc,endr,endc,res
-    ;there is here a problem must send [si] for current location to draw 
-    pop bx
+    DrawLUD row,col,1h
 
-    mov ax,row
+    noenemyonleftup:
+    dec ax
+    inc cx
+    mov tmpr,ax
+    mov tmpc,cx
+    getdb tmpr,tmpc
+    mov dx,chezzT[bx]
+    cmp dx,-1
+    jne enemyonrighttup
+    jmp far ptr noenemyonrighttup
+    enemyonrighttup:
+    DrawRUD row,col,1
+    noenemyonrighttup:
+    ;end takes
     cmp ax,6h
-    JE notstartingposs
-    jmp far ptr notstartingpos
-    notstartingposs:
-    ;check if pawn can move 2 spaces
-    
-    sub di,16d
-    mov ax,[di]
-    add di,16d
-    cmp ax,-1
-    JE somethingintheway2s
-    jmp far ptr somethingintheway2
-    somethingintheway2s:
-    pusha 
-    mov di,offset chezzC
-    mov ax,8
-    mov bx,row
-    mul bl
-    add ax,col
-    add di,ax
-    push ax
-    mov al,moveavailc
-    mov [di],al;might not work
-    pop ax
-    popa 
-    push bx
-    mov bx,row
-    sub bx,2
-    DrawPieceDB moveavailc,moveavailc,0,0,0fh,bx,col,begr,begc,endr,endc,res
-    pop bx
+    je whitefirstmove
+    jmp far ptr whitenotfirstmove
+    whitefirstmove:
+    ;this is the first move for this pawn
 
-    somethingintheway2:
-    notstartingpos:
-    somethingintheway1:
-    blackpawn:
 
+    whitenotfirstmove:
+    ;this is not first move for this pawn
+
+    jmp white
+    black:
+
+
+
+
+    white:
+    exit:
 ENDM Highpawn
 
 ;/**************************************************************************/
