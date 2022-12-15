@@ -396,104 +396,46 @@ ENDM deletechezzD
 
 
 DrawPieceDB MACRO PrimaryC,SecondaryC,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
-    local drawLoop,noerror,lblprim,lblsec,filter,contin,Nempty,exit,sec,con
-    ;primaryC is primary Color for the board which is at top left coener 
-    ;secondaryC is secondart color next to first square 
-    ;better to define primaryC and SecondaryC at begging of program
-    ;row is from 0 to 7
-    ;col is from 0 to 7
-    ;piece color is the main color of the piece and secondary color will be background color
-    ;roffset for row offset
-    ;coffset for col offset
-    pusha
-    
-    ;***********Drawing the pixels
-    ;Nempty:
-    mov ax,row
-    mov cx,25d
-    mul cl
-    mov bx,ax
+    ;/******DRAW PIECE FUNCTION WRAPPER********/
+push bx
+mov bx,row
+mov rowW,bx
 
-    mov ax,col
-    mul cl
-    ;now we have begging stored at ax for col begging
-    ;and bx for row begging
+mov bx,col
+mov colW,bx
 
-    mov begr,0
-    add begr,roffset
-    add begr,bx
+mov bl,pieceColor
+mov pieceColorW,bl
 
-    mov begc,0
-    add begc,coffset
-    add begc,ax
-     
-    mov endr,bx
-    mov endc,ax
+mov bl,PrimaryC
+mov PrimaryCW,bl
 
-    add endr,25d
-    add endc,25d
+mov bl,SecondaryC
+mov SecondaryCW,bl
 
-    mov cx,0
-    mov ah,0
-    mov ax,row
-    mov bx,2
-    div bl
-    xor cl,ah
+mov bl,res
+mov resW,bl
 
-    mov ah,0
-    mov ax,col
-    mov bx,2
-    div bl
-    xor cl,ah
-    
-    mov res,cl
+mov bx,begr
+mov begrW,bx
 
-    getdw row,col
-    mov ax,chezzP[bx]
-    cmp ax,-1
-    JNZ Nempty
-    mov ax,0
-    cmp res,0
-    jnz sec 
-    mov al,PrimaryC
-    jmp con
-    sec:mov al,SecondaryC
-    
-    con:mov res,al
-    Drawsquare col,row,begr,begc,res
-    jmp exit
-    
-    Nempty:
-    getdw row,col
-    mov bx,chezzP[bx]
-    ;mov BX , dataloc ; BL contains index at the current drawn pixel
-    MOV CX,begc
-    MOV DX,begr
-    MOV AH,0ch
-    drawLoop:
-    MOV AL,[BX]
-    cmp al,5
-    ja filter
-    cmp res,0
-    jnz lblsec 
-    lblprim:mov al,PrimaryC
-    jmp contin
-    lblsec:mov al,SecondaryC
-    jmp contin
-    filter: mov al,pieceColor
-    contin:
-    INT 10h 
-    INC CX
-    INC BX
-    CMP CX,endc
-    JNE drawLoop 
-	
-    MOV CX ,begc
-    INC DX
-    CMP DX ,endr
-    JNE drawLoop
-    ;************end drawing the pixels
-    exit:popa
+mov bx,begc
+mov begcW,bx
+
+mov bx,endr
+mov endrW,bx
+
+mov bx,endc
+mov endcW,bx
+
+mov bx,roffset
+mov roffsetW,bx
+
+mov bx,coffset
+mov coffsetW,bx
+
+call DrawPieceW
+pop bx
 ENDM DrawPieceDB
 
 initchezzC MACRO PrimaryC,SecondaryC,chezzC,res
