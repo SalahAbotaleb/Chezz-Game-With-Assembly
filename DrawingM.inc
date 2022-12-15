@@ -652,6 +652,7 @@ highlightR:
 getdb tmpr,tmpc
 mov chezzC[bx],4h
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -666,6 +667,7 @@ highlightG:
 getdb tmpr,tmpc
 mov chezzC[bx],0Ah
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -749,6 +751,7 @@ highlightR:
 getdb tmpr,tmpc
 mov chezzC[bx],4h
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -763,6 +766,7 @@ highlightG:
 getdb tmpr,tmpc
 mov chezzC[bx],0Ah
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -846,6 +850,7 @@ highlightR:
 getdb tmpr,tmpc
 mov chezzC[bx],4h
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -860,6 +865,7 @@ highlightG:
 getdb tmpr,tmpc
 mov chezzC[bx],0Ah
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -943,6 +949,7 @@ highlightR:
 getdb tmpr,tmpc
 mov chezzC[bx],4h
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -957,6 +964,7 @@ highlightG:
 getdb tmpr,tmpc
 mov chezzC[bx],0Ah
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -1042,6 +1050,7 @@ highlightR:
 getdb tmpr,tmpc
 mov chezzC[bx],4h
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -1056,6 +1065,7 @@ highlightG:
 getdb tmpr,tmpc
 mov chezzC[bx],0Ah
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -1141,6 +1151,7 @@ highlightR:
 getdb tmpr,tmpc
 mov chezzC[bx],4h
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -1155,6 +1166,7 @@ highlightG:
 getdb tmpr,tmpc
 mov chezzC[bx],0Ah
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -1240,6 +1252,7 @@ highlightR:
 getdb tmpr,tmpc
 mov chezzC[bx],4h
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -1254,6 +1267,7 @@ highlightG:
 getdb tmpr,tmpc
 mov chezzC[bx],0Ah
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -1339,6 +1353,7 @@ highlightR:
 getdb tmpr,tmpc
 mov chezzC[bx],4h
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  4,4,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
@@ -1353,6 +1368,7 @@ highlightG:
 getdb tmpr,tmpc
 mov chezzC[bx],0Ah
 dec nexttype
+and nexttype,0Fh
 DrawPieceDB  0Ah,0Ah,0,0,nexttype,tmpr,tmpc,begr,begc,endr,endc,res
 
 mov ax,tmpc
