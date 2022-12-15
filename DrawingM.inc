@@ -258,7 +258,7 @@ DrawPieceD MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col,
 ENDM DrawPieceD
 
 Drawsquare MACRO x,y,tmpx,tmpy,color
-    local row,col
+    local roow,cool
     ;x is row
     ;y is col
     pusha
@@ -283,9 +283,9 @@ Drawsquare MACRO x,y,tmpx,tmpy,color
 
     dec bx
     dec si
-    row:
+    roow:
     inc bx
-    col:
+    cool:
     inc si
     mov cx,si ;col
     mov dx,bx ;Row 
@@ -293,10 +293,10 @@ Drawsquare MACRO x,y,tmpx,tmpy,color
     mov ah,0ch ;Draw Pixel Command
     int 10h 
     cmp cx,tmpx
-    jnz col
+    jnz cool
     sub si,25d
     cmp dx,tmpy
-    jnz row
+    jnz roow
 
     popa
 ENDM Drawsquare
@@ -1595,17 +1595,78 @@ popa
 ENDM kill
 
 replace MACRO oldr,oldc,newr,newc
-local sec,con
+local sec,con,typ,typ2
 ;-1 means empty location
 pusha
 
-getdb newr,newc
-mov al,chezzT[BX]
-mov nexttype,al
-dec nexttype
-and nexttype,0Fh
 
-Drawsquare oldr,oldc,begr,begc,res ;removing the old square
-DrawPieceDB  PrimaryC,SecondaryC,0,0,nexttype,newr,newc,begr,begc,endr,endc,res ;drawing the piece at the new location
+getdb oldr,oldc
+mov ax,0
+mov al,chezzT[bx]
+
+cmp ax,0Ah
+ja typ 
+mov currtype,0
+jmp typ2
+typ:
+mov currtype,1
+typ2:
+dec currtype
+and currtype,0Fh
+
+;/*****replacing data*****/
+;moving at first data at new loction
+getdb oldr,oldc
+mov si,bx
+getdb newr,newc
+;si pointing to old location 
+;bx pointing to new location
+;cx is used as tmp intermediate variable
+mov chezzC[si],-1
+
+mov cl,chezzT[si]
+mov chezzT[BX],cl
+mov chezzT[si],-1
+
+mov cl,chezzN[BX]
+mov chezzN[si],cl
+mov chezzN[BX],-1
+
+mov timer[si],-1
+
+getdw oldr,oldc
+mov si,bx
+getdw newr,newc
+mov cx,chezzP[si]
+mov chezzP[bx],cx
+mov chezzP[si],-1
+;/*****end replacing data*****/
+    mov cx,0
+    mov ah,0
+    mov ax,oldr
+    mov bx,2
+    div bl
+    xor cl,ah
+
+    mov ah,0
+    mov ax,oldc
+    mov bx,2
+    div bl
+    xor cl,ah
+    
+    mov res,cl
+    getdb oldr,oldc
+
+    mov ax,0
+    cmp res,0
+    jnz sec 
+    mov al,PrimaryC
+    mov chezzC[BX],al
+    jmp con
+    sec:mov al,SecondaryC
+    mov chezzC[BX],al
+    con:mov res,al
+    Drawsquare oldc,oldr,begr,begc,res ;to be removed
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,currtype,newr,newc,begr,begc,endr,endc,res ;drawing the piece at the new location
 popa
 ENDM replace
