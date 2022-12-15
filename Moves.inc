@@ -367,31 +367,34 @@ ENDM Highpawn
 
 selcectp MACRO r,c
 mov dx,r
-mov selectedr,r
+mov selectedr,dx
 mov dx,c
-mov selectedc,c
+mov selectedc,dx
 mov selected,1
 ENDM selectp
 
 ;/**************************************************************************/
 
 deselectp MACRO
-local lbl,sec
+local lbl,sec,con,exit
 pusha
 ;this function deselect a selected piece and removes highlights of squares
 mov selectedr,-1
 mov selectedc,-1
 mov selected,0
 
-lbl:
 mov di,0
 ;/**recoloring highlighted cells and redrawing**/
 
+mov cx,0
+mov dx,0
+lbl:
 mov cl,storage[di]
 inc di
 mov dl,storage[di]
+inc di
 
-getdb cl,dl  
+getdb cx,dx  
 mov si,bx
 
 ;cx is pointing to row 
@@ -416,13 +419,15 @@ sec:
 mov bx,0
 mov bl,SecondaryC
 mov chezzC[si],bl
-
-getdW cl,dl
-DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,cx,dx,begr,begc,endr,endc,res 
+con:
+mov tmpx,cx
+mov tmpy,dx
+DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,tmpx,tmpy,begr,begc,endr,endc,res 
 ;/**end of recoloring and redrawing**/
 cmp di,head
-jne lbl
-
+je exit
+jmp far ptr lbl
+exit:
 mov head,0
 popa
 ENDM deselectp
