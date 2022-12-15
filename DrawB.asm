@@ -111,13 +111,129 @@ head DW 0
 storage DB 64 dup(-1)
 
 ;/******DRAW PIECE FUNCTION WRAPPER********/
-
-
-
+PrimaryCW DB 0
+SecondaryCW DB 0
+rowW DW 0
+colW DW 0
+pieceColorW DB 0
+resW DB 0
+begrW DW 0
+begcW DW 0
+endrW DW 0
+endcW DW 0
+roffsetW DW 0
+coffsetW DW 0
 ;/*****************************************/
 
 ;///////////////////////////////////////////
 .Code
+
+;/*****************************************/
+
+DrawPieceW PROC
+    ;local drawLoop,noerror,lblprim,lblsec,filter,contin,Nempty,exit,sec,con
+    ;primaryC is primary Color for the board which is at top left coener 
+    ;secondaryC is secondart color next to first square 
+    ;better to define primaryC and SecondaryC at begging of program
+    ;row is from 0 to 7
+    ;col is from 0 to 7
+    ;piece color is the main color of the piece and secondary color will be background color
+    ;roffset for row offset
+    ;coffset for col offset
+    pusha
+    
+    ;***********Drawing the pixels
+    ;Nempty:
+    mov ax,rowW
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,colW
+    mul cl
+    ;now we have begging stored at ax for col begging
+    ;and bx for row begging
+
+    mov begrW,0
+    mov cx,roffsetW
+    add begrW,cx
+    add begrW,bx
+
+    mov begcW,0
+    mov cx,coffsetW
+    add begcW,cx
+    add begcW,ax
+     
+    mov endrW,bx
+    mov endcW,ax
+
+    add endrW,25d
+    add endcW,25d
+
+    mov cx,0
+    mov ah,0
+    mov ax,rowW
+    mov bx,2
+    div bl
+    xor cl,ah
+
+    mov ah,0
+    mov ax,colW
+    mov bx,2
+    div bl
+    xor cl,ah
+    
+    mov resw,cl
+
+    getdw rowW,colW
+    mov ax,chezzP[bx]
+    cmp ax,-1
+    JNZ Nempty
+    mov ax,0
+    cmp resw,0
+    jnz sec 
+    mov al,PrimaryCW
+    jmp con
+    sec:mov al,SecondaryCW
+    
+    con:mov resw,al
+    Drawsquare colW,rowW,begrW,begcW,resw
+    jmp exitw
+    
+    Nempty:
+    getdw rowW,colW
+    mov bx,chezzP[bx]
+    ;mov BX , dataloc ; BL contains index at the current drawn pixel
+    MOV CX,begcW
+    MOV DX,begrW
+    MOV AH,0ch
+    drawLoop:
+    MOV AL,[BX]
+    cmp al,5
+    ja filterW
+    cmp resw,0
+    jnz lblsec 
+    lblprim:mov al,PrimaryCW
+    jmp continW
+    lblsec:mov al,SecondaryCW
+    jmp continW
+    filterW: mov al,pieceColorW
+    continW:
+    INT 10h 
+    INC CX
+    INC BX
+    CMP CX,endcW
+    JNE drawLoop 
+	
+    MOV CX ,begcW
+    INC DX
+    CMP DX ,endrW
+    JNE drawLoop
+    ;************end drawing the pixels
+    exitw:popa
+    ret
+DrawPieceW ENDP
+
 MAIN PROC FAR
     MOV AX , @DATA
     MOV DS , AX
