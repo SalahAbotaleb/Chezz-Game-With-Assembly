@@ -447,7 +447,7 @@ Highpawn MACRO row,col,playertpye,success
     dofrblock:
     drawup row,col,1
     ;this is not first move for this pawn
-    drawup row,col,1
+    ;drawup row,col,1
     jmp white
     black:
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
