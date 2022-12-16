@@ -1517,6 +1517,7 @@ initchezzN MACRO PrimaryC,SecondaryC,chezzN
 local redo,sec,con,exit
 pusha
 lea si,chezzN
+lea di,chezznrev
 mov cx,0
 mov dx,0
 mov bx,0
@@ -1527,6 +1528,11 @@ redo:
 cmp cx,1
 ja next
 mov [si],bl
+push dx
+mov dh,cl
+mov dl,al
+mov [di],dx
+pop dx
 jmp con
 next: cmp cx,6
 jb con
@@ -1545,7 +1551,7 @@ cmp cx,8
 jnz redo
 
 popa
-ENDM initchezzC
+ENDM initchezzN
 
 
 kill MACRO r,c

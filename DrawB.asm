@@ -67,6 +67,7 @@ movr dw ?
 movc dw ?
 tmpdb2 db ?
 tmpnumber dw 0h  ;number for timer put number in this variable before calling timer function proc
+passer dw 0h ;variable to be passed to procs
 ;selected variables and colors
 selectedr DW -1
 selectedc DW -1
@@ -139,114 +140,6 @@ coffsetW DW 0
 .Code
 
 ;/*****************************************/
-
-DrawPieceW PROC
-    ;local drawLoop,noerror,lblprim,lblsec,filter,contin,Nempty,exit,sec,con
-    ;primaryC is primary Color for the board which is at top left coener 
-    ;secondaryC is secondart color next to first square 
-    ;better to define primaryC and SecondaryC at begging of program
-    ;row is from 0 to 7
-    ;col is from 0 to 7
-    ;piece color is the main color of the piece and secondary color will be background color
-    ;roffset for row offset
-    ;coffset for col offset
-    pusha
-    cmp rowW,0FFh
-    jne nn
-    ;returntoconsole
-    nn:
-    ;***********Drawing the pixels
-    ;Nempty:
-    mov ax,rowW
-    mov cx,25d
-    mul cl
-    mov bx,ax
-
-    mov ax,colW
-    mul cl
-    ;now we have begging stored at ax for col begging
-    ;and bx for row begging
-
-    mov begrW,0
-    mov cx,roffsetW
-    add begrW,cx
-    add begrW,bx
-
-    mov begcW,0
-    mov cx,coffsetW
-    add begcW,cx
-    add begcW,ax
-     
-    mov endrW,bx
-    mov endcW,ax
-
-    add endrW,25d
-    add endcW,25d
-
-    mov cx,0
-    mov ah,0
-    mov ax,rowW
-    mov bx,2
-    div bl
-    xor cl,ah
-
-    mov ah,0
-    mov ax,colW
-    mov bx,2
-    div bl
-    xor cl,ah
-    
-    mov resw,cl
-
-    getdw rowW,colW
-    mov ax,chezzP[bx]
-    cmp ax,-1
-    JNZ Nempty
-    mov ax,0
-    cmp resw,0
-    jnz sec 
-    mov al,PrimaryCW
-    jmp con
-    sec:mov al,SecondaryCW
-    
-    con:mov resw,al
-    Drawsquare colW,rowW,begrW,begcW,resw
-    jmp exitw
-    
-    Nempty:
-    getdw rowW,colW
-    mov bx,chezzP[bx]
-    ;mov BX , dataloc ; BL contains index at the current drawn pixel
-    MOV CX,begcW
-    MOV DX,begrW
-    MOV AH,0ch
-    drawLoop:
-    MOV AL,[BX]
-    cmp al,5
-    ja filterW
-    cmp resw,0
-    jnz lblsec 
-    lblprim:mov al,PrimaryCW
-    jmp continW
-    lblsec:mov al,SecondaryCW
-    jmp continW
-    filterW: mov al,pieceColorW
-    continW:
-    INT 10h 
-    INC CX
-    INC BX
-    CMP CX,endcW
-    JNE drawLoop 
-	
-    MOV CX ,begcW
-    INC DX
-    CMP DX ,endrW
-    JNE drawLoop
-    ;************end drawing the pixels
-    exitw:popa
-    ret
-DrawPieceW ENDP
-
 ;procude that prints a number on the screen fro 3 to 1
 Drawtimp PROC
 ; local num1,num2,num3,notnum1,notnum2,notnum3,lop1,lop2,lop3,lop22,lop33,lop23,lop32,lop12,lop13
@@ -679,6 +572,131 @@ pusha
 
 Drawtimp ENDP
 
+DrawPieceW PROC
+    ;local drawLoop,noerror,lblprim,lblsec,filter,contin,Nempty,exit,sec,con
+    ;primaryC is primary Color for the board which is at top left coener 
+    ;secondaryC is secondart color next to first square 
+    ;better to define primaryC and SecondaryC at begging of program
+    ;row is from 0 to 7
+    ;col is from 0 to 7
+    ;piece color is the main color of the piece and secondary color will be background color
+    ;roffset for row offset
+    ;coffset for col offset
+    pusha
+    cmp rowW,0FFh
+    jne nn
+    ;returntoconsole
+    nn:
+    ;***********Drawing the pixels
+    ;Nempty:
+    mov ax,rowW
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,colW
+    mul cl
+    ;now we have begging stored at ax for col begging
+    ;and bx for row begging
+
+    mov begrW,0
+    mov cx,roffsetW
+    add begrW,cx
+    add begrW,bx
+
+    mov begcW,0
+    mov cx,coffsetW
+    add begcW,cx
+    add begcW,ax
+     
+    mov endrW,bx
+    mov endcW,ax
+
+    add endrW,25d
+    add endcW,25d
+
+    mov cx,0
+    mov ah,0
+    mov ax,rowW
+    mov bx,2
+    div bl
+    xor cl,ah
+
+    mov ah,0
+    mov ax,colW
+    mov bx,2
+    div bl
+    xor cl,ah
+    
+    mov resw,cl
+
+    getdw rowW,colW
+    mov ax,chezzP[bx]
+    cmp ax,-1
+    JNZ Nempty
+    mov ax,0
+    cmp resw,0
+    jnz sec 
+    mov al,PrimaryCW
+    jmp con
+    sec:mov al,SecondaryCW
+    
+    con:mov resw,al
+    Drawsquare colW,rowW,begrW,begcW,resw
+    jmp exitw
+    
+    Nempty:
+    getdw rowW,colW
+    mov bx,chezzP[bx]
+    ;mov BX , dataloc ; BL contains index at the current drawn pixel
+    MOV CX,begcW
+    MOV DX,begrW
+    MOV AH,0ch
+    drawLoop:
+    MOV AL,[BX]
+    cmp al,5
+    ja filterW
+    cmp resw,0
+    jnz lblsec 
+    lblprim:mov al,PrimaryCW
+    jmp continW
+    lblsec:mov al,SecondaryCW
+    jmp continW
+    filterW: mov al,pieceColorW
+    continW:
+    INT 10h 
+    INC CX
+    INC BX
+    CMP CX,endcW
+    JNE drawLoop 
+	
+    MOV CX ,begcW
+    INC DX
+    CMP DX ,endrW
+    JNE drawLoop
+    ;************end drawing the pixels
+    ;msh hetetak enta khales
+    getdb roww,colw
+    mov al,chezzN[BX]
+    cmp al,-1
+    jnz continuew
+    jmp far ptr exitw
+    continuew:
+    mov ah,0
+    mov bx,ax
+    mov al,time[bx]
+    mov ah,0
+    mov passer,AX
+    drawtim passer
+    ;////////////////////
+    exitw:
+    popa
+    ret
+DrawPieceW ENDP
+
+
+
+
 MAIN PROC FAR
     MOV AX , @DATA
     MOV DS , AX
@@ -782,9 +800,10 @@ MAIN PROC FAR
     initchezz  soliderData,6,5,05,chezzP,chezzT
     initchezz  soliderData,6,6,05h,chezzP,chezzT
     initchezz  soliderData,6,7,05h,chezzP,chezzT
-
+    
     
     ;/******************test area***************************/
+        
         replace 6,7,5,4
         replace 6,3,2,3
         replace 6,4,1,4
@@ -964,7 +983,7 @@ MAIN PROC FAR
     ;PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
     
     contDr:
-    ;fuction that updates timers
+    ;fuction that updates
     updatetime
 
 
