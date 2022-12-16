@@ -320,6 +320,7 @@ pop ax
 ENDM getcursorlocation
 
 insert MACRO row,col
+
 pusha
 mov bx,head
 mov ax,0

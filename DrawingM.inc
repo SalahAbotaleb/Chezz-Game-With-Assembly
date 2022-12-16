@@ -514,7 +514,7 @@ mov chezzC[bx],0Ah
 cmp ax,0Ah
 ja blackP
 jmp far ptr whiteP
-    blackP:
+    blackP: ;to be returned
     DrawPieceDB  0Ah,0Ah,0,0,0h,row,col,begr,begc,endr,endc,res
     jmp far ptr contDr
     whiteP:
@@ -523,7 +523,6 @@ jmp far ptr whiteP
     
     mov ax,row
     mov cx,col
-
     mov tmpdbr,al
     mov tmpdbc,cl
     insert tmpdbr,tmpdbc
@@ -577,6 +576,7 @@ mov tmpr,cx
 mov tmpc,ax
 
 getdb tmpr,tmpc
+
 mov ax,0
 mov al,chezzT[bx]
 cmp al,-1
@@ -1632,7 +1632,9 @@ mov cl,chezzN[BX]
 mov chezzN[si],cl
 mov chezzN[BX],-1
 
-mov timer[si],-1
+mov bx,0
+mov bl,chezzN[si]
+mov timer[bx],-1
 
 getdw oldr,oldc
 mov si,bx
