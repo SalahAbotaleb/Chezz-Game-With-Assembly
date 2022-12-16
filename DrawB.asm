@@ -413,7 +413,7 @@ MAIN PROC FAR
     choosepiece1:
 
     ;calling function to choose a piece
-    mov success,1
+    mov success,0
     push row
     push col
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res

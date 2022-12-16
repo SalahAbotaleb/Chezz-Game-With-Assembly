@@ -89,7 +89,7 @@ popa
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1,selectedn
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
 ;chezzP is the piece array
@@ -109,7 +109,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     ; mov success,0
     ; jmp far ptr leave
     ; cont1:
-
+    mov success,1
     mov ax,prevR
     mov bx,prevC
 
@@ -127,7 +127,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     ;check if position is empty
     cmp ax,-1
     JnE Q1
-    jmp far ptr leave
+    jmp far ptr selectedn
     Q1:
     ;check if player is white ;kinda racist
     cmp playertpye,0;probably serial port
@@ -214,7 +214,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     and ax,0f0h
     cmp ax,00
     JNE Qb2
-    jmp far ptr leave
+    jmp far ptr selectedn
     Qb2:
     ;check if piece is king
     mov ax,[di]
@@ -286,9 +286,9 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
 
     jmp far ptr leave
     bnpawnQ:
-    jmp far ptr leave
-
-
+    ;jmp far ptr leave
+    selectedn:
+    mov success,0
     leave:
 ENDM choosepiece
 
