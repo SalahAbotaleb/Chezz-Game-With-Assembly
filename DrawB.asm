@@ -350,7 +350,7 @@ MAIN PROC FAR
         replace 5,1,4,1
         kill 0,0
         kill 6,4
-
+        kill 6,7
         initchezz  horseData,4,2,14h,chezzP,chezzT
         ;number,row,col,numcolor,backc
         drawtim  1,5,0,0bh,PrimaryC;not this is not primary color but rather the color of the background
@@ -358,30 +358,12 @@ MAIN PROC FAR
         drawtim  3,0,5,0bh,PrimaryC
         drawtim  2,0,6,0bh,PrimaryC
         drawtim  1,0,4,0bh,PrimaryC
-    ; drawSelf 4,4
-	; drawup 4,4,10
-    ; Drawdown 4,4,10
-    ; Drawleft 4,4,10
-    ; Drawright 4,4,10
-    ; DrawRDD 4,4,10
-    ; DrawLDD 4,4,10
-    ; DrawLUD 4,4,10
-    ; DrawRUD 4,4,10
-
-    ; initchezz  soliderData,2,2,5h,chezzP,chezzT
-    ; getdb  1,0
-    ; mov chezzC[bx],9
-    ; mov al,chezzC[bx]
-    ; mov tmpdb,al
-    ; getdW 1,0
-    ; DrawPieceDB  9,9,0,0,0h,1,0,begr,begc,endr,endc,res
-
-    ; getdb  2,0
-    ; mov chezzC[bx],9
-    ; mov al,chezzC[bx]
-    ; mov tmpdb,al
-    ; getdw  2,0
-    ; DrawPieceDB  9,9,0,0,0h,2,0,begr,begc,endr,endc,res
+        
+        selectp 6,5
+        insert 2,5
+        insert 3,5
+        insert 4,5
+        movepiece 3,5
 
     ;/******************end of test area***************************/
 
@@ -426,11 +408,11 @@ MAIN PROC FAR
     movepiece row,col
     pop col
     pop row
-    jmp far ptr validate
+    jmp far ptr Q
     choosepiece1:
 
     ;calling function to choose a piece
-    mov success,0 
+    mov success,1 
     push row
     push col
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
@@ -441,7 +423,7 @@ MAIN PROC FAR
     jmp far ptr q
     suc:
     selectp row,col
-    jmp validate
+    jmp Q
 
     ;///////////////////////////////////////////////////////
     right:
