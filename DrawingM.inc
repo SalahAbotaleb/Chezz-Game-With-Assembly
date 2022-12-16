@@ -1561,11 +1561,23 @@ pusha
 getdb r,c
 mov chezzC[BX],-1
 mov chezzT[BX],-1
+;;;handle chezznrev////////////////
+push ax
+push bx
+mov al,chezzN[BX]
+mov bx,00h
+mov bl,al
+mov chezznrev[BX],-1
+mov time[bx],0
+pop bx 
+pop ax
+;;;/////////////////////////////////////end
 mov ax,0
 mov al,chezzN[BX]
 mov chezzN[BX],-1
 mov bx,ax
 mov timer[BX],-1
+
 
 getdW r,c
 mov chezzP[BX],-1
@@ -1637,7 +1649,24 @@ mov chezzT[si],-1
 mov cl,chezzN[BX]
 mov chezzN[si],cl
 mov chezzN[BX],-1
+;;;chezzNrev handeling and time handeling
+pusha
+mov dx,newr
+mov ax,newc
+mov dh,dl
+mov dl,al
 
+getdb newr,newc
+
+mov cl,chezzN[bx]
+mov bx,0
+mov bl,cl
+mov chezznrev[BX],dx
+
+mov time[bx],3
+popa
+;under checking
+;;;///////////////////////
 mov bx,0
 mov bl,chezzN[si]
 mov timer[bx],-1
@@ -1676,6 +1705,9 @@ mov chezzP[si],-1
     con:mov res,al
     Drawsquare oldc,oldr,begr,begc,res ;to be removed
     DrawPieceDB  PrimaryC,SecondaryC,0,0,currtype,newr,newc,begr,begc,endr,endc,res ;drawing the piece at the new location
+    
+
+
 popa
 ENDM replace
 
