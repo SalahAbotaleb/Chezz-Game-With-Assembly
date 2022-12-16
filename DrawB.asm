@@ -1,6 +1,7 @@
 include mymacros.inc
 include DrawingM.inc
 include Moves.inc
+include timer.inc
 .Model MEDIUM
 .286
 .Stack 64
@@ -963,6 +964,10 @@ MAIN PROC FAR
     ;PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
     
     contDr:
+    ;fuction that updates timers
+    updatetime
+
+
     mov ax,row
     mov bx,col
     
