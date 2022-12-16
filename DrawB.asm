@@ -22,6 +22,9 @@ tmpy DW 0
 row DW 0
 col DW 0
 
+rowx DW 0
+colx DW 0
+
 killWC DB 0 ;counter for killed white
 killBC DB 0 ;counter for killed black
 
@@ -154,12 +157,12 @@ pusha
     mov dx,0
     lop13:
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
     mov cx,dx
     push dx
@@ -182,12 +185,12 @@ pusha
     mov dx,0
     lop12:
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
     mov cx,dx
     push dx
@@ -207,15 +210,15 @@ pusha
     cmp dx,4
     jne lop12
 ;///////////////////
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
-    ;now we have begging stored at ax for col begging
-    ;and bx for row begging
+    ;now we have begging stored at ax for colx begging
+    ;and bx for rowx begging
     mov cx,ax
     mov dx,bx
     add dx,10d
@@ -231,12 +234,12 @@ pusha
 ;//////////////////
     lop1:
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
     mov cx,dx
     push dx
@@ -256,12 +259,12 @@ pusha
     cmp dx,5
     jne lop1
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
 
     mov cx,ax
@@ -272,12 +275,12 @@ pusha
     mov al,numcolor
     INT 10h
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
 
     mov cx,ax
@@ -300,12 +303,12 @@ pusha
     lop2:
     mov dx,cx
     push cx
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
    
     mov cx,dx
@@ -330,12 +333,12 @@ pusha
     lop22:
     mov dx,cx
     push cx
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
        
     mov cx,dx
@@ -361,12 +364,12 @@ pusha
 
     mov dx,cx
     push cx
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
        
     mov cx,dx
@@ -385,12 +388,12 @@ pusha
     cmp cx,3
     jne lop23
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
 
     mov cx,ax
@@ -401,12 +404,12 @@ pusha
     mov al,numcolor
     INT 10h
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
 
     mov cx,ax
@@ -418,12 +421,12 @@ pusha
     INT 10h
 
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
 
     mov cx,ax
@@ -445,12 +448,12 @@ pusha
     lop3:
     mov dx,cx
     push cx
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
    
     mov cx,dx
@@ -475,12 +478,12 @@ pusha
     lop32:
     mov dx,cx
     push cx
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
        
     mov cx,dx
@@ -506,12 +509,12 @@ pusha
 
     mov dx,cx
     push cx
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
        
     mov cx,dx
@@ -530,12 +533,12 @@ pusha
     cmp cx,3
     jne lop33
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
 
     mov cx,ax
@@ -546,12 +549,12 @@ pusha
     mov al,numcolor
     INT 10h
 
-    mov ax,row
+    mov ax,rowx
     mov cx,25d
     mul cl
     mov bx,ax
 
-    mov ax,col
+    mov ax,colx
     mul cl
 
     mov cx,ax
@@ -687,7 +690,15 @@ DrawPieceW PROC
     mov al,time[bx]
     mov ah,0
     mov passer,AX
-    drawtim passer
+    push ax
+
+    mov ax,roww
+    mov rowx,ax
+    mov ax,colw
+    mov colx,ax
+    Drawtim passer
+    pop ax
+
     ;////////////////////
     exitw:
     popa
@@ -804,33 +815,33 @@ MAIN PROC FAR
     
     ;/******************test area***************************/
         
-        replace 6,7,5,4
-        replace 6,3,2,3
-        replace 6,4,1,4
+         replace 6,7,5,4
+         replace 6,3,2,3
+        ; replace 6,4,1,4
 
-        replace 6,1,5,1
-        replace 5,1,4,1
-        kill 0,0
-        kill 6,4
-        kill 6,7
-        initchezz  horseData,4,2,14h,chezzP,chezzT
-        ;number,row,col,numcolor,backc
-        mov row,4
-        mov col,2 
-        drawtim  1;not this is not primary color but rather the color of the background
-        mov row,4
-        mov col,3 
-        drawtim  1
-        mov row,4
-        mov col,4
-        drawtim  1
-        mov row,6
-        mov col,5
-        drawtim  1
+        ; replace 6,1,5,1
+        ; replace 5,1,4,1
+        ; kill 0,0
+        ; kill 6,4
+        ; kill 6,7
+        ; initchezz  horseData,4,2,14h,chezzP,chezzT
+        ; ;number,row,col,numcolor,backc
+        ; mov row,4
+        ; mov col,2 
+        ; drawtim  1;not this is not primary color but rather the color of the background
+        ; mov row,4
+        ; mov col,3 
+        ; drawtim  1
+        ; mov row,4
+        ; mov col,4
+        ; drawtim  1
+        ; mov row,6
+        ; mov col,5
+        ; drawtim  1
         
-        selectp 6,5
-        Drawup 6,5,10
-        movepiece 1,5
+        ; selectp 6,5
+        ; Drawup 6,5,10
+        ; movepiece 1,5
 
     ;/******************end of test area***************************/
 
@@ -850,6 +861,7 @@ MAIN PROC FAR
     ;Q means the user wants to select
     
     Q:
+    updatetime
     MOV AH,1;every time looping we check here whether a key was selected or not
     INT 16h
     push ax
@@ -984,7 +996,6 @@ MAIN PROC FAR
     
     contDr:
     ;fuction that updates
-    updatetime
 
 
     mov ax,row

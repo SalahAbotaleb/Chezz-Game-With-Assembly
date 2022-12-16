@@ -1528,11 +1528,13 @@ redo:
 cmp cx,1
 ja next
 mov [si],bl
-push dx
-mov dh,cl
-mov dl,al
-mov [di],dx
-pop dx
+push bx
+mov bh,cl
+mov bl,dl
+mov [di],bx
+inc di
+inc di
+pop bx
 jmp con
 next: cmp cx,6
 jb con
@@ -1568,8 +1570,9 @@ push bx
 mov al,chezzN[BX]
 mov bx,00h
 mov bl,al
-mov chezznrev[BX],-1
 mov time[bx],0
+add bx,bx
+mov chezznrev[BX],-1
 pop bx 
 pop ax
 ;;;/////////////////////////////////////end
@@ -1647,9 +1650,14 @@ mov cl,chezzT[si]
 mov chezzT[BX],cl
 mov chezzT[si],-1
 
-mov cl,chezzN[BX]
-mov chezzN[si],cl
-mov chezzN[BX],-1
+mov cl,chezzN[si]
+mov chezzN[BX],cl
+mov chezzN[si],-1
+
+;mov bx,0
+;mov bl,chezzN[si]
+;mov timer[bx],-1
+
 ;;;chezzNrev handeling and time handeling
 pusha
 mov dx,newr
@@ -1662,15 +1670,25 @@ getdb newr,newc
 mov cl,chezzN[bx]
 mov bx,0
 mov bl,cl
-mov chezznrev[BX],dx
 
 mov time[bx],3
+add bx,bx
+mov chezznrev[BX],dx
 popa
 ;under checking
 ;;;///////////////////////
+
+pusha
+mov ax,2C00h
+INT 21h
+getdb newr,newc
+mov al,chezzN[bx]
 mov bx,0
-mov bl,chezzN[si]
-mov timer[bx],-1
+mov bl,al
+mov Timer[bx],dh
+popa
+
+
 
 getdw oldr,oldc
 mov si,bx

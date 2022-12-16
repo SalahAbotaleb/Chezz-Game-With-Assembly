@@ -55,7 +55,13 @@ je cont4
 jmp far ptr cont2
 cont4:
 replace selectedr,selectedc,movr,movc ;movr and movc can be replaced by row and col here
-drawtim 3
+push ax
+mov ax,row
+mov rowx,ax
+mov ax,col
+mov colx,ax
+Drawtim 3
+pop ax
 jmp far ptr dexit
 cont2:
 cmp ax,0AH
@@ -75,14 +81,13 @@ kill movr,movc
 cont3: 
 ;replace and timer
 replace selectedr,selectedc,movr,movc
-mov ax,2C00h
-INT 21h
-getdb movr,movc
-mov al,chezzN[bx]
-mov bx,0
-mov bl,al
-mov Timer[bx],dh
-drawtim 3
+push ax
+mov ax,row
+mov rowx,ax
+mov ax,col
+mov colx,ax
+Drawtim 3
+pop ax
 dexit: deselectp
 ;deselect then exit
 exit:
