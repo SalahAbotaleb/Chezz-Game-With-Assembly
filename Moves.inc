@@ -203,7 +203,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     jmp far ptr wnpawnQ
     wpawn:
     
-    Highpawn row,col,playertpye,success
+    Highpawnw row,col
      
     jmp far ptr leave
     wnpawnQ:
@@ -282,7 +282,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     bpawn:
 
     ;TODO call pawn function
-    Highpawn row,col,playertpye,success
+    Highpawnb row,col
 
     jmp far ptr leave
     bnpawnQ:
@@ -364,16 +364,11 @@ DrawKnight row,col
 ENDM HighKnight
 
 ;dont compare memory locations
-Highpawn MACRO row,col,playertpye,success
-    local exit,white,black,whitefirstmove,blackfirstmove,whitenotfirstmove,blacknotfirstmove,noenemyonleftup,noenemyonrighttup,enemyonleftup,enemyonrighttup,noenemyonleftdown,noenemyonrighttdown,enemyonleftdown,enemyonrighttdown,dofrblock,dofrblockb,dosecmove,dosecmoveb,dosecmove2,dosecmoveb2,CONWHITE
+Highpawnw MACRO row,col
+    local exit,white,black,whitefirstmove,whitenotfirstmov,noenemyonleftup,noenemyonrighttup,enemyonleftup,enemyonrighttup,dofrblock,dosecmove,dosecmove2,CONWHITE
    
-    mov success,1
     drawSelf row,col
-    mov al,playertpye
-    cmp al,0
-    je conwhite
-    jmp far ptr black
-    conwhite:
+
     mov ax,row
     mov cx,col
     ;takes
@@ -452,7 +447,17 @@ Highpawn MACRO row,col,playertpye,success
     ;drawup row,col,1
     jmp white
     black:
+
+
+    white:
+    exit:
+ENDM Highpawnw
+
+
+Highpawnb MACRO row,col
+local exit,black,whitefirstmove,blackfirstmove,blacknotfirstmove,noenemyonleftdown,noenemyonrighttdown,enemyonleftdown,enemyonrighttdown,dofrblockb,dosecmoveb,dosecmove2,dosecmoveb2
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    drawSelf row,col
     mov ax,row
     mov cx,col
     ;takes
@@ -515,7 +520,7 @@ Highpawn MACRO row,col,playertpye,success
     jmp far ptr exit
     dosecmoveb2:
     Drawdown row,col,2
-
+    jmp far ptr exit
 
     blacknotfirstmove:
     mov ax,row
@@ -525,7 +530,7 @@ Highpawn MACRO row,col,playertpye,success
     mov dl,chezzT[bx]
     cmp dl,-1
     je dofrblockb
-    jmp far ptr white
+    jmp far ptr exit
     dofrblockb:
     Drawdown row,col,1
     ;this is not first move for this pawn
@@ -534,12 +539,11 @@ Highpawn MACRO row,col,playertpye,success
 
 
 
-
+exit:
 ;;;;;;;;;;;;;;;;;;;;;
 
-    white:
-    exit:
-ENDM Highpawn
+
+ENDM Highpawnb
 
 ;/**************************************************************************/
 

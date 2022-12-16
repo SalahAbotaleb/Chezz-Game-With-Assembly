@@ -101,7 +101,7 @@ chezzN DB 64 dup(-1) ;numbering of each piece
 Timer  DB 32 dup(-1)
 
 ;///////////////////////////////////////////
-playertpye DB 0 ;0 for white 1 for Black
+playertpye DB 1 ;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
