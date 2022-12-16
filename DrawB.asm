@@ -360,10 +360,8 @@ MAIN PROC FAR
         drawtim  1,0,4,0bh,PrimaryC
         
         selectp 6,5
-        insert 2,5
-        insert 3,5
-        insert 4,5
-        movepiece 3,5
+        Drawup 6,5,10
+        movepiece 1,5
 
     ;/******************end of test area***************************/
 
