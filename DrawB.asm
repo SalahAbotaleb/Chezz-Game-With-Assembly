@@ -143,7 +143,10 @@ DrawPieceW PROC
     ;roffset for row offset
     ;coffset for col offset
     pusha
-    
+    cmp rowW,0FFh
+    jne nn
+    ;returntoconsole
+    nn:
     ;***********Drawing the pixels
     ;Nempty:
     mov ax,rowW
@@ -410,7 +413,7 @@ MAIN PROC FAR
     choosepiece1:
 
     ;calling function to choose a piece
-    mov success,1 
+    mov success,1
     push row
     push col
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
