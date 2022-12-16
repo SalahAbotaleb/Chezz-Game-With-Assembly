@@ -55,6 +55,7 @@ je cont4
 jmp far ptr cont2
 cont4:
 replace selectedr,selectedc,movr,movc ;movr and movc can be replaced by row and col here
+drawtim 3
 jmp far ptr dexit
 cont2:
 cmp ax,0AH
@@ -81,7 +82,7 @@ mov al,chezzN[bx]
 mov bx,0
 mov bl,al
 mov Timer[bx],dh
-
+drawtim 3
 dexit: deselectp
 ;deselect then exit
 exit:
