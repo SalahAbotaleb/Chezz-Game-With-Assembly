@@ -1670,3 +1670,472 @@ mov chezzP[si],-1
     DrawPieceDB  PrimaryC,SecondaryC,0,0,currtype,newr,newc,begr,begc,endr,endc,res ;drawing the piece at the new location
 popa
 ENDM replace
+
+
+drawtim MACRO number,row,col,numcolor,backc
+local num1,num2,num3,notnum1,notnum2,notnum3,lop1,lop2,lop3,lop22,lop33,lop23,lop32,lop12,lop13
+
+    mov ax,number
+    cmp ax,1
+    je num1
+    jmp far ptr notnum1
+    num1:
+    ;draw 1
+
+
+
+
+
+
+    mov dx,0
+    lop13:
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    mov cx,dx
+    push dx
+    mov cx,dx
+    mov cx,ax
+    add dx,bx
+    add dx,10d
+    add cx,13d
+
+    push ax
+    mov al,backc
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop DX
+    inc dx
+    cmp dx,4
+    jne lop13
+ ;///////////////////
+    mov dx,0
+    lop12:
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    mov cx,dx
+    push dx
+    mov dx,cx
+    mov cx,ax
+    add dx,bx
+    add dx,10d
+    add cx,11d
+
+    push ax
+    mov al,backc
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop DX
+    inc dx
+    cmp dx,4
+    jne lop12
+;///////////////////
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    ;now we have begging stored at ax for col begging
+    ;and bx for row begging
+    mov cx,ax
+    mov dx,bx
+    add dx,10d
+    add cx,11d
+    mov ah,0ch
+    mov al,numcolor
+    INT 10h
+
+
+    mov bx,dx
+    dec bx
+    mov dx,0
+
+
+
+
+;//////////////////
+    lop1:
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    mov cx,dx
+    push dx
+    mov cx,dx
+    mov cx,ax
+    add dx,bx
+    add dx,10d
+    add cx,12d
+
+    push ax
+    mov al,numcolor
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop DX
+    inc dx
+    cmp dx,5
+    jne lop1
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+
+    mov cx,ax
+    mov dx,bx
+    add dx,14d
+    add cx,11d
+    mov ah,0ch
+    mov al,numcolor
+    INT 10h
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+
+    mov cx,ax
+    mov dx,bx
+    add dx,14d
+    add cx,13d
+    mov ah,0ch
+    mov al,numcolor
+    INT 10h
+
+
+
+
+
+
+    ;;;;;;;;;;
+    notnum1:
+    cmp ax,2
+    je num2
+    jmp far ptr notnum2
+    num2:
+    ;draw 2
+
+
+
+    mov cx,0
+    lop2:
+    mov dx,cx
+    push cx
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    
+   
+    mov cx,dx
+    add cx,ax
+    mov dx,bx
+    add dx,12d
+    add cx,11d
+
+    push ax
+    mov al,numcolor
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop cX
+    inc cx
+    cmp cx,3
+    jne lop2
+
+    ;second loop
+
+    mov cx,0
+    lop22:
+    mov dx,cx
+    push cx
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    
+   
+    mov cx,dx
+    add cx,ax
+    mov dx,bx
+    add dx,10d
+    add cx,11d
+
+    push ax
+    mov al,numcolor
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop cX
+    inc cx
+    cmp cx,3
+    jne lop22
+
+    ;third loop
+
+    mov cx,0
+    lop23:
+
+
+
+
+
+    
+    mov dx,cx
+    push cx
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    
+   
+    mov cx,dx
+    add cx,ax
+    mov dx,bx
+    add dx,14d
+    add cx,11d
+
+    push ax
+    mov al,numcolor
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop cX
+    inc cx
+    cmp cx,3
+    jne lop23
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+
+    mov cx,ax
+    mov dx,bx
+    add dx,11d
+    add cx,13d
+    mov ah,0ch
+    mov al,numcolor
+    INT 10h
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+
+    mov cx,ax
+    mov dx,bx
+    add dx,13d
+    add cx,11d
+    mov ah,0ch
+    mov al,numcolor
+    INT 10h
+
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+
+    mov cx,ax
+    mov dx,bx
+    add dx,13d
+    add cx,13d
+    mov ah,0ch
+    mov al,backc
+    INT 10h
+
+
+
+
+
+    notnum2:
+    cmp ax,3
+    je num3
+    jmp far ptr notnum3
+    num3:
+    ;draw 3
+
+
+
+
+    mov cx,0
+    lop3:
+    mov dx,cx
+    push cx
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    
+   
+    mov cx,dx
+    add cx,ax
+    mov dx,bx
+    add dx,12d
+    add cx,11d
+
+    push ax
+    mov al,numcolor
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop cX
+    inc cx
+    cmp cx,3
+    jne lop3
+
+    ;second loop
+
+    mov cx,0
+    lop32:
+    mov dx,cx
+    push cx
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    
+   
+    mov cx,dx
+    add cx,ax
+    mov dx,bx
+    add dx,10d
+    add cx,11d
+
+    push ax
+    mov al,numcolor
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop cX
+    inc cx
+    cmp cx,3
+    jne lop32
+
+    ;third loop
+
+    mov cx,0
+    lop33:
+
+
+
+
+
+    
+    mov dx,cx
+    push cx
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+    
+   
+    mov cx,dx
+    add cx,ax
+    mov dx,bx
+    add dx,14d
+    add cx,11d
+
+    push ax
+    mov al,numcolor
+    mov ah,0ch
+    INT 10h
+    pop ax
+    pop cX
+    inc cx
+    cmp cx,3
+    jne lop33
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+
+    mov cx,ax
+    mov dx,bx
+    add dx,11d
+    add cx,13d
+    mov ah,0ch
+    mov al,numcolor
+    INT 10h
+
+    mov ax,row
+    mov cx,25d
+    mul cl
+    mov bx,ax
+
+    mov ax,col
+    mul cl
+
+    mov cx,ax
+    mov dx,bx
+    add dx,13d
+    add cx,13d
+    mov ah,0ch
+    mov al,numcolor
+    INT 10h
+
+
+
+
+
+    notnum3:
+    
+ENDM drawtim

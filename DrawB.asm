@@ -350,7 +350,38 @@ MAIN PROC FAR
         replace 5,1,4,1
         kill 0,0
         kill 6,4
-        kill 1,7
+
+        initchezz  horseData,4,2,14h,chezzP,chezzT
+        ;number,row,col,numcolor,backc
+        drawtim  1,5,0,0bh,PrimaryC;not this is not primary color but rather the color of the background
+      
+        drawtim  3,0,5,0bh,PrimaryC
+        drawtim  2,0,6,0bh,PrimaryC
+        drawtim  1,0,4,0bh,PrimaryC
+    ; drawSelf 4,4
+	; drawup 4,4,10
+    ; Drawdown 4,4,10
+    ; Drawleft 4,4,10
+    ; Drawright 4,4,10
+    ; DrawRDD 4,4,10
+    ; DrawLDD 4,4,10
+    ; DrawLUD 4,4,10
+    ; DrawRUD 4,4,10
+
+    ; initchezz  soliderData,2,2,5h,chezzP,chezzT
+    ; getdb  1,0
+    ; mov chezzC[bx],9
+    ; mov al,chezzC[bx]
+    ; mov tmpdb,al
+    ; getdW 1,0
+    ; DrawPieceDB  9,9,0,0,0h,1,0,begr,begc,endr,endc,res
+
+    ; getdb  2,0
+    ; mov chezzC[bx],9
+    ; mov al,chezzC[bx]
+    ; mov tmpdb,al
+    ; getdw  2,0
+    ; DrawPieceDB  9,9,0,0,0h,2,0,begr,begc,endr,endc,res
 
     ;/******************end of test area***************************/
 
