@@ -355,6 +355,8 @@ ENDM HighBishop
 
 HighKnight MACRO row,col
 
+drawSelf row,col
+
 DrawKnight row,col
 
 
