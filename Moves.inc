@@ -2,77 +2,94 @@ include DrawingM.inc
 include mymacros.inc
 
 movepiece MACRO row,col
-local lbl,sec,con,exit,white,black,cont1,resume
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,white,black
 pusha
 ;this function deselect a selected piece and removes highlights of squares
-mov selectedr,-1
-mov selectedc,-1
-mov selected,0
+mov cx,row
+mov dx,col
+xor cx,selectedr
+xor dx,selectedc
+or cx,dx
+cmp cx,0
+jne con
+jmp far ptr dexit
+con:
 
-cmp head,0
-jne resume
-jmp far ptr exit
-resume:
+;/**checking that the selected cell is one of highlighted cells**/
 mov di,0
-;/**recoloring highlighted cells and redrawing**/
 
+
+lbl:
+;cx is pointing to row 
+;dx is pointing to colomn
 mov cx,0
 mov dx,0
-lbl:
 mov cl,storage[di]
 inc di
 mov dl,storage[di]
 inc di
 
-getdb cx,dx  
-mov si,bx
+mov movr,cx
+mov movc,dx
 
-;cx is pointing to row 
-;dx is pointing to colomn
+xor cx,row
+xor dx,col
+or cx,dx
+cmp cx,0
+jne cont1
+jmp far ptr fexit
+cont1:cmp di,head
+jne lbl
+jmp far ptr exit
+;/**end checking**/
+fexit:
+;found an item and deselect then exit
+mov cx,movr
+mov dx,movc
 
-mov res,0
-mov ax,cx
-mov bx,2
-div bl
-xor res,ah
-mov ax,dx
-mov bx,2
-div bl
-xor res,ah
-cmp res,0
-jnz sec 
-mov bx,0
-mov bl,PrimaryC
-mov chezzC[si],bl
-jmp con
-sec:
-mov bx,0
-mov bl,SecondaryC
-mov chezzC[si],bl
-con:
-mov tmpx,cx
-mov tmpy,dx
-mov al,chezzT[si]
-cmp al,0Ah
-jbe white
-jmp far ptr black
-white:
-DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,tmpx,tmpy,begr,begc,endr,endc,res
-jmp far ptr cont1
+getdb movr,movc
+mov ax,0
+mov al,chezzT[BX]
+cmp al,-1
+je cont4
+jmp far ptr cont2
+cont4:
+replace selectedr,selectedc,movr,movc ;movr and movc can be replaced by row and col here
+jmp far ptr dexit
+cont2:
+cmp ax,0AH
+ja black
+jmp far ptr white
 black:
-DrawPieceDB  PrimaryC,SecondaryC,0,0,0,tmpx,tmpy,begr,begc,endr,endc,res
-cont1:
-;/**end of recoloring and redrawing**/
-cmp di,head
-je exit
-jmp far ptr lbl
+;now the one to be killed is balck
+;enqueue if needed the killed piece
+inc killBC
+kill movr,movc
+jmp far ptr cont3
+white:
+;now the one to be killed is white
+;enqueue if needed the killed piece
+inc killWC
+kill movr,movc
+cont3: 
+;replace and timer
+replace selectedr,selectedc,movr,movc
+mov ax,2C00h
+INT 21h
+getdb movr,movc
+mov al,chezzN[bx]
+mov bx,0
+mov bl,al
+mov Timer[bx],dh
+
+dexit: deselectp
+;deselect then exit
 exit:
-mov head,0
 popa    
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
 ;chezzP is the piece array
@@ -85,7 +102,14 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
 ;success is the success flag
 ;wnkingQ means tha the piece is not white king 
 
-    
+    ; getdb prevR,prevC
+    ; mov al,chezzT[BX]
+    ; cmp al,-1
+    ; jne cont1
+    ; mov success,0
+    ; jmp far ptr leave
+    ; cont1:
+
     mov ax,prevR
     mov bx,prevC
 

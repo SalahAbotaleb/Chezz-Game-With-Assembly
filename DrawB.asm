@@ -60,6 +60,8 @@ currtype db ?
 nexttype db ?
 tmpr dw ?
 tmpc dw ?
+movr dw ?
+movc dw ?
 tmpdb2 db ?
 ;selected variables and colors
 selectedr DW -1
@@ -341,44 +343,15 @@ MAIN PROC FAR
     
     ;/******************test area***************************/
         replace 6,7,5,4
-        initchezz  bishopData,3,4,03h,chezzP,chezzT
+        replace 6,3,2,3
+        replace 6,4,1,4
+
+        replace 6,1,5,1
+        replace 5,1,4,1
+        kill 0,0
         kill 6,4
+        kill 1,7
 
-        initchezz  horseData,4,2,14h,chezzP,chezzT
-    ; drawSelf 4,4
-	; drawup 4,4,10
-    ; Drawdown 4,4,10
-    ; Drawleft 4,4,10
-    ; Drawright 4,4,10
-    ; DrawRDD 4,4,10
-    ; DrawLDD 4,4,10
-    ; DrawLUD 4,4,10
-    ; DrawRUD 4,4,10
-
-    ; initchezz  soliderData,2,2,5h,chezzP,chezzT
-    ; getdb  1,0
-    ; mov chezzC[bx],9
-    ; mov al,chezzC[bx]
-    ; mov tmpdb,al
-    ; getdW 1,0
-    ; DrawPieceDB  9,9,0,0,0h,1,0,begr,begc,endr,endc,res
-
-    ; getdb  2,0
-    ; mov chezzC[bx],9
-    ; mov al,chezzC[bx]
-    ; mov tmpdb,al
-    ; getdw  2,0
-    ; DrawPieceDB  9,9,0,0,0h,2,0,begr,begc,endr,endc,res
-
-    ; getdb  3,0
-    ; mov chezzC[bx],9
-    ; mov al,chezzC[bx]
-    ; mov tmpdb,al
-    ; getdw  3,0
-    ; DrawPieceDB  9,9,0,0,0h,3,0,begr,begc,endr,endc,res
-    ; insert 3,0
-    ; insert 2,0
-    ; insert 1,0
     ;/******************end of test area***************************/
 
     mov row,0
@@ -417,19 +390,26 @@ MAIN PROC FAR
     movepiece1:
 
 ;calling function to move a piece
-    ;movepiece PrimaryC,SecondaryC,[si],0,0,0h,prevR,prevC,begr,begc,endr,endc,res
-    deselectp
+    push row
+    push col
+    movepiece row,col
+    pop col
+    pop row
     jmp far ptr validate
     choosepiece1:
 
     ;calling function to choose a piece
     mov success,0 
-    
+    push row
+    push col
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    selectp row,col
-    cmp success,0
+    pop col
+    pop row
+    cmp success,1
     je suc
+    jmp far ptr q
     suc:
+    selectp row,col
     jmp validate
 
     ;///////////////////////////////////////////////////////
