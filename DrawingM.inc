@@ -436,11 +436,6 @@ mov coffsetW,bx
 
 call DrawPieceW
 
-drawtim 1
-
-
-
-
 pop bx
 ENDM DrawPieceDB
 
