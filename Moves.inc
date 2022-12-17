@@ -95,7 +95,7 @@ popa
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1,selectedn
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1,selectedn,validtime
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
 ;chezzP is the piece array
@@ -115,6 +115,25 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     ; mov success,0
     ; jmp far ptr leave
     ; cont1:
+    ;should add the timer check here
+    ;still under testing
+    ;comment this for game to work without timer 
+    ;timer is still not working 100%
+    pusha 
+    mov ax,row
+    mov cx,col
+    getdb row,col
+    mov dx,0
+    mov dl,chezzN[BX]
+    mov bx,dx
+    mov dx,0
+    mov dl,time[bx]
+    cmp dx,00h
+    je validtime
+    jmp far ptr leave
+    validtime:
+    popa
+    ;///////////////////////////////////////////
     mov success,1
     mov ax,prevR
     mov bx,prevC
