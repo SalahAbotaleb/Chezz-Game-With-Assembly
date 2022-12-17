@@ -3,6 +3,7 @@
 ;ReadstringMsg PromptMsg,Outputloc----- takes string location promtmsg and displays it then ,puts it in location Outputloc
 ;Readstring Outputloc ----- puts string in location Outputloc
 ;Displaynumber ----- displays number stored in ax as decimal number
+;DisplaynumberGraphicMode ----- displays decimal number in graphics mode
 ;ReadNumberMsg PromptMsg,outputloc ----- read a number and stores in ax with a message PromptMsg,also puts it in location Outputloc as ascii
 ;ReadNumber outputloc ----- read a number and stores in ax with no message output,also puts it in location Outputloc as ascii,no output msg on screen
 ;printnewline ----- goes to the next line
@@ -32,7 +33,7 @@ pusha
 mov si,@data;moves to si the location in memory of the data segment
 mov ah,13h;service to print string in graphic mode
 mov al,0;sub-service 0 all the characters will be in the same color(bl) and cursor position is not updated after the string is written
-mov bh,0
+mov bh,0;Display page
 mov bl,0Fh;color of the text
 mov cx,Size;size of string
 mov dl,Column
@@ -90,52 +91,55 @@ ENDM Displaynumber
 
 DisplaynumberGraphicMode Macro num,Column,Row
 local equalsixteen,unitth,lessnine,ENDDD
-    mov  dl, Column  ;Column
-    mov  dh, Row   ;Row
-    mov  bh, 0    ;Display page
-    mov  ah, 02h  ;SetCursorPosition
-    int  10h
+mov  dl, Column  
+mov  dh, Row   
+mov  bh, 0    ;Display page
+mov  ah, 02h  ;SetCursorPosition
+int  10h
 
-    mov al, num
-    cmp num, 9
-    jbe lessnine
-    cmp num, 16
-    je equalsixteen
+mov al, num
+cmp num, 9
+jbe lessnine
+cmp num, 16
+je equalsixteen
 
-    mov  al, num
-    shr  al, 3
-    add  al, '0'
-    mov  bl, 0Fh  ;Color is white
-    mov  bh, 0    ;Display page
-    mov  ah, 0Eh  ;Teletype
-    int  10h
-    jmp unitth
+mov  al, num
+shr  al, 3
+add  al, '0'
+mov  bl, 0Fh  ;Color is white
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
+jmp unitth
 
-    equalsixteen: mov  al, num
-    shr  al, 4
-    add  al, '0'
-    mov  bl, 0Fh  ;Color is white
-    mov  bh, 0    ;Display page
-    mov  ah, 0Eh  ;Teletype
-    int  10h
+equalsixteen:
+mov  al, num
+shr  al, 4
+add  al, '0'
+mov  bl, 0Fh  ;Color is white
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
 
-    unitth: inc dl
-    mov  al, num
-    sub  al, 10
-    add  al, '0'
-    mov  bl, 0Fh  ;Color is white
-    mov  bh, 0    ;Display page
-    mov  ah, 0Eh  ;Teletype
-    int  10h
-    jmp ENDDD
+unitth: 
+inc dl
+mov  al, num
+sub  al, 10
+add  al, '0'
+mov  bl, 0Fh  ;Color is white
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
+jmp ENDDD
 
-    lessnine: mov  al, killWC
-    add  al, '0'
-    mov  bl, 0Fh  ;Color is red
-    mov  bh, 0    ;Display page
-    mov  ah, 0Eh  ;Teletype
-    int  10h
-    ENDDD:
+lessnine: 
+mov  al, killWC
+add  al, '0'
+mov  bl, 0Fh  ;Color is white
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
+ENDDD:
 ENDM DisplaynumberGraphicMode
 
 ReadNumberMsg MACRO PromptMsg,outputloc ;read a number and stores in ax with a message output
