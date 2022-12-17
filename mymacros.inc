@@ -1,4 +1,5 @@
 ;DisplayString STR -----displays string location STR
+;DisplayStringGraphicMode ----- displays string location STR in graphics mode using string size and choosing which row and column
 ;ReadstringMsg PromptMsg,Outputloc----- takes string location promtmsg and displays it then ,puts it in location Outputloc
 ;Readstring Outputloc ----- puts string in location Outputloc
 ;Displaynumber ----- displays number stored in ax as decimal number
@@ -23,6 +24,22 @@ mov dx,offset STR
 int 21h 
 pop ax
 ENDM STR
+
+DisplayStringGraphicMode MACRO STR,Size,Column,Row
+pusha
+mov si,@data;moves to si the location in memory of the data segment
+mov ah,13h;service to print string in graphic mode
+mov al,0;sub-service 0 all the characters will be in the same color(bl) and cursor position is not updated after the string is written
+mov bh,0
+mov bl,0Fh;color of the text
+mov cx,Size;size of string
+mov dl,Column
+mov dh,Row
+mov es,si;moves to es the location in memory of the data segment
+mov bp,offset STR;mov bp the offset of the string
+int 10h
+popa
+ENDM DisplayStringGraphicMode
 
 ReadstringMsg MACRO PromptMsg,Outputloc
 push ax

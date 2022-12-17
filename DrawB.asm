@@ -127,6 +127,12 @@ roffsetW DW 0
 coffsetW DW 0
 ;/*****************************************/
 
+status_msg DB "Status:-$"
+checkmate_msg DB "CheckMate$"
+black_win_msg DB "Black Win$"
+white_win_msg DB "White Win$"
+seperation_line DB "---------------$"
+
 ;///////////////////////////////////////////
 .Code
 
@@ -281,6 +287,14 @@ MAIN PROC FAR
     DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,5,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,6,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,7,begr,begc,endr,endc,res
+
+    DisplayStringGraphicMode status_msg,8,26,1
+    ;DisplayStringGraphicMode checkmate_msg,9,27,2
+    ;DisplayStringGraphicMode black_win_msg,9,27,3
+    ;DisplayStringGraphicMode white_win_msg,9,27,3
+    ;DisplayStringGraphicMode seperation_line,15,25,4
+
+
 
     ;1x for black 
     ;0x for white
