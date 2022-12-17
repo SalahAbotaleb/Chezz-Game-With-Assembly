@@ -128,9 +128,10 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     mov bx,dx
     mov dx,0
     mov dl,time[bx]
-    cmp dx,00h
-    je validtime
-    jmp far ptr leave
+    cmp dx,0
+    JLE validtime
+    ;un comment the next line to make the game work timer it is still not working though
+    ;jmp far ptr leave
     validtime:
     popa
     ;///////////////////////////////////////////
