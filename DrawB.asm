@@ -179,7 +179,10 @@ status_msg DB "Status:-$"
 checkmate_msg DB "CheckMate$"
 black_win_msg DB "Black Win$"
 white_win_msg DB "White Win$"
+black_killed_msg DB "Black Kill: $"
+white_killed_msg DB "White Kill: $"
 seperation_line DB "---------------$"
+notification_msg DB "Notification:-"
 rowInitChezz DB ?
 colInitChezz DB  ?
 typeInitChezz DB ?
@@ -899,11 +902,16 @@ MAIN PROC FAR
     DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,6,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,7,begr,begc,endr,endc,res
 
-    DisplayStringGraphicMode status_msg,8,26,1
-    ;DisplayStringGraphicMode checkmate_msg,9,27,2
-    ;DisplayStringGraphicMode black_win_msg,9,27,3
-    ;DisplayStringGraphicMode white_win_msg,9,27,3
-    ;DisplayStringGraphicMode seperation_line,15,25,4
+    DisplayStringGraphicMode status_msg,8,25,1
+    DisplayStringGraphicMode white_killed_msg,12,26,2
+    DisplaynumberGraphicMode killWC,37,2
+    DisplayStringGraphicMode black_killed_msg,12,26,3
+    DisplaynumberGraphicMode killBC,37,3
+    ;DisplayStringGraphicMode checkmate_msg,9,27,5
+    ;DisplayStringGraphicMode black_win_msg,9,27,6
+    ;DisplayStringGraphicMode white_win_msg,9,27,6
+    DisplayStringGraphicMode seperation_line,15,25,7
+    DisplayStringGraphicMode notification_msg,14,25,8
 
 
 
