@@ -86,6 +86,56 @@ popa
 
 ENDM Displaynumber
 
+DisplaynumberGraphicMode Macro num,Column,Row
+local equalsixteen,unitth,lessnine,ENDDD
+    mov  dl, Column  ;Column
+    mov  dh, Row   ;Row
+    mov  bh, 0    ;Display page
+    mov  ah, 02h  ;SetCursorPosition
+    int  10h
+
+    mov al, num
+    cmp num, 9
+    jbe lessnine
+    cmp num, 16
+    je equalsixteen
+
+    mov  al, num
+    shr  al, 3
+    add  al, '0'
+    mov  bl, 0Fh  ;Color is white
+    mov  bh, 0    ;Display page
+    mov  ah, 0Eh  ;Teletype
+    int  10h
+    jmp unitth
+
+    equalsixteen: mov  al, num
+    shr  al, 4
+    add  al, '0'
+    mov  bl, 0Fh  ;Color is white
+    mov  bh, 0    ;Display page
+    mov  ah, 0Eh  ;Teletype
+    int  10h
+
+    unitth: inc dl
+    mov  al, num
+    sub  al, 10
+    add  al, '0'
+    mov  bl, 0Fh  ;Color is white
+    mov  bh, 0    ;Display page
+    mov  ah, 0Eh  ;Teletype
+    int  10h
+    jmp ENDDD
+
+    lessnine: mov  al, killWC
+    add  al, '0'
+    mov  bl, 0Fh  ;Color is red
+    mov  bh, 0    ;Display page
+    mov  ah, 0Eh  ;Teletype
+    int  10h
+    ENDDD:
+ENDM DisplaynumberGraphicMode
+
 ReadNumberMsg MACRO PromptMsg,outputloc ;read a number and stores in ax with a message output
 pusha
 
