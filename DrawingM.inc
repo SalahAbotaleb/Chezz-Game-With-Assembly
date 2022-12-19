@@ -516,10 +516,10 @@ cmp ax,0Ah
 ja blackP
 jmp far ptr whiteP
     blackP: ;to be returned
-    DrawPieceDB  0Ah,0Ah,0,0,0h,row,col,begr,begc,endr,endc,res
+    DrawPieceDB  0Eh,0Eh,0,0,0h,row,col,begr,begc,endr,endc,res
     jmp far ptr contDr
     whiteP:
-    DrawPieceDB  0Ah,0Ah,0,0,0Fh,row,col,begr,begc,endr,endc,res
+    DrawPieceDB  0Eh,0Eh,0,0,0Fh,row,col,begr,begc,endr,endc,res
     contDr:
     
     mov ax,row

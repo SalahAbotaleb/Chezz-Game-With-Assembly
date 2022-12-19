@@ -838,6 +838,7 @@ MAIN PROC FAR
     INT 16h
     push ax
     jz noflush
+    mov al,9h
     mov ah,0Ch
     INT 21h
     
@@ -859,7 +860,7 @@ MAIN PROC FAR
     movepiece row,col
     pop col
     pop row
-    jmp far ptr validate ;need to be modified ;;
+    jmp far ptr DrawBckGnd ;need to be modified ;;
     choosepiece1:
 
     ;calling function to choose a piece
@@ -871,10 +872,46 @@ MAIN PROC FAR
     pop row
     cmp success,1
     je suc
-    jmp far ptr validate
+    jmp far ptr Q ;;;;;
     suc:
     selectp row,col
-    jmp far ptr validate;;;
+ ;/****************************************************************************************/
+    DrawBckGnd:
+    ;fuction that update
+    mov ax,row
+    mov bx,col
+    
+    mov prevR,ax
+    mov prevC,bx
+
+    lea si,chezzP
+    lea di,chezzT
+    mov ax,8
+    mov bx,row
+    mul bl
+    add ax,col
+    add di,ax
+    add ax,ax
+    add si,ax  
+    mov ax,[si]
+    
+    mov bx,0
+    mov bl,[di]
+
+    shr bl,1
+    shr bl,1
+    shr bl,1
+    shr bl,1
+    ;we are moving the color bit to the lsb
+
+    cmp bl,1
+    JE BlackGND
+    jmp far ptr whiteGND
+    BlackGND:DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
+    jmp far ptr Q
+    whiteGND:DrawPieceDB  0EH,0EH,0,0,0Fh,row,col,begr,begc,endr,endc,res
+    jmp far ptr Q
+     ;/****************************************************************************************/
 
     ;/****************************************************************************************/
     right:
@@ -923,12 +960,10 @@ MAIN PROC FAR
     int 21h 
     mov ax,prevR
     mov bx,prevC
-
-
-
     mov row,ax
     mov col,bx
-    
+    jmp far ptr Q
+
     draw:
     mov ax,row
     mov bx,col
