@@ -875,7 +875,24 @@ MAIN PROC FAR
     JE doQ
     jmp far ptr right
     doQ:
-   
+   ;/****************************************************************************************/
+    ; pusha 
+
+    ; getdb row,col
+    ; mov dx,0
+    ; mov dl,chezzN[BX]
+    ; mov bx,dx
+    ; mov dx,0
+    ; mov dl,time[bx]
+    ; cmp dx,0
+    ; JLE validtime
+    ; ;un comment the next line to make the game work timer it is still not working though
+    ; ;mov selected,0
+    ; jmp far ptr resolve
+    ; validtime:
+    ; popa
+
+   ;/****************************************************************************************/
     cmp selected,0
     jne movepiece1
     jmp far ptr choosepiece1 
@@ -902,7 +919,7 @@ MAIN PROC FAR
     jmp far ptr q
     suc:
     selectp row,col
-    jmp Q
+    jmp far ptr Q
 
     ;///////////////////////////////////////////////////////
     right:
