@@ -119,10 +119,11 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     ;still under testing
     ;comment this for game to work without timer 
     ;timer is still not working 100%
+    pusha
     pusha 
-    mov ax,row
-    mov cx,col
-    getdb row,col
+    mov selected,0
+
+    getdb prevR,prevC
     mov dx,0
     mov dl,chezzN[BX]
     mov bx,dx
@@ -131,10 +132,12 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     cmp dx,0
     JLE validtime
     ;un comment the next line to make the game work timer it is still not working though
-    ;jmp far ptr leave
+    ;mov selected,0
+    jmp far ptr leave
     validtime:
     popa
     ;///////////////////////////////////////////
+    
     mov success,1
     mov ax,prevR
     mov bx,prevC
@@ -316,6 +319,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     selectedn:
     mov success,0
     leave:
+    popa
 ENDM choosepiece
 
 ;/**************************************************************************/
