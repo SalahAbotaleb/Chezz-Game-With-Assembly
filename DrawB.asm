@@ -113,7 +113,7 @@ time DB 32 dup(0)
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 1 ;0 for white 1 for Black
+playertpye DB 0 ;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -139,11 +139,11 @@ roffsetW DW 0
 coffsetW DW 0
 ;/*****************************************/
 
-;///////////////////////////////////////////
+
 .Code
 
 ;/*****************************************/
-;procude that prints a number on the screen fro 3 to 1
+;procude that prints a number on the screen from 3 to 1
 Drawtimp PROC
 ; local num1,num2,num3,notnum1,notnum2,notnum3,lop1,lop2,lop3,lop22,lop33,lop23,lop32,lop12,lop13
 pusha
@@ -566,9 +566,6 @@ pusha
     INT 10h
 
 
-
-
-
     notnum3:
     popa
     ret;
@@ -696,6 +693,8 @@ DrawPieceW PROC
     mov rowx,ax
     mov ax,colw
     mov colx,ax
+    getdb rowx,colx
+    mov cl,timer
     Drawtim passer
     pop ax
 
@@ -817,31 +816,6 @@ MAIN PROC FAR
         
          replace 6,7,5,4
          replace 6,3,2,3
-        ; replace 6,4,1,4
-
-        ; replace 6,1,5,1
-        ; replace 5,1,4,1
-        ; kill 0,0
-        ; kill 6,4
-        ; kill 6,7
-        ; initchezz  horseData,4,2,14h,chezzP,chezzT
-        ; ;number,row,col,numcolor,backc
-        ; mov row,4
-        ; mov col,2 
-        ; drawtim  1;not this is not primary color but rather the color of the background
-        ; mov row,4
-        ; mov col,3 
-        ; drawtim  1
-        ; mov row,4
-        ; mov col,4
-        ; drawtim  1
-        ; mov row,6
-        ; mov col,5
-        ; drawtim  1
-        
-        ; selectp 6,5
-        ; Drawup 6,5,10
-        ; movepiece 1,5
 
     ;/******************end of test area***************************/
 
@@ -855,11 +829,9 @@ MAIN PROC FAR
     lea di,chezzT
     DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
 
-    ;deletechezzD 0,2,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
 
-; /**************************************************/
-    ;Q means the user wants to select
-    
+   ;/****************************************************************************************/
+   ;Q means the user wants to select
     Q:
     updatetime
     MOV AH,1;every time looping we check here whether a key was selected or not
@@ -871,28 +843,11 @@ MAIN PROC FAR
     
     noflush:
     pop ax
-    cmp ah,10h  ;press Q condition
+    cmp ah,1Ch  ;press Q condition
     JE doQ
     jmp far ptr right
+   ;/****************************************************************************************/
     doQ:
-   ;/****************************************************************************************/
-    ; pusha 
-
-    ; getdb row,col
-    ; mov dx,0
-    ; mov dl,chezzN[BX]
-    ; mov bx,dx
-    ; mov dx,0
-    ; mov dl,time[bx]
-    ; cmp dx,0
-    ; JLE validtime
-    ; ;un comment the next line to make the game work timer it is still not working though
-    ; ;mov selected,0
-    ; jmp far ptr resolve
-    ; validtime:
-    ; popa
-
-   ;/****************************************************************************************/
     cmp selected,0
     jne movepiece1
     jmp far ptr choosepiece1 
@@ -904,7 +859,7 @@ MAIN PROC FAR
     movepiece row,col
     pop col
     pop row
-    jmp far ptr Q
+    jmp far ptr validate ;need to be modified ;;
     choosepiece1:
 
     ;calling function to choose a piece
@@ -916,33 +871,33 @@ MAIN PROC FAR
     pop row
     cmp success,1
     je suc
-    jmp far ptr q
+    jmp far ptr validate
     suc:
     selectp row,col
-    jmp far ptr Q
+    jmp far ptr validate;;;
 
-    ;///////////////////////////////////////////////////////
+    ;/****************************************************************************************/
     right:
    
-    cmp ah,20h  ;right condition
+    cmp ah,4DH  ;right condition
     JNE left
     inc col
     jmp validate
     
     left:
-    cmp ah,01EH  ;left condition
+    cmp ah,4BH  ;left condition
     JNE up
     dec col
     jmp validate
 
     up:
-    cmp ah,011H  ;up condition
+    cmp ah,48H  ;up condition
     JNE down
     dec row
     jmp validate
 
     down:
-    cmp ah,1FH   ;down condition
+    cmp ah,50H   ;down condition
     JE skipthis 
     jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
     skipthis:

@@ -95,7 +95,7 @@ popa
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1,selectedn,validtime
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1,selectedn,validtime,validtocont
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
 ;chezzP is the piece array
@@ -120,6 +120,21 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     ;comment this for game to work without timer 
     ;timer is still not working 100%
     pusha
+
+
+    ;/****************************************************************************************/
+    ;validate choosen piece matches the player type 
+    getdb prevR,prevC
+    mov cl,chezzT[BX]
+    shr cl,1
+    shr cl,1
+    shr cl,1
+    shr cl,1
+    xor cl,playertpye
+    jz validtocont
+    jmp far ptr leave
+    ;/****************************************************************************************/
+    validtocont:
     pusha 
     mov selected,0
 
@@ -136,8 +151,7 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     jmp far ptr leave
     validtime:
     popa
-    ;///////////////////////////////////////////
-    
+;/****************************************************************************************/
     mov success,1
     mov ax,prevR
     mov bx,prevC
