@@ -838,7 +838,6 @@ MAIN PROC FAR
     INT 16h
     push ax
     jz noflush
-    mov al,9h
     mov ah,0Ch
     INT 21h
     
@@ -849,6 +848,19 @@ MAIN PROC FAR
     jmp far ptr right
    ;/****************************************************************************************/
     doQ:
+    ;/**********/
+    getdb prevR,prevC
+    mov dx,0
+    mov dl,chezzN[BX]
+    mov bx,dx
+    mov dx,0
+    mov dl,time[bx]
+    cmp dx,0
+    JLE validtime
+    jmp Q
+    validtime:
+    ;/*********/
+    
     cmp selected,0
     jne movepiece1
     jmp far ptr choosepiece1 
@@ -872,7 +884,7 @@ MAIN PROC FAR
     pop row
     cmp success,1
     je suc
-    jmp far ptr Q ;;;;;
+    jmp far ptr right ;;;;;
     suc:
     selectp row,col
  ;/****************************************************************************************/
