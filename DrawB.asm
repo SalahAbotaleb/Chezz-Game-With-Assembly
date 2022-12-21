@@ -1,14 +1,31 @@
+EXTRN SEND:FAR
+EXTRN RECIEVE:FAR
+EXTRN INITCONECT:FAR
+EXTRN RecievedROLD:WORD
+EXTRN RecievedCOLD:WORD
+EXTRN RecievedRNEW:WORD
+EXTRN RecievedCNEW:WORD
+EXTRN Exist:BYTE
+
+PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW
+
 include mymacros.inc
 include DrawingM.inc
 include Moves.inc
-include timer.inc
+include timer.inc       
 .Model MEDIUM
 .286
 .Stack 64
 .Data
-
+org(1000)
 boardWidth EQU 200
 boardHeight EQU 200
+
+SendROLD DW -1
+SendCOLD DW -1
+
+SendRNEW DW -1
+SendCNEW DW -1
 
 begr DW 0
 begc DW 0
@@ -33,6 +50,8 @@ prevC DW 0
 
 piecew EQU 25
 pieceh EQU 25
+
+
 ;colors 
 ;0  Black
 ;1  blue
@@ -86,8 +105,8 @@ kingFilename DB 'king.bin',0
 soliderFilename DB 'solider.bin',0
 bishopFilename DB 'bishop.bin',0
 queenFilename DB 'queen.bin',0
-
-
+debugFilename DB 'DEBUG.txt',0
+debugfilehand DW ?
 
 filehandle DW ?
 
@@ -714,6 +733,13 @@ MAIN PROC FAR
     MOV AL, 13h
     INT 10h
 
+    ;/*********/
+    ; mov al, 1
+	; mov dx, offset debugFilename
+	; mov ah, 3dh
+	; int 21h
+	; mov debugfilehand, ax
+    ;/*********/
 	DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
 	DrawPiece  PrimaryC,SecondaryC,RookFilename,filehandle,rookData,0,0,0h,0,0,begr,begc,endr,endc,res
     DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0h,0,7,begr,begc,endr,endc,res
@@ -814,8 +840,8 @@ MAIN PROC FAR
     
     ;/******************test area***************************/
         
-         replace 6,7,5,4
-         replace 6,3,2,3
+         ;replace 6,7,5,4
+         ;replace 6,3,2,3
 
     ;/******************end of test area***************************/
 
@@ -831,9 +857,20 @@ MAIN PROC FAR
 
 
    ;/****************************************************************************************/
+   CALL INITCONECT
    ;Q means the user wants to select
     Q:
     updatetime
+     ;/**********/
+    CALL RECIEVE
+    cmp EXIST,4
+    JE ContUpdate
+    jmp far ptr NoUpdate
+    ContUpdate:
+    mov exist,0
+    movepiece RecievedRNEW,RecievedCNEW,1
+    ;/**********/
+    NoUpdate:
     MOV AH,1;every time looping we check here whether a key was selected or not
     INT 16h
     push ax
@@ -848,16 +885,19 @@ MAIN PROC FAR
     jmp far ptr right
    ;/****************************************************************************************/
     doQ:
-    ;/**********/
+    ;/****/ here error
+
     getdb prevR,prevC
     mov dx,0
     mov dl,chezzN[BX]
+    cmp dl,-1
+    JE validtime
     mov bx,dx
     mov dx,0
     mov dl,time[bx]
     cmp dx,0
-    JLE validtime
-    jmp Q
+    JE validtime
+    jmp far ptr q
     validtime:
     ;/*********/
     
@@ -865,11 +905,10 @@ MAIN PROC FAR
     jne movepiece1
     jmp far ptr choosepiece1 
     movepiece1:
-
 ;calling function to move a piece
     push row
     push col
-    movepiece row,col
+    movepiece row,col,0
     pop col
     pop row
     jmp far ptr DrawBckGnd ;need to be modified ;;
@@ -889,6 +928,7 @@ MAIN PROC FAR
     selectp row,col
  ;/****************************************************************************************/
     DrawBckGnd:
+
     ;fuction that update
     mov ax,row
     mov bx,col
@@ -1052,6 +1092,9 @@ MAIN PROC FAR
     jmp far ptr Q
 
     ;Press any key to exit
+    mov  ah, 3eh
+    lea  bx, debugFilename
+    int  21h 
     returntoconsole
 MAIN ENDP
 end main

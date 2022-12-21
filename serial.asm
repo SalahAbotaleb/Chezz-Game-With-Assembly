@@ -1,25 +1,26 @@
+EXTRN SendROLD:WORD
+EXTRN SendCOLD:WORD
+
+EXTRN SendRNEW:WORD
+EXTRN SendCNEW:WORD
+
+PUBLIC SEND,RECIEVE,RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW,INITCONECT,Exist
 include mymacros.inc
 .286
 .MODEL SMALL
 .STACK 64
 .DATA
-SendCurPosR DB 0d
-SendCurPosC DB 0d
-RecCurPosR DB 13d
-RecCurPosC DB  0d
+RecievedROLD DW -1
+RecievedCOLD DW -1
 
-HoldDataFS DB 0d
-HolDataS DB 0d
+RecievedRNEW DW -1
+RecievedCNEW DW -1
 
-RecievedData DB 0
-
-PrimaryN DB 'ZAHAR:$'
-secondaryN DB 'SALAH:$'
+Exist DB 0
+;/********************/
 .code
-MAIN    PROC FAR               
-        MOV AX,@DATA
-        MOV DS,AX    
-    clearscreen
+INITCONECT PROC FAR   
+    pusha            
     ;/********************/
     mov dx,3fbh 			; Line Control Register
     mov al,10000000b		;Set Divisor Latch Access Bit
@@ -42,92 +43,103 @@ MAIN    PROC FAR
     ;11:8bits
     out dx,al
     ;/********************/
-    movecursorlocation SendCurPosC,SendCurPosR,0
-    DisplayString PrimaryN
-    movecursorlocation RecCurPosC,RecCurPosR,0
-    DisplayString SecondaryN
-    
-    mov SendCurPosC,-1
-    mov RecCurPosC,-1
-    
-    inc SendCurPosR
-    inc RecCurPosR
+    popa
+  RET
+INITCONECT ENDP
 
-    drawhorizontallineinetextmode 12
-    ;/********************/
-    checkSendOrRec: 
-    mov al,HoldDataFS
-    cmp al,1
-    jz SendData
-    
-    mov ah,1
-    int 16h
-    jz checkRec
-    mov HolDataS,al
-
-    mov al,9
-    mov ah,0CH
-    INT 21h
-    ;/********************/
-    SendData:
-    mov dx , 3FDH		; Line Status Register
-    In al , dx 	;Read Line Status
-  	AND al , 00100000b
-  	JZ HoldData
-    mov HoldDataFS,0
+SEND PROC FAR   
+    pusha  
+    	mov dx , 3FDH		; Line Status Register
+AGAIN1:  	In al , dx 			;Read Line Status
+  		AND al , 00100000b
+  		JZ AGAIN1
+          
     mov dx , 3F8H		; Transmit data register
-  	mov  al,HolDataS
-  	out dx , al 
+  	mov  AX,SendROLD
+  	out dx , AX 
 
-    cmp SendCurPosC,79d
-    JNE checkRow
-    inc SendCurPosR
-    mov SendCurPosC,-1
-    checkRow:
-    inc SendCurPosC
-    cmp SendCurPosR,12d
-    JE checkRec                                 ;for project edit
-    movecursorlocation SendCurPosC,SendCurPosR,0
-    
-    mov ah,2 
-    mov dl,HolDataS
-    int 21h
-    jmp checkRec
-    ;/********************/
-    HoldData:
-    mov HoldDataFS,1
-    ;/********************/
-    
-    checkRec:
+	mov dx , 3FDH		; Line Status Register
+AGAIN2:  	In al , dx 			;Read Line Status
+  		AND al , 00100000b
+  		JZ AGAIN2
+
+    mov dx , 3F8H		; Transmit data register
+  	mov  AX,SendCOLD
+  	out dx , AX 
+
+	mov dx , 3FDH		; Line Status Register
+AGAIN3:  	In al , dx 			;Read Line Status
+  		AND al , 00100000b
+  		JZ AGAIN3
+
+    mov dx , 3F8H		; Transmit data register
+  	mov  AX,SendRNEW
+  	out dx , AX 
+
+	mov dx , 3FDH		; Line Status Register
+AGAIN4:  	In al , dx 			;Read Line Status
+  		AND al , 00100000b
+  		JZ AGAIN4
+
+    mov dx , 3F8H		; Transmit data register
+  	mov  AX,SendCNEW
+  	out dx , AX 
+    popa
+  RET
+SEND ENDP
+
+RECIEVE PROC FAR               
+     pusha
     ;Check that Data Ready
 	    mov dx , 3FDH		; Line Status Register
 	    in al , dx 
   		AND al , 1
-        JNZ GoCont
-        jmp far ptr checkSendOrRec
-        GoCont:
+      JNZ GoIN
+      jmp far ptr GoOut
+      GoIN:
+      mov exist,4
+      mov ah,0
+      mov al,exist
      ;If Ready read the VALUE in Receive data register
-  		mov dx , 03F8H
+      mov dx , 03F8H
   		in al , dx 
-  		mov  RecievedData , al
+      MOV AH,0
+  		mov  RecievedROLD , AX
+      
 
-    ;/********************/
-    cmp RecCurPosC,79d
-    JNE checkRowR
-    inc RecCurPosR
-    mov RecCurPosC,-1
-    checkRowR:
-    inc RecCurPosC
-    cmp RecCurPosR,12d
-    JE exit                                 ;for project edit
-    movecursorlocation RecCurPosC,RecCurPosR,0
-    
-    mov ah,2 
-    mov dl,RecievedData
-    int 21h
+      ww:mov dx , 3FDH		; Line Status Register
+	    in al , dx 
+  		AND al , 1
+      jz ww
 
-    exit:jmp far ptr checkSendOrRec
-    ;/********************/
-    returntoconsole
-MAIN    ENDP
-END MAIN
+      mov dx , 03F8H
+  		in al , dx 
+      MOV AH,0
+  		mov  RecievedCOLD , AX
+
+      ww2:
+      mov dx , 3FDH		; Line Status Register
+	    in al , dx 
+  		AND al , 1
+      jz ww2
+
+      mov dx , 03F8H
+  		in al , dx 
+      MOV AH,0
+  		mov  RecievedRNEW , AX
+
+
+      ww3:
+      mov dx , 3FDH		; Line Status Register
+	    in al , dx 
+  		AND al , 1
+      jz ww3
+      mov dx , 03F8H
+  		in al , dx 
+      MOV AH,0
+  		mov  RecievedCNEW , AX
+    GoOut:
+    popa
+  RET
+RECIEVE ENDP
+END 

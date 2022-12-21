@@ -48,7 +48,7 @@ mov cl,4
 shr bl,cl
 
 cmp bl,0
-jne resetW
+je resetW
 DrawPieceDB  PrimaryC,SecondaryC,0,0,0H,rowx,colx,begr,begc,endr,endc,res
 resetW:
 DrawPieceDB  PrimaryC,SecondaryC,0,0,0FH,rowx,colx,begr,begc,endr,endc,res

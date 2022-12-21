@@ -1,9 +1,17 @@
 include DrawingM.inc
 include mymacros.inc
 
-movepiece MACRO row,col
-local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,white,black
+movepiece MACRO row,col,RecievedFlag
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData
 pusha
+;RecievedFlag if 1  then skip validations and go replace it directly
+;----
+mov bx,RecievedFlag
+cmp bx,1
+JNE movValidate
+jmp far ptr ChangeRecieved
+;-----
+movValidate:
 ;this function deselect a selected piece and removes highlights of squares
 mov cx,row
 mov dx,col
@@ -62,7 +70,7 @@ mov ax,col
 mov colx,ax
 Drawtim 3
 pop ax
-jmp far ptr dexit
+jmp far ptr SendData
 cont2:
 cmp ax,0AH
 ja black
@@ -88,8 +96,61 @@ mov ax,col
 mov colx,ax
 Drawtim 3
 pop ax
-dexit: deselectp
+SendData:
+;/******/
+
+mov BX,RecievedFlag
+cmp BX,1
+JNE CONT6
+JMP FAR PTR dexit
+CONT6:
+mov ax,selectedr
+mov SendROLD,ax
+
+; mov dx,AX
+; Displaynumber
+; printnewline
+
+mov ax,selectedc
+mov SendCOLD,ax
+
+; mov dx,AX
+; Displaynumber
+; printnewline
+
+mov ax,movr
+mov SendRNEW,ax
+
+; mov dx,AX
+; Displaynumber
+; printnewline
+
+mov ax,movc
+mov SendCNEW,ax
+
+; mov dx,AX
+; Displaynumber
+; Printnewline
+
+CALL SEND 
+
+;/******/
+dexit:deselectp
+jmp far ptr exit
 ;deselect then exit
+ChangeRecieved:
+; mov dx,RecievedROLD
+; Displaynumber
+; printnewline
+; mov dx,RecievedCOLD
+; Displaynumber
+; printnewline
+; mov dx,RecievedRNEW
+; Displaynumber
+; printnewline
+; mov dx,RecievedCNEW
+; Displaynumber
+replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
 exit:
 popa    
 ENDM movepiece
@@ -141,6 +202,8 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     getdb prevR,prevC
     mov dx,0
     mov dl,chezzN[BX]
+    cmp dl,-1
+    JE validtime
     mov bx,dx
     mov dx,0
     mov dl,time[bx]
