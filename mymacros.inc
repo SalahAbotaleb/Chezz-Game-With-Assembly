@@ -16,6 +16,8 @@
 ;GotoTextmode MACRO ----- changes mode to text mode
 ;drawhorizontallineinetextmode y ----- draws a horizontal line in text mode across the screen
 ;getcursorlocation MACRO ----- This function returns cursor location 
+;printchar ----- print a character in text mode
+;setCursor ----- sets cursor to a position x and y and pagenumber (0)
 DisplayString MACRO STR
 push ax
 mov ah,9
@@ -360,3 +362,17 @@ mov col,cl
 exit:
 popa
 ENDM remove
+
+printchar MACRO x
+mov ah,2   
+mov dl,x
+int 21h
+ENDM printchar
+
+setCursor MACRO x,y
+mov ah,2
+mov bh,0
+mov dl,x
+mov dh,y
+int 10h
+ENDM setCursor

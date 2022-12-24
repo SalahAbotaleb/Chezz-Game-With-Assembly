@@ -22,7 +22,7 @@ mov cl, 0               ; col left
 mov dh, 22              ; row bottom
 mov dl, 79              ; col right
 int 10h 
-  
+
 ENDM scrolllower
 
 saveCursorS MACRO
@@ -41,21 +41,7 @@ mov initxR,dl
 mov inityR,dh
 ENDM saveCursorR 
 
-setCursor MACRO x,y
-mov ah,2
-mov bh,0
-mov dl,x
-mov dh,y
-int 10h
-ENDM setCursor
-
-printchar MACRO x
-mov ah,2   
-mov dl,x
-int 21h
-ENDM printchar
-
-
+include mymacros.inc
 .MODEL SMALL
 .STACK 64
 .DATA
