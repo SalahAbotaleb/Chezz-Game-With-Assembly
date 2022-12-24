@@ -1,4 +1,3 @@
-;This is a macro to clear the upper half of the screen when it's compleltely full of charachters
 scrollupper MACRO
    
 mov ah, 6               
@@ -11,8 +10,7 @@ mov dl, 79              ; col right
 int 10h 
   
 ENDM scrollupper 
-;-----------------------------------------------------------------------------------------------
-;This is a macro to clear the lower half of the screen when it's compleltely full of charachters
+
 
 scrolllower MACRO
    
@@ -26,8 +24,7 @@ mov dl, 79              ; col right
 int 10h 
   
 ENDM scrolllower
-;--------------------------------------------------------------------------------------------------
-;this is a macro to get the cursor position of the send mode in dx "we need to save the cursor position every time we go to revieve mode or send mode"
+
 saveCursorS MACRO
 mov ah,3h
 mov bh,0h
@@ -35,8 +32,7 @@ int 10h
 mov initxS,dl
 mov inityS,dh
 ENDM saveCursorS  
-;---------------------------------------------------------------------------------------------------
-;this is a macro to get the cursor position of the Receive mode in dx "we need to save the cursor position every time we go to revieve mode or send mode"
+
 saveCursorR MACRO
 mov ah,3h
 mov bh,0h
@@ -44,8 +40,7 @@ int 10h
 mov initxR,dl
 mov inityR,dh
 ENDM saveCursorR 
-;----------------------------------------------------------------------------------------------------
-;this is a macro to set the cursor in the right position
+
 setCursor MACRO x,y
 mov ah,2
 mov bh,0
@@ -55,12 +50,12 @@ int 10h
 ENDM setCursor
 
 printchar MACRO x
-mov ah,2          ; printing the char
+mov ah,2   
 mov dl,x
 int 21h
 ENDM printchar
 
-;-----------------------------------------------------------------------------------------------------
+
 .MODEL SMALL
 .STACK 64
 .DATA
@@ -157,7 +152,6 @@ jz jumpReceive   ;if not then jmp to recieving mode
 jnz send         ;if yes jmp to send mode
 
 
-
 send:
 
 mov ah,0   ;clear buffer
@@ -167,17 +161,17 @@ mov VALUE,al  ; save the key ascii code in al
 
 CMP al, 08h   ; backpace
 jnz ENTERS
-cmp initxS, 0
+cmp initxS, 0   ; check if it not the end of line from the left
 JE backlines
 dec initxS
-setCursor initxS,inityS
+setCursor initxS,inityS     ;first dec the x_position then set cursor then print space, then we put the cursor back by incrementing the x_position
 printchar ' '
 inc initxS
 setCursor initxS,inityS
 
 backlines: cmp initxS, 0
 jne ENTERS
-cmp inityS, 1
+cmp inityS, 1   ;if it is the end of line from left and not the first row, then backspace will set cursor to the end of the line above line from the right
 je ENTERS
 dec inityS
 setCursor 80,inityS
@@ -322,6 +316,7 @@ chatting endp
 exit:
 
 ;; HERE SHOULD BE THE RETURN TO THE MAIN MENU
+;--------------------------------------------
 ;--------------------------------------------
 ;--------------------------------------------
 ;--------------------------------------------
