@@ -2,7 +2,7 @@ include DrawingM.inc
 include mymacros.inc
 
 movepiece MACRO row,col,RecievedFlag
-local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7
 pusha
 ;RecievedFlag if 1  then skip validations and go replace it directly
 ;----
@@ -150,6 +150,17 @@ ChangeRecieved:
 ; printnewline
 ; mov dx,RecievedCNEW
 ; Displaynumber
+mov ax,RecievedRNEW
+xor ax,selectedr
+mov bx,RecievedCNEW
+xor bx,selectedc
+or ax,bx
+jz cont5
+jmp far ptr cont7
+cont5:deselectp
+replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
+jmp far ptr exit
+cont7:
 replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
 exit:
 popa    
@@ -470,7 +481,7 @@ ENDM HighKnight
 
 ;dont compare memory locations
 Highpawnw MACRO row,col
-    local exit,white,black,whitefirstmove,whitenotfirstmov,noenemyonleftup,noenemyonrighttup,enemyonleftup,enemyonrighttup,dofrblock,dosecmove,dosecmove2,CONWHITE
+    local exit,white,black,whitefirstmove,whitenotfirstmov,noenemyonleftup,noenemyonrighttup,enemyonleftup,enemyonrighttup,dofrblock,dosecmove,dosecmove2,CONWHITE,WHITENOTFIRSTMOVE
    
     drawSelf row,col
 
