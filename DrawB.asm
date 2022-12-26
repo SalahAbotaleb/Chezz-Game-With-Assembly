@@ -48,6 +48,9 @@ killBC DB 0 ;counter for killed black
 prevR DW 0
 prevC DW 0
 
+chooseR DW 0
+chooseC DW 0
+
 piecew EQU 25
 pieceh EQU 25
 
@@ -132,13 +135,13 @@ time DB 32 dup(0)
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 0 ;0 for white 1 for Black
+playertpye DB 1 ;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
 
 success DB 0 ;0 for fail 1 for success
-
+AvoidLp DB 0
 ;///////////////////////////////////////////
 head DW 0
 storage DB 64 dup(-1)
@@ -157,8 +160,16 @@ endcW DW 0
 roffsetW DW 0
 coffsetW DW 0
 ;/*****************************************/
-
-
+rowInitChezz DB ?
+colInitChezz DB  ?
+typeInitChezz DB ?
+picInitChezz   DW ?
+;/*****************************************/
+colorD DB ?
+rowD DW 0
+colD DW 0
+datalocD DW 0
+;/*****************************************/
 .Code
 
 ;/*****************************************/
@@ -590,7 +601,81 @@ pusha
     ret;
 
 Drawtimp ENDP
+; ;/*******/
+; DrawPieceDW proc
+;     pusha
+;      ;***********Drawing the pixels
+;     mov ax,rowD
+;     mov cx,25d
+;     mul cl
+;     mov bx,ax
 
+;     mov ax,colD
+;     mul cl
+;     ;now we have begging stored at ax for colD begging
+;     ;and bx for rowD begging
+
+;     mov begr,0
+;     add begr,0
+;     add begr,bx
+
+;     mov begc,0
+;     add begc,0
+;     add begc,ax
+     
+;     mov endr,bx
+;     mov endc,ax
+
+;     add endr,25d
+;     add endc,25d
+
+;     mov cx,0
+;     mov ah,0
+;     mov ax,rowD
+;     mov bx,2
+;     div bl
+;     xor cl,ah
+
+;     mov ah,0
+;     mov ax,colD
+;     mov bx,2
+;     div bl
+;     xor cl,ah
+    
+;     mov res,cl
+
+
+;     mov BX , datalocD ; BL contains index at the current drawn pixel
+;     MOV CX,begc
+;     MOV DX,begr
+;     MOV AH,0ch
+;     drawLoopd:
+;     MOV AL,[BX]
+;     cmp al,5
+;     ja filterd
+;     cmp res,0
+;     jnz lblsecd 
+;     lblprimd:mov al,PrimaryC
+;     jmp contind
+;     lblsecd:mov al,SecondaryC
+;     jmp contind
+;     filterd: mov al,colorD
+;     contind:
+;     INT 10h 
+;     INC CX
+;     INC BX
+;     CMP CX,endc
+;     JNE drawLoopd 
+	
+;     MOV CX ,begc
+;     INC DX
+;     CMP DX ,endr
+;     JNE drawLoopd
+;     ;************end drawing the pixels
+;     popa
+; DrawPieceDW endp
+
+;/*******/
 DrawPieceW PROC
     ;local drawLoop,noerror,lblprim,lblsec,filter,contin,Nempty,exit,sec,con
     ;primaryC is primary Color for the board which is at top left coener 
@@ -723,6 +808,31 @@ DrawPieceW PROC
     ret
 DrawPieceW ENDP
 
+inittChezzW proc
+pusha
+lea si,chezzP
+lea di,chezzT
+
+mov bx,0
+mov ax,8
+mov bl,rowInitChezz
+mul bl
+add al,colInitChezz
+
+add di,ax
+mov bl,typeInitChezz
+mov [di],bl
+
+add ax,ax
+
+add si,ax
+
+mov ax,picInitChezz
+mov [si],ax
+
+popa
+ret
+inittChezzW ENDP
 
 
 
@@ -732,51 +842,9 @@ MAIN PROC FAR
     MOV AH, 0
     MOV AL, 13h
     INT 10h
-
     ;/*********/
-    ; mov al, 1
-	; mov dx, offset debugFilename
-	; mov ah, 3dh
-	; int 21h
-	; mov debugfilehand, ax
-    ;/*********/
-	DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
-	DrawPiece  PrimaryC,SecondaryC,RookFilename,filehandle,rookData,0,0,0h,0,0,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0h,0,7,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,horseFilename,filehandle,horseData,0,0,0h,0,1,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,horseData,0,0,0h,0,6,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,bishopFilename,filehandle,bishopData,0,0,0h,0,2,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,bishopData,0,0,0h,0,5,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,queenFilename,filehandle,queenData,0,0,0h,0,3,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,kingFilename,filehandle,kingData,0,0,0h,0,4,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,soliderFilename,filehandle,soliderData,0,0,0h,1,0,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,1,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,2,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,3,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,4,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,5,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,6,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,7,begr,begc,endr,endc,res
-
-
-    DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0Fh,7,7,begr,begc,endr,endc,res
-	DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0Fh,7,0,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,horseData,0,0,0Fh,7,1,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,horseData,0,0,0Fh,7,6,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,bishopData,0,0,0Fh,7,2,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,bishopData,0,0,0Fh,7,5,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,queenData,0,0,0Fh,7,3,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,kingData,0,0,0Fh,7,4,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,0,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,1,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,2,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,3,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,4,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,5,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,6,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,7,begr,begc,endr,endc,res
-
-    ;1x for black 
+    ;intializations
+     ;1x for black 
     ;0x for white
     ;0 for king
     ;1 for queen
@@ -814,6 +882,14 @@ MAIN PROC FAR
     initchezz  soliderData,1,7,15h,chezzP,chezzT
 
     ;/****************************************************************************************/
+    DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
+    DrawPiece  PrimaryC,SecondaryC,RookFilename,filehandle,rookData,0,0,0h,0,0,begr,begc,endr,endc,res
+    DrawPiece  PrimaryC,SecondaryC,horseFilename,filehandle,horseData,0,0,0h,0,1,begr,begc,endr,endc,res
+    DrawPiece  PrimaryC,SecondaryC,bishopFilename,filehandle,bishopData,0,0,0h,0,2,begr,begc,endr,endc,res
+    DrawPiece  PrimaryC,SecondaryC,queenFilename,filehandle,queenData,0,0,0h,0,3,begr,begc,endr,endc,res
+    DrawPiece  PrimaryC,SecondaryC,kingFilename,filehandle,kingData,0,0,0h,0,4,begr,begc,endr,endc,res
+    DrawPiece  PrimaryC,SecondaryC,soliderFilename,filehandle,soliderData,0,0,0h,1,0,begr,begc,endr,endc,res
+   
 
     initchezz  rookData,7,0,02h,chezzP,chezzT
     initchezz  rookData,7,7,02h,chezzP,chezzT
@@ -836,6 +912,43 @@ MAIN PROC FAR
     initchezz  soliderData,6,5,05,chezzP,chezzT
     initchezz  soliderData,6,6,05h,chezzP,chezzT
     initchezz  soliderData,6,7,05h,chezzP,chezzT
+
+
+
+    ;/*********/
+	;DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
+    ;DrawPieceDB MACRO PrimaryC,SecondaryC,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
+	;DrawPieceD MACRO PrimaryC,SecondaryC,dataloc,roffset,coffset,pieceColor,row,col,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,0,7,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,0,6,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,0,5,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,1,1,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,1,2,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,1,3,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,1,4,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,1,5,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,1,6,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0h,1,7,begr,begc,endr,endc,res
+
+
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,7,7,begr,begc,endr,endc,res
+	DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,7,0,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,7,1,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,7,6,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,7,2,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,7,5,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,7,3,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,7,4,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,0,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,1,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,2,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,3,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,4,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,5,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,6,begr,begc,endr,endc,res
+    DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,7,begr,begc,endr,endc,res
+
+   
     
     
     ;/******************test area***************************/
@@ -862,6 +975,7 @@ MAIN PROC FAR
     Q:
     updatetime
      ;/**********/
+    mov AvoidLp,0
     CALL RECIEVE
     cmp EXIST,4
     JE ContUpdate
@@ -869,6 +983,9 @@ MAIN PROC FAR
     ContUpdate:
     mov exist,0
     movepiece RecievedRNEW,RecievedCNEW,1
+    mov AvoidLp,1
+    jmp far ptr Reselectp
+    ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,selectedr,selectedc,success,begr,begc,endr,endc,res
     ;/**********/
     NoUpdate:
     MOV AH,1;every time looping we check here whether a key was selected or not
@@ -915,12 +1032,27 @@ MAIN PROC FAR
     choosepiece1:
 
     ;calling function to choose a piece
+    mov ax,prevR
+    mov chooseR,ax
+    mov ax,prevC
+    mov chooseC,ax
     mov success,0
+    jmp far ptr NoReselect
+    Reselectp:
+    mov ax,selectedr
+    mov ChooseR,ax
+    mov ax,selectedc
+    mov ChooseC,ax
+    NoReselect:
     push row
     push col
-    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
+    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,chooseR,chooseC,success,begr,begc,endr,endc,res
     pop col
     pop row
+    cmp avoidlp,0
+    jz contcheck
+    jmp far ptr Q
+    contcheck:
     cmp success,1
     je suc
     jmp far ptr right ;;;;;
