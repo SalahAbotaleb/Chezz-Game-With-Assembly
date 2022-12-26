@@ -56,7 +56,7 @@ printcharGraphics MACRO x,color
 mov  al, x
 mov  bl, color
 mov  bh, 0    ;Display page
-mov  ah, 0Eh  ;Teletype
+mov  ah, 0Eh
 int  10h
 ENDM printcharGraphics
 
@@ -1541,8 +1541,11 @@ IN_GAME_CHATTING proc near
 
     CMP al, 08h   ; backpace
     jnz ENTERS
-    cmp initxS, 25
-    JE backlines
+    cmp initxS, 39
+    jne LOL
+    printcharGraphics ' ',0
+    LOL:cmp initxS, 25
+    JBE backlines
     dec initxS
     setCursor initxS,inityS
     printcharGraphics ' ',0
@@ -1557,18 +1560,19 @@ IN_GAME_CHATTING proc near
     setCursor 40,inityS
     saveCursorS
 
+    jumpReceive: jmp Receive
+
     ENTERS: CMP al,0Dh    ; check if the key is enter
     jnz ContLineS
     jz newlineS
 
-    jumpReceive: jmp Receive
 
 
     newlineS:
-    CMP inityS,16   ;check if the cursor is in the bottom of the upper screen to scrollup one line
+    CMP inityS,15   ;check if the cursor is in the bottom of the upper screen to scrollup one line
     jnz notlastlineS
     scrollupper
-    setCursor 25,16
+    setCursor 25,15
     jmp printcharS
     
     notlastlineS:inc inityS     
@@ -1576,20 +1580,25 @@ IN_GAME_CHATTING proc near
 
     ContLineS:
     setCursor initxS,inityS  ; setting the cursor after newlineS
-    CMP initxS,39           ; here we need to check when the x passes 79 so go to a newline
+    CMP initxS,39        ; here we need to check when the x passes 39 so go to a newline
     JZ CheckBottomS               ; so we must check if it is in the bottom line or not
     jnz printcharS
 
-    CheckBottomS:CMP inityS,16   ;check if the cursor is in the bottom of the upper screen to scrollup one line
+    CheckBottomS:CMP inityS,15   ;check if the cursor is in the bottom of the upper screen to scrollup one line
     JNZ printcharS
     scrollupper
-    setCursor 25,16 
+    setCursor 25,15 
 
 
     printcharS:
     printcharGraphics VALUE,0fh          ; printing the char
+    saveCursorS
+    cmp initxS,25
+    JAE IgnoreS
+    setCursor 25,inityS
+
     
-    
+    IgnoreS:
     ;Check that Transmitter Holding Register is Empty
 
     mov dx,3FDH 		; Line Status Register
@@ -1613,6 +1622,8 @@ IN_GAME_CHATTING proc near
 
     jumpExit:jmp EXITT
 
+    ;--------------------------------------------------
+    ;--------------------------------------------------
     Receive:
 
     mov ah,1            ;check if there is key pressed then go to the sending mode
@@ -1634,11 +1645,14 @@ IN_GAME_CHATTING proc near
 
     CMP al, 08h   ; backpace
     jnz ENTERR
-    cmp initxR, 25
+    cmp initxR, 39
+    jne LOLL
+    printcharGraphics ' ',0h
+    LOLL:cmp initxR, 25
     JE backliner
     dec initxR
     setCursor initxR,inityR
-    printcharGraphics ' ',0fh
+    printcharGraphics ' ',0h
     inc initxR
     setCursor initxR,inityR
 
@@ -1683,9 +1697,12 @@ IN_GAME_CHATTING proc near
 
     printcharR:
     printcharGraphics VALUE, 0fh             ; printing the char
-    
-
     saveCursorR
+    cmp initxR,25
+    JAE IgnoreR
+    setCursor 25,inityR
+
+    IgnoreR:
 
     jmp mainloop        
 
