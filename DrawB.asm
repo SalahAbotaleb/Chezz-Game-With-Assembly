@@ -1,3 +1,65 @@
+;This is a macro to clear the upper half of the screen when it's compleltely full of charachters
+scrollupper MACRO
+   
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 0               ; attribute
+mov ch, 9              ; row top
+mov cl, 25               ; col left
+mov dh, 15             ; row bottom
+mov dl, 39              ; col right
+int 10h 
+  
+ENDM scrollupper 
+;-----------------------------------------------------------------------------------------------
+;This is a macro to clear the lower half of the screen when it's compleltely full of charachters
+
+scrolllower MACRO
+   
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 0               ; attribute
+mov ch, 18              ; row top
+mov cl, 25              ; col left
+mov dh, 24              ; row bottom
+mov dl, 39              ; col right
+int 10h 
+  
+ENDM scrolllower
+
+saveCursorS MACRO
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxS,dl
+mov inityS,dh
+ENDM saveCursorS  
+;---------------------------------------------------------------------------------------------------
+;this is a macro to get the cursor position of the Receive mode in dx "we need to save the cursor position every time we go to revieve mode or send mode"
+saveCursorR MACRO
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxR,dl
+mov inityR,dh
+ENDM saveCursorR 
+
+setCursor MACRO x,y
+mov ah,2
+mov bh,0
+mov dl,x
+mov dh,y
+int 10h
+ENDM setCursor
+
+printcharGraphics MACRO x,color
+mov  al, x
+mov  bl, color
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
+ENDM printcharGraphics
+
 include mymacros.inc
 include DrawingM.inc
 include Moves.inc
@@ -134,7 +196,15 @@ white_win_msg DB "White Win$"
 black_killed_msg DB "Black Kill: $"
 white_killed_msg DB "White Kill: $"
 seperation_line DB "---------------$"
-notification_msg DB "Notification:-"
+notification_msg DB "Notification:-$"
+first_name DB "First Name:-$"
+second_name DB "Second Name:-$"
+
+VALUE  db ?     ;VALUE which will be sent or Received by user
+initxS db 25     ;initial position for sender column
+inityS db 9     ;initial position for sender row
+initxR db 25     ;initial position for receiver column
+inityR db 18    ;initial position for receiver row
 
 ;///////////////////////////////////////////
 .Code
@@ -300,7 +370,10 @@ MAIN PROC FAR
     ;DisplayStringGraphicMode black_win_msg,9,27,6
     ;DisplayStringGraphicMode white_win_msg,9,27,6
     DisplayStringGraphicMode seperation_line,15,25,7
-    DisplayStringGraphicMode notification_msg,14,25,8
+    DisplayStringGraphicMode first_name,12,25,8
+    DisplayStringGraphicMode seperation_line,15,25,16
+    DisplayStringGraphicMode second_name,13,25,17
+    
 
 
 
@@ -402,6 +475,29 @@ MAIN PROC FAR
 
     ;deletechezzD 0,2,chezzP,chezzT,begr,begc,res,PrimaryC,SecondaryC
 
+    ; set divisor latch access bit
+
+    mov dx,3fbh 			; Line ContLinerol Register
+    mov al,10000000b		;Set Divisor Latch Access Bit
+    out dx,al               ;Out it
+
+    ;Set LSB byte of the Baud Rate Divisor Latch register.
+
+    mov dx,3f8h			
+    mov al,0ch			
+    out dx,al
+
+    ;Set MSB byte of the Baud Rate Divisor Latch register.
+
+    mov dx,3f9h
+    mov al,00h
+    out dx,al
+
+    ;Set port configuration
+    mov dx,3fbh
+    mov al,00011011b
+    out dx,al  
+
 ; /**************************************************/
     ;Q means the user wants to select
     
@@ -415,7 +511,10 @@ MAIN PROC FAR
     
     noflush:
     pop ax
-    cmp ah,10h  ;press Q condition
+    cmp ah,3fH ; press Fn+F5 to start in game chatting
+    JNE skip
+    call IN_GAME_CHATTING
+    SKIP:cmp ah,10h  ;press Q condition
     JE doQ
     jmp far ptr right
     doQ:
@@ -576,4 +675,174 @@ MAIN PROC FAR
     ;Press any key to exit
     returntoconsole
 MAIN ENDP
+
+
+IN_GAME_CHATTING proc near
+
+    mainloop:
+
+    mov ah,1    ;check if a key is pressed
+    int 16h
+    jz jumpReceive   ;if not then jmp to recieving mode
+    jnz SEND         ;if yes jmp to send mode
+
+    SEND:
+    mov ah,0   ;clear buffer
+    int 16h
+    mov VALUE,al  ; save the key ascii code in al
+
+    CMP al, 08h   ; backpace
+    jnz ENTERS
+    cmp initxS, 25
+    JE backlines
+    dec initxS
+    setCursor initxS,inityS
+    printcharGraphics ' ',0
+    inc initxS
+    setCursor initxS,inityS
+
+    backlines: cmp initxS, 25
+    jne ENTERS
+    cmp inityS, 9
+    je ENTERS
+    dec inityS
+    setCursor 40,inityS
+    saveCursorS
+
+    ENTERS: CMP al,0Dh    ; check if the key is enter
+    jnz ContLineS
+    jz newlineS
+
+    jumpReceive: jmp Receive
+
+
+    newlineS:
+    CMP inityS,16   ;check if the cursor is in the bottom of the upper screen to scrollup one line
+    jnz notlastlineS
+    scrollupper
+    setCursor 25,16
+    jmp printcharS
+    
+    notlastlineS:inc inityS     
+    mov initxS,25
+
+    ContLineS:
+    setCursor initxS,inityS  ; setting the cursor after newlineS
+    CMP initxS,39           ; here we need to check when the x passes 79 so go to a newline
+    JZ CheckBottomS               ; so we must check if it is in the bottom line or not
+    jnz printcharS
+
+    CheckBottomS:CMP inityS,16   ;check if the cursor is in the bottom of the upper screen to scrollup one line
+    JNZ printcharS
+    scrollupper
+    setCursor 25,16 
+
+
+    printcharS:
+    printcharGraphics VALUE,0fh          ; printing the char
+    
+    
+    ;Check that Transmitter Holding Register is Empty
+
+    mov dx,3FDH 		; Line Status Register
+    AGAIN:In al , dx 	;Read Line Status
+    test al , 00100000b
+    jz Receive          ; Not empty
+
+    ;If empty put the VALUE in Transmit data register
+
+    mov dx , 3F8H		; Transmit data register
+    mov al,VALUE        
+    out dx , al             
+
+    cmp al, 27     ; press Esc to continue game
+    je jumpExit
+    saveCursorS          
+    jmp mainloop
+
+
+    jumpSend:jmp send
+
+    jumpExit:jmp EXITT
+
+    Receive:
+
+    mov ah,1            ;check if there is key pressed then go to the sending mode
+    int 16h
+    jnz jumpSend
+
+    ;Check that Data Ready
+
+    mov dx , 3FDH		; Line Status Register
+    in al , dx 
+    test al , 1
+    JZ Receive
+
+    ;If Ready read the VALUE in Receive data register
+
+    mov dx , 03F8H
+    in al , dx 
+    mov VALUE,al
+
+    CMP al, 08h   ; backpace
+    jnz ENTERR
+    cmp initxR, 25
+    JE backliner
+    dec initxR
+    setCursor initxR,inityR
+    printcharGraphics ' ',0fh
+    inc initxR
+    setCursor initxR,inityR
+
+    jumpExitt: jmp jumpExit
+
+    backliner:cmp initxR,25
+    jne ENTERR
+    cmp inityR, 18
+    je ENTERR
+    dec inityR
+    setCursor 40,inityR
+    saveCursorR
+
+    ENTERR:CMP VALUE,27     ; press Esc to continue game
+    je jumpExitt
+
+
+    CMP VALUE,0Dh           ;check if the key pressed is enter
+    JNZ ContLineR
+    JZ newlineR
+
+    newlineR:
+    cmp inityR,24           ;check if the cursor is in the bottom of the lower screen to scrollup one line
+    jnz notlastlineR
+    scrolllower
+    setCursor 25,24
+    jmp printcharR
+
+    notlastlineR: inc inityR
+    mov initxR,25
+
+    ContLineR:
+    setCursor initxR,inityR     ; setting the cursor after newlineR
+    CMP initxR,39               ; here we need to check when the x passes 79 so go to a newline
+    JZ CheckBottomR                  ; so we must check if it is in the bottom line or not
+    jnz printcharR
+
+    CheckBottomR: cmp inityR,24    ;check if the cursor is in the bottom of the lower screen to scrollup one line
+    jnz printcharR
+    scrolllower
+    setCursor 25,24
+
+    printcharR:
+    printcharGraphics VALUE, 0fh             ; printing the char
+    
+
+    saveCursorR
+
+    jmp mainloop        
+
+
+    EXITT:
+RET
+IN_GAME_CHATTING ENDP
 end main
