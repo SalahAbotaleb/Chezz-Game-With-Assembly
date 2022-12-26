@@ -1,5 +1,5 @@
 updatetime MACRO 
-    local looper,outofloop,jmpinloop,jmpinloop2,skipinteration,continue, skipthispart,exitw,nn,Nempty,drawLoop,sec,con,lblprim,lblsec,filterW,continW,continuew,resettime,resetW
+    local looper,outofloop,jmpinloop,jmpinloop2,skipinteration,continue, skipthispart,exitw,nn,Nempty,drawLoop,sec,con,lblprim,lblsec,filterW,continW,continuew,resettime,resetW,cont
 pusha
 ;gets current time dx seconds and parts of a second ,cx hours and minutes
 mov ax,2c00h
@@ -43,6 +43,7 @@ resettime:
 mov timer[di],-1
 getdb rowx,colx
 mov bl,chezzT[bx]
+
 mov bh,0
 mov cl,4
 shr bl,cl
@@ -50,8 +51,10 @@ shr bl,cl
 cmp bl,0
 je resetW
 DrawPieceDB  PrimaryC,SecondaryC,0,0,0H,rowx,colx,begr,begc,endr,endc,res
+jmp cont
 resetW:
 DrawPieceDB  PrimaryC,SecondaryC,0,0,0FH,rowx,colx,begr,begc,endr,endc,res
+cont:
 
 skipinteration:
 inc di
