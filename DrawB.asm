@@ -860,6 +860,34 @@ MAIN PROC FAR
    CALL INITCONECT
    ;Q means the user wants to select
     Q:
+    ;check king dead condition
+    pusha
+    mov ax,chezznrev[4]
+    mov bx,00h
+    mov bl,ah
+    mov rowx,bx
+    mov bl,al
+    mov colx,bx
+    getdb rowx,colx
+    mov dl,chezzT[BX]
+    cmp dl,00h
+    JE bkingnotdead
+    jmp far ptr blackkingdead
+    bkingnotdead:
+    mov ax,chezznrev[14]
+    mov bx,00h
+    mov bl,ah
+    mov rowx,bx
+    mov bl,al
+    mov colx,bx
+    getdb rowx,colx
+    mov dl,chezzT[BX]
+    cmp dl,10h
+    JE wkingnotdead
+    jmp far ptr blackkingdead
+    wkingnotdead:
+    popa
+    ;////////////////////////
     updatetime
      ;/**********/
     CALL RECIEVE
@@ -1090,7 +1118,21 @@ MAIN PROC FAR
     jmp far ptr Q
     white:DrawPieceDB  0EH,0EH,0,0,0Fh,row,col,begr,begc,endr,endc,res
     jmp far ptr Q
+    ;/****************************************************************************************/
+    ;white king dead
+    whitekingdead:
 
+    ;black wins the game
+
+    jmp far ptr death
+    ;/****************************************************************************************/
+    ;black king dead
+    blackkingdead:
+
+    ;white wins the game
+
+    ;/****************************************************************************************/
+    death:
     ;Press any key to exit
     mov  ah, 3eh
     lea  bx, debugFilename
