@@ -1,6 +1,6 @@
 ;This is a macro to clear the upper half of the screen when it's compleltely full of charachters
 scrollupper MACRO
-   
+pusha
 mov ah, 6               
 mov al, 1               ; number of lines to scroll
 mov bh, 0               ; attribute
@@ -9,13 +9,13 @@ mov cl, 25               ; col left
 mov dh, 15             ; row bottom
 mov dl, 39              ; col right
 int 10h 
-  
+popa
 ENDM scrollupper 
 ;-----------------------------------------------------------------------------------------------
 ;This is a macro to clear the lower half of the screen when it's compleltely full of charachters
 
 scrolllower MACRO
-   
+pusha
 mov ah, 6               
 mov al, 1               ; number of lines to scroll
 mov bh, 0               ; attribute
@@ -24,40 +24,48 @@ mov cl, 25              ; col left
 mov dh, 24              ; row bottom
 mov dl, 39              ; col right
 int 10h 
-  
+popa
 ENDM scrolllower
 
 saveCursorS MACRO
+pusha
 mov ah,3h
 mov bh,0h
 int 10h
 mov initxS,dl
 mov inityS,dh
+popa
 ENDM saveCursorS  
 ;---------------------------------------------------------------------------------------------------
 ;this is a macro to get the cursor position of the Receive mode in dx "we need to save the cursor position every time we go to revieve mode or send mode"
 saveCursorR MACRO
+pusha
 mov ah,3h
 mov bh,0h
 int 10h
 mov initxR,dl
 mov inityR,dh
+popa
 ENDM saveCursorR 
 
 setCursor MACRO x,y
+pusha
 mov ah,2
 mov bh,0
 mov dl,x
 mov dh,y
 int 10h
+popa
 ENDM setCursor
 
 printcharGraphics MACRO x,color
+pusha
 mov  al, x
 mov  bl, color
 mov  bh, 0    ;Display page
 mov  ah, 0Eh
 int  10h
+popa
 ENDM printcharGraphics
 
 EXTRN SEND:FAR
@@ -1539,28 +1547,33 @@ IN_GAME_CHATTING proc near
     int 16h
     mov VALUE,al  ; save the key ascii code in al
 
-    CMP al, 08h   ; backpace
-    jnz ENTERS
-    cmp initxS, 39
+    CMP al, 08h   ; check backpace
+    jnz jumpenters
+    cmp initxS, 39  ; check if the cursor is in the last column
     jne LOL
-    printcharGraphics ' ',0
+    printcharGraphics ' ',0 ; to be able to delete the last character in the right when backspacing from the line under it
     LOL:cmp initxS, 25
-    JBE backlines
+    JBE backlines   ; check if it is the last column in the left, so that we don't remove parts of the board
     dec initxS
     setCursor initxS,inityS
-    printcharGraphics ' ',0
+    printcharGraphics ' ',0 ; to delete when backspacing
     inc initxS
     setCursor initxS,inityS
+    jmp backlines
 
-    backlines: cmp initxS, 25
+    jumpenters: jmp ENTERS
+    jumpReceive: jmp Receive
+
+    backlines: cmp initxS, 25   ; to go to the row above when it is at the last column from the left
     jne ENTERS
-    cmp inityS, 9
+    cmp inityS, 9   ; here to compare if it is the last row in the top or not, so that it doesn't delete any text or board drawing
     je ENTERS
     dec inityS
     setCursor 40,inityS
     saveCursorS
+    jmp ENTERS
 
-    jumpReceive: jmp Receive
+    
 
     ENTERS: CMP al,0Dh    ; check if the key is enter
     jnz ContLineS
@@ -1591,6 +1604,8 @@ IN_GAME_CHATTING proc near
 
 
     printcharS:
+    cmp VALUE, 60h
+    JE IgnoreS
     printcharGraphics VALUE,0fh          ; printing the char
     saveCursorS
     cmp initxS,25
@@ -1612,7 +1627,7 @@ IN_GAME_CHATTING proc near
     mov al,VALUE        
     out dx , al             
 
-    cmp al, 27     ; press Esc to continue game
+    cmp al, 60H     ; press Esc to continue game
     je jumpExit
     saveCursorS          
     jmp mainloop
@@ -1643,30 +1658,33 @@ IN_GAME_CHATTING proc near
     in al , dx 
     mov VALUE,al
 
-    CMP al, 08h   ; backpace
-    jnz ENTERR
-    cmp initxR, 39
+    CMP al, 08h   ; check backpace
+    jnz jumpenterr
+    cmp initxR, 39  ; check if the cursor is in the last column
     jne LOLL
-    printcharGraphics ' ',0h
+    printcharGraphics ' ',0h    ; to be able to delete the last character in the right when backspacing from the line under it
     LOLL:cmp initxR, 25
-    JE backliner
+    JBE backliner   ; check if it is the last column in the left, so that we don't remove parts of the board
     dec initxR
     setCursor initxR,inityR
-    printcharGraphics ' ',0h
+    printcharGraphics ' ',0h    ; to delete when backspacing
     inc initxR
     setCursor initxR,inityR
+    jmp backliner
+
+    jumpenterr: jmp ENTERR
 
     jumpExitt: jmp jumpExit
 
-    backliner:cmp initxR,25
+    backliner:cmp initxR,25  ; to go to the row above when it is at the last column from the left
     jne ENTERR
-    cmp inityR, 18
+    cmp inityR, 18     ; here to compare if it is the last row in the top or not, so that it doesn't delete any text or board drawing
     je ENTERR
     dec inityR
     setCursor 40,inityR
     saveCursorR
 
-    ENTERR:CMP VALUE,27     ; press Esc to continue game
+    ENTERR:CMP VALUE,60h     ; press Esc to continue game
     je jumpExitt
 
 
@@ -1696,6 +1714,8 @@ IN_GAME_CHATTING proc near
     setCursor 25,24
 
     printcharR:
+    cmp VALUE, 60H
+    JE IgnoreR
     printcharGraphics VALUE, 0fh             ; printing the char
     saveCursorR
     cmp initxR,25
