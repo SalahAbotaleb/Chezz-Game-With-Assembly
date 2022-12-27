@@ -498,7 +498,7 @@ pop ax
 ENDM getdW
 
 
-drawSelf MACRO row,col
+drawSelf MACRO row,col,hhead,sstorage
 local typ,typ2,contDr,blackP,whiteP
 ;steps is max number
 pusha
@@ -520,14 +520,14 @@ jmp far ptr whiteP
     mov cx,col
     mov tmpdbr,al
     mov tmpdbc,cl
-    insert tmpdbr,tmpdbc
+    insert tmpdbr,tmpdbc,hhead,sstorage
 popa
 ENDM drawSelf
 
 ;/**************************************************************************/
 
 
-Drawup MACRO row,col,steps
+Drawup MACRO row,col,steps,sstorage
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
 ;steps is max number
 pusha
@@ -602,7 +602,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr exit
 
@@ -617,7 +617,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 inc dx
 cmp dx,steps
@@ -631,7 +631,7 @@ ENDM Drawup
 ;/**************************************************************************/
 
 
-Drawdown MACRO row,col,steps
+Drawdown MACRO row,col,steps,hhead,sstorage
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
 ;steps is max number
 pusha
@@ -705,7 +705,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr exit
 
@@ -720,7 +720,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 inc dx
 cmp dx,steps
@@ -730,7 +730,7 @@ exit:
 popa
 ENDM Drawdown
 
-Drawright MACRO row,col,steps
+Drawright MACRO row,col,steps,hhead,sstorage
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
 ;steps is max number
 pusha
@@ -804,7 +804,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr exit
 
@@ -819,7 +819,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 inc dx
 cmp dx,steps
@@ -832,7 +832,7 @@ ENDM Drawright
 ;/************************************************************/
 
 
-Drawleft MACRO row,col,steps
+Drawleft MACRO row,col,steps,hhead,sstorage
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
 ;steps is max number
 pusha
@@ -906,7 +906,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr exit
 
@@ -921,7 +921,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 inc dx
 cmp dx,steps
@@ -931,7 +931,7 @@ exit:
 popa
 ENDM Drawleft
 
-DrawRUD MACRO row,col,steps
+DrawRUD MACRO row,col,steps,hhead,sstorage
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
 ;steps is max number
 ;DRAW RIGHT UP DIAGONAL
@@ -1007,7 +1007,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr exit
 
@@ -1022,7 +1022,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 inc dx
 cmp dx,steps
@@ -1108,7 +1108,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr exit
 
@@ -1123,7 +1123,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 inc dx
 cmp dx,steps
@@ -1133,7 +1133,7 @@ exit:
 popa
 ENDM DrawLDD
 
-DrawLUD MACRO row,col,steps
+DrawLUD MACRO row,col,steps,hhead,sstorage
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
 ;steps is max number
 ;DRAW LEFT UP DIAGONAL
@@ -1209,7 +1209,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr exit
 
@@ -1224,7 +1224,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 inc dx
 cmp dx,steps
@@ -1234,7 +1234,7 @@ exit:
 popa
 ENDM DrawLUP
 
-DrawRDD MACRO row,col,steps
+DrawRDD MACRO row,col,steps,hhead,sstorage
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5
 ;steps is max number
 ;DRAW RIGHT DOWN DIAGONAL
@@ -1310,7 +1310,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr exit
 
@@ -1325,7 +1325,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 inc dx
 cmp dx,steps
@@ -1335,7 +1335,7 @@ exit:
 popa
 ENDM DrawRDD
 
-DrawKnight MACRO row,col
+DrawKnight MACRO row,col,hhead,sstorage
 local lop,exit,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5,l1,l2,l3,l4,l5,l6,l7,l8,endl
 ;DRAW all knight moves
 pusha
@@ -1473,7 +1473,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 jmp far ptr endl
 
@@ -1488,7 +1488,7 @@ mov ax,tmpc
 mov cx,tmpr
 mov tmpdbr,cl
 mov tmpdbc,al
-insert tmpdbr,tmpdbc
+insert tmpdbr,tmpdbc,hhead,sstorage
 
 endl:
 pop dx

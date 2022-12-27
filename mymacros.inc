@@ -392,23 +392,23 @@ pop ax
 
 ENDM getcursorlocation
 
-insert MACRO row,col
+insert MACRO row,col,hheadx,sstoragex
 
 pusha
-mov bx,head
+mov bx,hheadx
 mov ax,0
 mov cx,0
-
 mov al,row
 mov cl,col
-
-mov storage[bx],al ;moving row
-inc head
-mov bx,head
-mov storage[bx],cl ;moving col
-inc head
-
+lea si,sstoragex
+mov [si+bx],al ;moving row
+inc hheadx
+mov bx,hheadx
+lea si,sstoragex
+mov [si+bx],cl ;moving col
+inc hheadx
 popa
+
 ENDM insert
 
 remove MACRO row,col

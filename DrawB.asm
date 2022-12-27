@@ -44,10 +44,17 @@ colx DW 0
 killWC DB 0 ;counter for killed white
 
 killBC DB 0 ;counter for killed black
+;/*************/
+prevR1 DW 0
+prevC1 DW 0
+
+prevR2 DW 0
+prevC2 DW 0
+;/***********/
 
 prevR DW 0
 prevC DW 0
-
+;/***********/
 wkingR DW 0
 wkingC DW 0
 
@@ -110,7 +117,13 @@ selectedc DW -1
 selected DB 0
 selectAtrec DB 0
 
+selected1 DB 0
+selectedr1 DW -1
+selectedc1 DW -1
 
+selected2 DB 0
+selectedr2 DW -1
+selectedc2 DW -1
 
 moveavailc DB 0Ah
 takeavailc db 4h 
@@ -157,8 +170,14 @@ playertpye DB 1;0 for white 1 for Black
 success DB 0 ;0 for fail 1 for success
 AvoidLp DB 0
 ;///////////////////////////////////////////
-head DW 0
-storage DB 64 dup(-1)
+head1 DW 0
+storage1 DB 64 dup(-1)
+
+head2 DW 0
+storage2 DB 64 dup(-1)
+
+; hhead DW 0
+; sstorage DB 64 dup(-1)
 
 ;/******DRAW PIECE FUNCTION WRAPPER********/
 PrimaryCW DB 0
@@ -204,6 +223,8 @@ datalocD DW 0
 
 playtimes DW 0
 counter DB 0
+
+
 ;/*****************************************/
 .Code
 
@@ -936,7 +957,7 @@ MAIN PROC FAR
         
          ;replace 6,7,5,4
          ;replace 6,3,2,3
-
+        insert 5,2,head1,storage1
     ;/******************end of test area***************************/
 
     mov row,0
@@ -945,6 +966,12 @@ MAIN PROC FAR
     mov prevR,0
     mov prevC,0
     
+    mov prevR1,0
+    mov prevC1,0
+
+    mov prevR2,0
+    mov prevC2,0
+
     lea si,chezzP
     lea di,chezzT
     DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
@@ -955,22 +982,6 @@ MAIN PROC FAR
    ;Q means the user wants to select
     Q:
     ;saving king coordinates
-    ; pusha
-    ; mov ax,chezznrev[4h]
-    ; mov bx,00h
-    ; mov bl,ah
-    ; mov bkingr,bx
-    ; mov bl,al
-    ; mov bkingC,bx
-    ; mov ax,chezznrev[14h]
-    ; mov bx,00h
-    ; mov bl,ah
-    ; mov bkingr,bx
-    ; mov bl,al
-    ; mov bkingC,bx
-    
-    
-    ;
     ;check king dead condition
     pusha
       DisplaynumberGraphicMode killBC,37,3
@@ -1053,7 +1064,7 @@ MAIN PROC FAR
     mov exist,0
     mov al,selected
     mov selectAtrec,al
-    movepiece RecievedRNEW,RecievedCNEW,1
+    ;movepiece RecievedRNEW,RecievedCNEW,1
     mov AvoidLp,1
     jmp far ptr Reselectp
     ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,selectedr,selectedc,success,begr,begc,endr,endc,res
@@ -1072,12 +1083,12 @@ MAIN PROC FAR
     JNE skip
     call IN_GAME_CHATTING
     SKIP:
-    cmp ah,1ch  ;press Q condition
-    mov playertpye,1
+    cmp ah,1ch  ;press enter condition
+    mov playertpye,0
     JE doQ
     
-    cmp ah,10h
-    mov playertpye,0
+    cmp ah,10h ;press enter condition
+    mov playertpye,1
     JE doQ
     jmp far ptr right
    ;/****************************************************************************************/
@@ -1105,7 +1116,7 @@ MAIN PROC FAR
 ;calling function to move a piece
     push row
     push col
-    movepiece row,col,0
+    movepiece row,col,0,head1,storage1
     pop col
     pop row
     jmp far ptr DrawBckGnd ;need to be modified ;;
@@ -1132,7 +1143,7 @@ MAIN PROC FAR
     NoReselect:
     push row
     push col
-    choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,chooseR,chooseC,success,begr,begc,endr,endc,res
+    choosepiece head1,storage1,PrimaryC,SecondaryC,playertpye,moveavailc,takeavailc,chooseR,chooseC,success,res
     pop col
     pop row
     cmp avoidlp,0
@@ -1157,7 +1168,7 @@ MAIN PROC FAR
     je suc
     jmp far ptr right ;;;;;
     suc:
-    selectp row,col
+    selectp row,col,selectedr1,selectedc1,selected1
  ;/****************************************************************************************/
     DrawBckGnd:
 
@@ -1589,4 +1600,258 @@ IN_GAME_CHATTING proc near
     EXITT:
 RET
 IN_GAME_CHATTING ENDP
+choosepiece MACRO hhead,sstorage,PrimaryC,SecondaryC,playertpye,moveavailc,takeavailc,prevR,prevC,success,res,
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1,selectedn,validtime,validtocont,keepSelect,exist,begin
+;PrimaryC is the primary color
+;SecondaryC is the secondary color
+;chezzP is the piece array
+;chezzT is the type array
+;playertype is 0 for white and 1 for black
+;moveavailc is the array of available moves
+;takeavailc is the array of available takes
+;prevR is the previous row
+;prevC is the previous column
+;success is the success flag
+;wnkingQ means tha the piece is not white king 
+
+    ; getdb prevR,prevC
+    ; mov al,chezzT[BX]
+    ; cmp al,-1
+    ; jne cont1
+    ; mov success,0
+    ; jmp far ptr leave
+    ; cont1:
+    ;should add the timer check here
+    ;still under testing
+    ;comment this for game to work without timer 
+    ;timer is still not working 100%
+    pusha
+
+
+    ;/****************************************************************************************/
+    ;validate choosen piece matches the player type 
+    getdb prevR,prevC
+    mov cl,chezzT[BX]
+    shr cl,1
+    shr cl,1
+    shr cl,1
+    shr cl,1
+    xor cl,playertpye
+    jz validtocont
+    jmp far ptr leave
+    ;/****************************************************************************************/
+    validtocont:
+    pusha 
+    ;cmp avoidlp,0
+    ;jz keepSelect
+    ;push selectedr
+    ;push selectedc
+    ;jmp begin
+    keepSelect:
+    mov selected,0
+    begin:
+    getdb prevR,prevC
+    mov dx,0
+    mov dl,chezzN[BX]
+    cmp dl,-1
+    JE validtime
+    mov bx,dx
+    mov dx,0
+    mov dl,time[bx]
+    cmp dx,0
+    JLE validtime
+    jmp far ptr leave
+    validtime:
+    popa
+;/****************************************************************************************/
+    mov success,1
+    mov ax,prevR
+    mov bx,prevC
+
+    lea si,chezzP
+    lea di,chezzT
+    mov ax,8
+    mov bx,row
+    mul bl
+    add ax,col
+    add di,ax
+    add ax,ax
+    add si,ax  
+    mov ax,[di]
+
+    ;check if position is empty
+    cmp ax,-1
+    JnE Q1
+    jmp far ptr selectedn
+    Q1:
+    ;check if player is white ;kinda racist
+    cmp playertpye,0;probably serial port
+    JE whiteQ
+    jmp far ptr blackQ
+    whiteQ:
+    ;white player
+    ;check if piece is white
+    and ax,0f0h
+    cmp ax,00
+    JE Q2
+    jmp far ptr leave
+    Q2:
+    ;check if piece is king
+    mov ax,[di]
+    and ax,0fh
+    cmp ax,0
+    JE wking
+    jmp far ptr wnkingQ
+    wking:
+    ;TODO call king function
+    HighKing row,col,hhead,sstorage
+    jmp far ptr leave
+    wnkingQ:
+    ;check if piece is queen
+    cmp ax,1
+    JE wqueen
+    jmp far ptr wnueenQ
+    wqueen:
+
+    ;TODO call queen function
+    HighQueen row,col,10,hhead,sstorage
+
+    jmp far ptr leave
+    wnueenQ:
+    ;check if piece is rook
+    cmp ax,2
+    JE wrook
+    jmp far ptr wnrookQ
+    wrook:         
+    
+    ;TODO call rook function
+    HighRook row,col,10,hhead,sstorage
+
+    jmp far ptr leave
+    wnrookQ:
+    ;check if piece is bishop
+    cmp ax,3
+    JE wbishop
+    jmp far ptr wnbishopQ
+    wbishop:
+
+    ;TODO call bishop function
+   
+    HighBishop row,col,10,hhead,sstorage
+
+    jmp far ptr leave
+    wnbishopQ:
+    ;check if piece is knight
+
+    cmp ax,4
+    JE wknight
+    jmp far ptr wnknightQ
+    wknight:
+   
+    ;TODO call knight function
+    HighKnight row,col,hhead,sstorage
+    jmp far ptr leave
+    wnknightQ:
+    ;check if piece is pawn
+    cmp ax,5
+    JE wpawn
+    jmp far ptr wnpawnQ
+    wpawn:
+    
+    Highpawnw row,col,hhead,sstorage
+     
+    jmp far ptr leave
+    wnpawnQ:
+    jmp far ptr leave
+    blackQ:
+    ;black player
+    ;check if piece is black
+    and ax,0f0h
+    cmp ax,00
+    JNE Qb2
+    jmp far ptr selectedn
+    Qb2:
+    ;check if piece is king
+    mov ax,[di]
+    and ax,0fh
+    cmp ax,0
+    JE bking
+    jmp far ptr bnkingQ
+    bking:
+
+    ;TODO call king function
+    HighKing row,col,hhead,sstorage
+    jmp far ptr leave
+    bnkingQ:
+    ;check if piece is queen
+
+    cmp ax,1
+    JE bqueen
+    jmp far ptr bnqueenQ
+    bqueen:
+
+    ;TODO call queen function
+    HighQueen row,col,10,hhead,sstorage
+
+    jmp far ptr leave
+    bnqueenQ:
+    ;check if piece is rook
+    
+    cmp ax,2
+    JE brook
+    jmp far ptr bnrookQ
+    brook:
+    
+    ;TODO call rook function
+    HighRook row,col,10,hhead,sstorage
+
+
+    jmp far ptr leave
+    bnrookQ:
+    ;check if piece is bishop
+    cmp ax,3
+    JE bbishop
+    jmp far ptr bnbishopQ
+    bbishop:
+
+    ;TODO call bishop function
+    HighBishop row,col,10,hhead,sstorage
+    
+    jmp far ptr leave
+    bnbishopQ:
+    ;check if piece is knight
+    
+    cmp ax,4
+    JE bknight
+    jmp far ptr bnknightQ
+    bknight:
+
+    ;TODO call knight function
+    HighKnight row,col,hhead,sstorage
+    jmp far ptr leave
+    bnknightQ:
+    ;check if piece is pawn
+    cmp ax,5
+    JE bpawn
+    jmp far ptr bnpawnQ
+    bpawn:
+
+    ;TODO call pawn function
+    Highpawnb row,col,hhead,sstorage
+
+    jmp far ptr leave
+    bnpawnQ:
+    ;jmp far ptr leave
+    selectedn:
+    mov success,0
+    leave:
+
+    ;cmp avoidlp,0
+    ;JZ exit
+    ;pop selectedc
+    ;pop selectedr
+    exit:
+    popa
+
+ENDM choosepiece
 end main
