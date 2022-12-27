@@ -1585,7 +1585,7 @@ IN_GAME_CHATTING proc near
     CMP inityS,15   ;check if the cursor is in the bottom of the upper screen to scrollup one line
     jnz notlastlineS
     scrollupper
-    setCursor 25,15
+    setCursor 25,15 ; if so, leave at the bottom line after scrolling up one line
     jmp printcharS
     
     notlastlineS:inc inityS     
@@ -1696,7 +1696,7 @@ IN_GAME_CHATTING proc near
     cmp inityR,24           ;check if the cursor is in the bottom of the lower screen to scrollup one line
     jnz notlastlineR
     scrolllower
-    setCursor 25,24
+    setCursor 25,24     ; if so, leave at the bottom line after scrolling up one line
     jmp printcharR
 
     notlastlineR: inc inityR
