@@ -1551,10 +1551,23 @@ ENDM initchezzN
 
 
 kill MACRO r,c
-local sec,con
+local sec,con,nwking,nbking
 ;-1 means empty location
 pusha
-
+;chk if king is killed
+pusha
+getdb r,c
+mov al,chezzT[bx]
+cmp al,00h
+jnz nwking
+mov wkingdead,1
+nwking:
+cmp al,10h
+jnz nbking
+mov bkingdead,1
+nbking:
+popa
+;//////////////////
 getdb r,c
 mov chezzC[BX],-1
 mov chezzT[BX],-1
@@ -1733,3 +1746,4 @@ mov tmpnumber,ax
 call Drawtimp 
 pop ax
 ENDM drawtim
+
