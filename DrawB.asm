@@ -200,6 +200,10 @@ colorD DB ?
 rowD DW 0
 colD DW 0
 datalocD DW 0
+
+
+playtimes DW 0
+counter DB 0
 ;/*****************************************/
 .Code
 
@@ -922,6 +926,10 @@ MAIN PROC FAR
     DisplayStringGraphicMode first_name,12,25,8
     DisplayStringGraphicMode seperation_line,15,25,16
     DisplayStringGraphicMode second_name,13,25,17
+
+    mov ax,2c00h
+    int 21h
+    mov playtimes,dx
     ;-------
     
     ;/******************test area***************************/
@@ -940,6 +948,8 @@ MAIN PROC FAR
     lea si,chezzP
     lea di,chezzT
     DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
+    DrawPieceDB  0EH,0EH,0,0,0h,7,7,begr,begc,endr,endc,res
+
    ;/****************************************************************************************/
    CALL INITCONECT
    ;Q means the user wants to select
@@ -1001,6 +1011,27 @@ MAIN PROC FAR
     ;//check for chekcmate end
     ;////////////////////////
     updatetime
+     pusha
+    mov ax,2c00h
+    int 21h
+    ; cmp cl,playtimeM
+    ; jb belowM
+    ; mov ch,0
+    ; sub cl,playtimeM
+    ; belowM:
+    cmp dl,byte ptr playtimes
+    jbe donothing
+    cmp dx,playtimes
+    jb belowS
+    sub dx,playtimes
+    mov counter,dl
+    belowS:
+    add dx,16h
+    sub dx,playtimes
+    mov counter,dl 
+    donothing:
+    DisplaynumberGraphicMode counter,37,5
+    popa
      ;/**********/
     push selectedr
     push selectedc
@@ -1040,7 +1071,13 @@ MAIN PROC FAR
     cmp ah,3fH ; press Fn+F5 to start in game chatting
     JNE skip
     call IN_GAME_CHATTING
-    SKIP:cmp ah,1ch  ;press Q condition
+    SKIP:
+    cmp ah,1ch  ;press Q condition
+    mov playertpye,1
+    JE doQ
+    
+    cmp ah,10h
+    mov playertpye,0
     JE doQ
     jmp far ptr right
    ;/****************************************************************************************/
@@ -1179,12 +1216,38 @@ MAIN PROC FAR
     JNE down
     dec row
     jmp validate
-
+    
     down:
     cmp ah,50H   ;down condition
-    JE skipthis 
+    JNE right2 
+    ;jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
+    inc row
+    jmp validate
+
+    right2:
+   
+    cmp ah,20H  ;right condition
+    JNE left2
+    inc col
+    jmp validate
+    
+    left2:
+    cmp ah,1EH  ;left condition
+    JNE up2
+    dec col
+    jmp validate
+
+    up2:
+    cmp ah,11H  ;up condition
+    JNE down2
+    dec row
+    jmp validate
+    
+    down2:
+    cmp ah,1FH   ;down condition
+    JE skipthis2 
     jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
-    skipthis:
+    skipthis2:
     inc row
 
     validate:
