@@ -48,6 +48,17 @@ killBC DB 0 ;counter for killed black
 prevR DW 0
 prevC DW 0
 
+wkingR DW 0
+wkingC DW 0
+
+bkingR DW 0
+bkingC DW 0
+
+wkingdead db 0
+bkingdead db 0
+ 
+threat db 0
+
 chooseR DW 0
 chooseC DW 0
 
@@ -135,7 +146,7 @@ time DB 32 dup(0)
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 1 ;0 for white 1 for Black
+playertpye DB 1;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -844,7 +855,7 @@ MAIN PROC FAR
     INT 10h
     ;/*********/
     ;intializations
-     ;1x for black 
+    ;1x for black 
     ;0x for white
     ;0 for king
     ;1 for queen
@@ -973,36 +984,61 @@ MAIN PROC FAR
    CALL INITCONECT
    ;Q means the user wants to select
     Q:
+    ;saving king coordinates
+    ; pusha
+    ; mov ax,chezznrev[4h]
+    ; mov bx,00h
+    ; mov bl,ah
+    ; mov bkingr,bx
+    ; mov bl,al
+    ; mov bkingC,bx
+    ; mov ax,chezznrev[14h]
+    ; mov bx,00h
+    ; mov bl,ah
+    ; mov bkingr,bx
+    ; mov bl,al
+    ; mov bkingC,bx
+    
+    
+    ;
     ;check king dead condition
     pusha
-    mov ax,chezznrev[4]
-    mov bx,00h
-    mov bl,ah
-    mov rowx,bx
-    mov bl,al
-    mov colx,bx
-    getdb rowx,colx
-    mov dl,chezzT[BX]
-    cmp dl,00h
-    JE bkingnotdead
+    cmp wkingdead,1
+    jne wkingisalive
+    jmp far ptr whitekingdead
+    wkingisalive:
+    cmp bkingdead,1
+    jne bkingisalive
     jmp far ptr blackkingdead
-    bkingnotdead:
-    mov ax,chezznrev[14]
-    mov bx,00h
-    mov bl,ah
-    mov rowx,bx
-    mov bl,al
-    mov colx,bx
-    getdb rowx,colx
-    mov dl,chezzT[BX]
-    cmp dl,10h
-    JE wkingnotdead
-    jmp far ptr blackkingdead
-    wkingnotdead:
+    bkingisalive:
     popa
+    ;//check for chekcmate
+    pusha
+    mov bx,0
+    mov bl,playertpye
+    shr bl,1
+    shr bl,1
+    shr bl,1
+    shr bl,1
+    add bl,5
+    mov ax,chezznrev[bx]
+    mov cx,0
+    mov cl,ah
+    mov roww,cx
+    mov cx,0
+    mov cl,al
+    mov colw,cx
+    ;checkformate playertpye,threat,roww,colw,7
+    ;cmp threat,1
+    jne notcheckmateend
+    ;something needs to happen when his is checked
+    ;gototextmode
+    notcheckmateend:
+    popa
+    ;//check for chekcmate end
     ;////////////////////////
     updatetime
-     ;/**********/
+    ;/**********/
     mov AvoidLp,0
     CALL RECIEVE
     cmp EXIST,4
@@ -1255,12 +1291,36 @@ MAIN PROC FAR
     whitekingdead:
 
     ;black wins the game
-
+    ;drawkingdead
+    pusha
+    mov cx,60 ;Column
+    mov dx,120 ;Row
+    mov al,5 ;Pixel color
+    mov ah,0ch ;Draw Pixel Command
+    theultimateloopb:int 10h 
+    inc cx
+    cmp cx,120
+    jne theultimateloopb
+    mov cx,60 ;Column
+    inc dx
+    cmp dx,150
+    jne theultimateloopb
+    popa
     jmp far ptr death
     ;/****************************************************************************************/
     ;black king dead
     blackkingdead:
-
+    pusha
+    mov cx,60 ;Column
+    mov dx,120 ;Row
+    mov al,3  ;Pixel color
+    mov ah,0ch ;Draw Pixel Command
+    theultimateloopw:int 10h 
+    inc cx
+    cmp cx,120
+    jne theultimateloopw
+    popa
+    jmp far ptr death
     ;white wins the game
 
     ;/****************************************************************************************/
