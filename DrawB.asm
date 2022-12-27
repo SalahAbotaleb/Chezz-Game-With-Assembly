@@ -1,73 +1,3 @@
-;This is a macro to clear the upper half of the screen when it's compleltely full of charachters
-scrollupper MACRO
-pusha
-mov ah, 6               
-mov al, 1               ; number of lines to scroll
-mov bh, 0               ; attribute
-mov ch, 9              ; row top
-mov cl, 25               ; col left
-mov dh, 15             ; row bottom
-mov dl, 39              ; col right
-int 10h 
-popa
-ENDM scrollupper 
-;-----------------------------------------------------------------------------------------------
-;This is a macro to clear the lower half of the screen when it's compleltely full of charachters
-
-scrolllower MACRO
-pusha
-mov ah, 6               
-mov al, 1               ; number of lines to scroll
-mov bh, 0               ; attribute
-mov ch, 18              ; row top
-mov cl, 25              ; col left
-mov dh, 24              ; row bottom
-mov dl, 39              ; col right
-int 10h 
-popa
-ENDM scrolllower
-
-saveCursorS MACRO
-pusha
-mov ah,3h
-mov bh,0h
-int 10h
-mov initxS,dl
-mov inityS,dh
-popa
-ENDM saveCursorS  
-;---------------------------------------------------------------------------------------------------
-;this is a macro to get the cursor position of the Receive mode in dx "we need to save the cursor position every time we go to revieve mode or send mode"
-saveCursorR MACRO
-pusha
-mov ah,3h
-mov bh,0h
-int 10h
-mov initxR,dl
-mov inityR,dh
-popa
-ENDM saveCursorR 
-
-setCursor MACRO x,y
-pusha
-mov ah,2
-mov bh,0
-mov dl,x
-mov dh,y
-int 10h
-popa
-ENDM setCursor
-
-printcharGraphics MACRO x,color
-pusha
-mov  al, x
-mov  bl, color
-mov  bh, 0    ;Display page
-mov  ah, 0Eh
-int  10h
-popa
-ENDM printcharGraphics
-
 EXTRN SEND:FAR
 EXTRN RECIEVE:FAR
 EXTRN INITCONECT:FAR
@@ -219,7 +149,7 @@ time DB 32 dup(0)
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 0;0 for white 1 for Black
+playertpye DB 1;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -944,54 +874,7 @@ MAIN PROC FAR
     MOV AL, 13h
     INT 10h
 
-	DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
-	DrawPiece  PrimaryC,SecondaryC,RookFilename,filehandle,rookData,0,0,0h,0,0,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0h,0,7,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,horseFilename,filehandle,horseData,0,0,0h,0,1,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,horseData,0,0,0h,0,6,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,bishopFilename,filehandle,bishopData,0,0,0h,0,2,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,bishopData,0,0,0h,0,5,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,queenFilename,filehandle,queenData,0,0,0h,0,3,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,kingFilename,filehandle,kingData,0,0,0h,0,4,begr,begc,endr,endc,res
-    DrawPiece  PrimaryC,SecondaryC,soliderFilename,filehandle,soliderData,0,0,0h,1,0,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,1,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,2,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,3,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,4,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,5,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,6,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0h,1,7,begr,begc,endr,endc,res
-
-
-    DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0Fh,7,7,begr,begc,endr,endc,res
-	DrawPieceD  PrimaryC,SecondaryC,rookData,0,0,0Fh,7,0,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,horseData,0,0,0Fh,7,1,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,horseData,0,0,0Fh,7,6,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,bishopData,0,0,0Fh,7,2,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,bishopData,0,0,0Fh,7,5,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,queenData,0,0,0Fh,7,3,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,kingData,0,0,0Fh,7,4,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,0,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,1,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,2,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,3,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,4,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,5,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,6,begr,begc,endr,endc,res
-    DrawPieceD  PrimaryC,SecondaryC,soliderData,0,0,0Fh,6,7,begr,begc,endr,endc,res
-
-    DisplayStringGraphicMode status_msg,8,25,1
-    DisplayStringGraphicMode white_killed_msg,12,26,2
-    DisplaynumberGraphicMode killWC,37,2
-    DisplayStringGraphicMode black_killed_msg,12,26,3
-    DisplaynumberGraphicMode killBC,37,3
-    ;DisplayStringGraphicMode checkmate_msg,9,27,5
-    ;DisplayStringGraphicMode black_win_msg,9,27,6
-    ;DisplayStringGraphicMode white_win_msg,9,27,6
-    DisplayStringGraphicMode seperation_line,15,25,7
-    DisplayStringGraphicMode first_name,12,25,8
-    DisplayStringGraphicMode seperation_line,15,25,16
-    DisplayStringGraphicMode second_name,13,25,17
+	;DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
     
 
 
@@ -1101,7 +984,21 @@ MAIN PROC FAR
     DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,7,begr,begc,endr,endc,res
 
    
+    ;-------
     
+    DisplayStringGraphicMode status_msg,8,25,1
+    DisplayStringGraphicMode white_killed_msg,12,26,2
+    DisplaynumberGraphicMode killWC,37,2
+    DisplayStringGraphicMode black_killed_msg,12,26,3
+    DisplaynumberGraphicMode killBC,37,3
+    ;DisplayStringGraphicMode checkmate_msg,9,27,5
+    ;DisplayStringGraphicMode black_win_msg,9,27,6
+    ;DisplayStringGraphicMode white_win_msg,9,27,6
+    DisplayStringGraphicMode seperation_line,15,25,7
+    DisplayStringGraphicMode first_name,12,25,8
+    DisplayStringGraphicMode seperation_line,15,25,16
+    DisplayStringGraphicMode second_name,13,25,17
+    ;-------
     
     ;/******************test area***************************/
         
@@ -1121,28 +1018,28 @@ MAIN PROC FAR
     DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
 
 
-    ; set divisor latch access bit
+    ; ; set divisor latch access bit
 
-    mov dx,3fbh 			; Line ContLinerol Register
-    mov al,10000000b		;Set Divisor Latch Access Bit
-    out dx,al               ;Out it
+    ; mov dx,3fbh 			; Line ContLinerol Register
+    ; mov al,10000000b		;Set Divisor Latch Access Bit
+    ; out dx,al               ;Out it
 
-    ;Set LSB byte of the Baud Rate Divisor Latch register.
+    ; ;Set LSB byte of the Baud Rate Divisor Latch register.
 
-    mov dx,3f8h			
-    mov al,0ch			
-    out dx,al
+    ; mov dx,3f8h			
+    ; mov al,0ch			
+    ; out dx,al
 
-    ;Set MSB byte of the Baud Rate Divisor Latch register.
+    ; ;Set MSB byte of the Baud Rate Divisor Latch register.
 
-    mov dx,3f9h
-    mov al,00h
-    out dx,al
+    ; mov dx,3f9h
+    ; mov al,00h
+    ; out dx,al
 
-    ;Set port configuration
-    mov dx,3fbh
-    mov al,00011011b
-    out dx,al  
+    ; ;Set port configuration
+    ; mov dx,3fbh
+    ; mov al,00011011b
+    ; out dx,al
 
    ;/****************************************************************************************/
    CALL INITCONECT
@@ -1526,9 +1423,6 @@ MAIN PROC FAR
     ;/****************************************************************************************/
     death:
     ;Press any key to exit
-    mov  ah, 3eh
-    lea  bx, debugFilename
-    int  21h 
     returntoconsole
 MAIN ENDP
 
@@ -1540,9 +1434,9 @@ IN_GAME_CHATTING proc near
     mov ah,1    ;check if a key is pressed
     int 16h
     jz jumpReceive   ;if not then jmp to recieving mode
-    jnz SEND         ;if yes jmp to send mode
+    jnz SENDa         ;if yes jmp to send mode
 
-    SEND:
+    SENDa:
     mov ah,0   ;clear buffer
     int 16h
     mov VALUE,al  ; save the key ascii code in al
@@ -1633,7 +1527,7 @@ IN_GAME_CHATTING proc near
     jmp mainloop
 
 
-    jumpSend:jmp send
+    jumpSend:jmp senda
 
     jumpExit:jmp EXITT
 
