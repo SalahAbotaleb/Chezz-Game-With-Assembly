@@ -139,35 +139,24 @@ dexit:deselectp
 jmp far ptr exit
 ;deselect then exit
 ChangeRecieved:
-; mov dx,RecievedROLD
-; Displaynumber
-; printnewline
-; mov dx,RecievedCOLD
-; Displaynumber
-; printnewline
-; mov dx,RecievedRNEW
-; Displaynumber
-; printnewline
-; mov dx,RecievedCNEW
-; Displaynumber
-mov ax,RecievedRNEW
-xor ax,selectedr
-mov bx,RecievedCNEW
-xor bx,selectedc
-or ax,bx
-jz cont5
-jmp far ptr cont7
-cont5:deselectp
+; mov al,selected
+; mov selectAtrec,al
 replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
+deselectp
+; pop selectedc
+; cmp selectedc,-1
+; push selectedc
+; je exit
+; mov selected,1
 jmp far ptr exit
-cont7:
-replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
+;cont7:
+;replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
 exit:
 popa    
 ENDM movepiece
 
 choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,prevR,prevC,success,begr,begc,endr,endc,res
-    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1,selectedn,validtime,validtocont
+    local leave,Q1,Q2,Qb2,whiteQ,blackQ,wnkingQ,wnueenQ,wnbishopQ,wnknightQ,wnrookQ,wnpawnQ,bnkingQ,bnqueenQ,bnbishopQ,bnknightQ,bnrookQ,bnpawnQ,skipwpawn,wking,wqueen,wrook,wbishop,wknight,wpawn,skipbpawn,bking,bqueen,brook,bbishop,bknight,bpawn,cont1,selectedn,validtime,validtocont,keepSelect,exist,begin
 ;PrimaryC is the primary color
 ;SecondaryC is the secondary color
 ;chezzP is the piece array
@@ -208,8 +197,14 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     ;/****************************************************************************************/
     validtocont:
     pusha 
+    ;cmp avoidlp,0
+    ;jz keepSelect
+    ;push selectedr
+    ;push selectedc
+    ;jmp begin
+    keepSelect:
     mov selected,0
-
+    begin:
     getdb prevR,prevC
     mov dx,0
     mov dl,chezzN[BX]
@@ -405,7 +400,14 @@ choosepiece MACRO PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc
     selectedn:
     mov success,0
     leave:
+
+    ;cmp avoidlp,0
+    ;JZ exit
+    ;pop selectedc
+    ;pop selectedr
+    exit:
     popa
+
 ENDM choosepiece
 
 ;/**************************************************************************/
