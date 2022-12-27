@@ -10,8 +10,7 @@ mov dl, 79              ; col right
 int 10h 
   
 ENDM scrollupper 
-
-
+;-----------------------------------------------------------------------------------------------
 scrolllower MACRO
    
 mov ah, 6               
@@ -22,9 +21,9 @@ mov cl, 0               ; col left
 mov dh, 22              ; row bottom
 mov dl, 79              ; col right
 int 10h 
-
+  
 ENDM scrolllower
-
+;--------------------------------------------------------------------------------------------------
 saveCursorS MACRO
 mov ah,3h
 mov bh,0h
@@ -32,7 +31,7 @@ int 10h
 mov initxS,dl
 mov inityS,dh
 ENDM saveCursorS  
-
+;---------------------------------------------------------------------------------------------------
 saveCursorR MACRO
 mov ah,3h
 mov bh,0h
@@ -40,8 +39,22 @@ int 10h
 mov initxR,dl
 mov inityR,dh
 ENDM saveCursorR 
+;----------------------------------------------------------------------------------------------------
+setCursor MACRO x,y
+mov ah,2
+mov bh,0
+mov dl,x
+mov dh,y
+int 10h
+ENDM setCursor
 
-include mymacros.inc
+printchar MACRO x
+mov ah,2          ; printing the char
+mov dl,x
+int 21h
+ENDM printchar
+
+;-----------------------------------------------------------------------------------------------------
 .MODEL SMALL
 .STACK 64
 .DATA
@@ -49,7 +62,7 @@ include mymacros.inc
 LINE  db 80 dup('-'),'$'
 firstname db "First Name:-$"
 secondname db "Second Name:-$"
-returnmsg db "- To end Chat. Press Esc$"
+returnmsg db "- To end Chat. Press ~ Key$"
 VALUE  db ?     ;VALUE which will be sent or Received by user
 initxS db 0     ;initial position for sender column
 inityS db 1     ;initial position for sender row
@@ -138,6 +151,7 @@ jz jumpReceive   ;if not then jmp to recieving mode
 jnz send         ;if yes jmp to send mode
 
 
+
 send:
 
 mov ah,0   ;clear buffer
@@ -145,19 +159,22 @@ int 16h
 
 mov VALUE,al  ; save the key ascii code in al
 
-CMP al, 08h   ; backpace
+CMP al, 08h   ; check backpace
 jnz ENTERS
-cmp initxS, 0   ; check if it not the end of line from the left
-JE backlines
+cmp initxS, 79  ; check if the cursor is in the last column
+jne LOL
+printchar ' '   ; to be able to delete the last character in the right when backspacing from the line under it
+LOL:cmp initxS, 0
+JE backlines    ; check if it is the last column in the left
 dec initxS
-setCursor initxS,inityS     ;first dec the x_position then set cursor then print space, then we put the cursor back by incrementing the x_position
-printchar ' '
+setCursor initxS,inityS
+printchar ' '   ; to delete when backspacing
 inc initxS
 setCursor initxS,inityS
 
-backlines: cmp initxS, 0
+backlines: cmp initxS, 0    ; to go to the row above when it is at the last column from the left
 jne ENTERS
-cmp inityS, 1   ;if it is the end of line from left and not the first row, then backspace will set cursor to the end of the line above line from the right
+cmp inityS, 1   ; here to compare if it is the last row in the top or not, so that it doesn't delete any text
 je ENTERS
 dec inityS
 setCursor 80,inityS
@@ -174,7 +191,7 @@ newlineS:
 CMP inityS,10   ;check if the cursor is in the bottom of the upper screen to scrollup one line
 jnz notlastlineS
 scrollupper
-setCursor 0,10
+setCursor 0,10  ; if so, leave at the bottom line after scrolling up one line
 jmp printcharS
  
 notlastlineS:inc inityS     
@@ -209,7 +226,7 @@ mov dx , 3F8H		; Transmit data register
 mov al,VALUE        
 out dx , al         
 
-CMP al,27           ; check Esc key to end chatting mode
+CMP al,7Eh           ; check Esc key to end chatting mode
 JZ jumpExit
 saveCursorS          
 jmp mainloop        
@@ -240,26 +257,29 @@ mov dx , 03F8H
 in al , dx 
 mov VALUE,al
 
-CMP al, 08h   ; backpace
+CMP al, 08h   ; check backpace
 jnz ENTERR
-cmp initxR, 0
-JE backliner
+cmp initxR, 79  ; check if the cursor is in the last column
+jne LOLL
+printchar ' '   ; to be able to delete the last character in the right when backspacing from the line under it
+LOLL:cmp initxR, 0
+JE backliner    ; check if it is the last column in the left
 dec initxR
 setCursor initxR,inityR
-printchar ' '
+printchar ' '   ; to delete when backspacing
 inc initxR
 setCursor initxR,inityR
 
-backliner:cmp initxR,0
+backliner:cmp initxR,0  ; to go to the row above when it is at the last column from the left
 jne ENTERR
-cmp inityR, 13
+cmp inityR, 13      ; here to compare if it is the last row in the top or not, so that it doesn't delete any text
 je ENTERR
 dec inityR
 setCursor 80,inityR
 saveCursorR
 
-ENTERR:CMP VALUE,27            ;check if the Received data is Esc key to end chatting mode
-JZ  jumpExit
+ENTERR:CMP VALUE,7Eh           ;check if the Received data is Esc key to end chatting mode
+JZ  jumpExitt
 
 
 CMP VALUE,0Dh           ;check if the key pressed is enter
@@ -270,7 +290,7 @@ newlineR:
 cmp inityR,22           ;check if the cursor is in the bottom of the lower screen to scrollup one line
 jnz notlastlineR
 scrolllower
-setCursor 0,22
+setCursor 0,22      ; if so, leave at the bottom line after scrolling up one line
 jmp printcharR
 
 notlastlineR: inc inityR
@@ -281,6 +301,8 @@ setCursor initxR,inityR     ; setting the cursor after newlineR
 CMP initxR,79               ; here we need to check when the x passes 79 so go to a newline
 JZ CheckBottomR                  ; so we must check if it is in the bottom line or not
 jnz printcharR
+
+jumpExitt: jmp EXIT
 
 CheckBottomR: cmp inityR,22     ;check if the cursor is in the bottom of the lower screen to scrollup one line
 jnz printcharR
@@ -302,7 +324,6 @@ chatting endp
 exit:
 
 ;; HERE SHOULD BE THE RETURN TO THE MAIN MENU
-;--------------------------------------------
 ;--------------------------------------------
 ;--------------------------------------------
 ;--------------------------------------------
