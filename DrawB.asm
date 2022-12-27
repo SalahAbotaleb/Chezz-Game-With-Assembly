@@ -97,6 +97,9 @@ passer dw 0h ;variable to be passed to procs
 selectedr DW -1
 selectedc DW -1
 selected DB 0
+selectAtrec DB 0
+
+
 
 moveavailc DB 0Ah
 takeavailc db 4h 
@@ -135,7 +138,7 @@ time DB 32 dup(0)
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 1 ;0 for white 1 for Black
+playertpye DB 0 ;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -973,15 +976,30 @@ MAIN PROC FAR
    CALL INITCONECT
    ;Q means the user wants to select
     Q:
+   
+    
     updatetime
      ;/**********/
+    push selectedr
+    push selectedc
     mov AvoidLp,0
     CALL RECIEVE
     cmp EXIST,4
     JE ContUpdate
     jmp far ptr NoUpdate
     ContUpdate:
+    ;
+    ; mov ax,selectedr
+    ; Displaynumber
+    ; mov ax,selectedc
+    ; Displaynumber
+    ; mov al,selected
+    ; mov ah,0
+    ; Displaynumber
+    ;
     mov exist,0
+    mov al,selected
+    mov selectAtrec,al
     movepiece RecievedRNEW,RecievedCNEW,1
     mov AvoidLp,1
     jmp far ptr Reselectp
@@ -1039,10 +1057,16 @@ MAIN PROC FAR
     mov success,0
     jmp far ptr NoReselect
     Reselectp:
+    pop selectedc
+    pop selectedr
     mov ax,selectedr
     mov ChooseR,ax
+    ;Displaynumber
+    ;printnewline
     mov ax,selectedc
     mov ChooseC,ax
+    ;Displaynumber
+    ;printnewline
     NoReselect:
     push row
     push col
@@ -1051,6 +1075,20 @@ MAIN PROC FAR
     pop row
     cmp avoidlp,0
     jz contcheck
+    mov ah,0
+    mov al,selectAtrec
+    mov selected,al
+    ;Displaynumber
+    ;printnewline
+    ;
+    ; mov ax,selectedr
+    ; Displaynumber
+    ; mov ax,selectedc
+    ; Displaynumber
+    ; mov al,selected
+    ;  mov ah,0
+    ; Displaynumber
+    ;
     jmp far ptr Q
     contcheck:
     cmp success,1
