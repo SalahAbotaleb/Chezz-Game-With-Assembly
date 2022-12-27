@@ -9,6 +9,7 @@ include mymacros.inc
 MSG1  DB  "Please Enter Your Name: $"
 MSG2  DB  13,"Invalid! Re-Enter your Name: $"
 INPUT_NAME DB  30,?,30 DUP('$')
+Incomingname DB  30,?,30 DUP('$')
 
 F1outputmsg  DB  "To start  chating  press F1 $"
 F2outputmsg  DB  "To start the game  press F2 $"
@@ -25,6 +26,9 @@ mov ds,ax
 CALL SUBPROG1
 
 GotoTextmode
+
+
+looptillesc:;to keep lopping until the user press esc
 
 movecursorlocation 19h,7h,0h    ;moves cursor to the middle of the page 
 
@@ -60,6 +64,8 @@ DisplayString test3       ;returntoconsole  ;Close Program
 
 goout:
 ;returntoconsole
-
+mov ax,1
+add ax,1
+jnz looptillesc
 MAIN ENDP    
 END MAIN
