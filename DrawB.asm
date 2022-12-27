@@ -261,6 +261,23 @@ initxS db 25     ;initial position for sender column
 inityS db 9     ;initial position for sender row
 initxR db 25     ;initial position for receiver column
 inityR db 18    ;initial position for receiver row
+
+status_msg DB "Status:-$"
+checkmate_msg DB "CheckMate$"
+black_win_msg DB "Black Win$"
+white_win_msg DB "White Win$"
+black_killed_msg DB "Black Kill: $"
+white_killed_msg DB "White Kill: $"
+seperation_line DB "---------------$"
+notification_msg DB "Notification:-$"
+first_name DB "First Name:-$"
+second_name DB "Second Name:-$"
+
+VALUE  db ?     ;VALUE which will be sent or Received by user
+initxS db 25     ;initial position for sender column
+inityS db 9     ;initial position for sender row
+initxR db 25     ;initial position for receiver column
+inityR db 18    ;initial position for receiver row
 rowInitChezz DB ?
 colInitChezz DB  ?
 typeInitChezz DB ?
