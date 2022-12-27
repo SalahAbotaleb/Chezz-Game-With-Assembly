@@ -447,3 +447,72 @@ mov dl,x
 mov dh,y
 int 10h
 ENDM setCursor
+;This is a macro to clear the upper half of the screen when it's compleltely full of charachters
+scrollupper MACRO
+pusha
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 0               ; attribute
+mov ch, 9              ; row top
+mov cl, 25               ; col left
+mov dh, 15             ; row bottom
+mov dl, 39              ; col right
+int 10h 
+popa
+ENDM scrollupper 
+;-----------------------------------------------------------------------------------------------
+;This is a macro to clear the lower half of the screen when it's compleltely full of charachters
+
+scrolllower MACRO
+pusha
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 0               ; attribute
+mov ch, 18              ; row top
+mov cl, 25              ; col left
+mov dh, 24              ; row bottom
+mov dl, 39              ; col right
+int 10h 
+popa
+ENDM scrolllower
+
+saveCursorS MACRO
+pusha
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxS,dl
+mov inityS,dh
+popa
+ENDM saveCursorS  
+;---------------------------------------------------------------------------------------------------
+;this is a macro to get the cursor position of the Receive mode in dx "we need to save the cursor position every time we go to revieve mode or send mode"
+saveCursorR MACRO
+pusha
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxR,dl
+mov inityR,dh
+popa
+ENDM saveCursorR 
+
+setCursor MACRO x,y
+pusha
+mov ah,2
+mov bh,0
+mov dl,x
+mov dh,y
+int 10h
+popa
+ENDM setCursor
+
+printcharGraphics MACRO x,color
+pusha
+mov  al, x
+mov  bl, color
+mov  bh, 0    ;Display page
+mov  ah, 0Eh
+int  10h
+popa
+ENDM printcharGraphics
