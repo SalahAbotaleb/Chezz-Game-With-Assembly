@@ -177,8 +177,8 @@ coffsetW DW 0
 
 status_msg DB "Status:-$"
 checkmate_msg DB "CheckMate$"
-black_win_msg DB "Black Win$"
-white_win_msg DB "White Win$"
+black_win_msg DB "Black Win$$"
+white_win_msg DB "White Win$$"
 black_killed_msg DB "Black Kill: $$$"
 white_killed_msg DB "White Kill: $$$"
 seperation_line DB "---------------$"
@@ -1340,7 +1340,7 @@ MAIN PROC FAR
     cmp dx,150
     jne theultimateloopb
     popa
-    jmp far ptr death
+    jmp far ptr death1
     ;/****************************************************************************************/
     ;black king dead
     blackkingdead:
@@ -1354,12 +1354,26 @@ MAIN PROC FAR
     cmp cx,120
     jne theultimateloopw
     popa
-    jmp far ptr death
+    jmp far ptr death2
     ;white wins the game
 
     ;/****************************************************************************************/
-    death:
+    death1:
     ;Press any key to exit
+    DisplayStringGraphicMode black_win_msg,9,27,6
+    ssa:
+    mov ah,0
+    int 16h 
+    cmp al,3Eh
+    jmp ssa
+    returntoconsole
+    death2:
+    DisplayStringGraphicMode white_win_msg,9,27,6
+    ssb:
+    mov ah,0
+    int 16h 
+    cmp al,3Eh
+    jmp ssb
     returntoconsole
 MAIN ENDP
 
