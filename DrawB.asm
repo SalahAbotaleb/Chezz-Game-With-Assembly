@@ -185,6 +185,7 @@ seperation_line DB "---------------$"
 notification_msg DB "Notification:-$"
 first_name DB "First Name:-$"
 second_name DB "Second Name:-$"
+Timer_Counter DB "Timer: $"
 
 VALUE  db ?     ;VALUE which will be sent or Received by user
 initxS db 25     ;initial position for sender column
@@ -200,6 +201,11 @@ colorD DB ?
 rowD DW 0
 colD DW 0
 datalocD DW 0
+
+playtime DB 0
+playtimeS DB 0
+playtimeH DB 0
+counter DB 0
 ;/*****************************************/
 .Code
 
@@ -914,6 +920,8 @@ MAIN PROC FAR
     DisplayStringGraphicMode white_killed_msg,12,26,2
     ;DisplaynumberGraphicMode killWC,37,2
     DisplayStringGraphicMode black_killed_msg,12,26,3
+    DisplayStringGraphicMode Timer_Counter,7,26,5
+
     ;DisplaynumberGraphicMode killBC,37,3
     ;DisplayStringGraphicMode checkmate_msg,9,27,5
     ;DisplayStringGraphicMode black_win_msg,9,27,6
@@ -922,6 +930,17 @@ MAIN PROC FAR
     DisplayStringGraphicMode first_name,12,25,8
     DisplayStringGraphicMode seperation_line,15,25,16
     DisplayStringGraphicMode second_name,13,25,17
+    pusha
+    mov ax,2c00h
+    int 21h
+    ; mov playtimes,dh
+    ; mov playtimeH,Cl
+    mov Al,cl
+    mov bl,3Ch
+    mul bl
+    add Al,dh
+    mov playtime,al
+    popa
     ;-------
     
     ;/******************test area***************************/
@@ -1001,6 +1020,22 @@ MAIN PROC FAR
     ;//check for chekcmate end
     ;////////////////////////
     updatetime
+     pusha
+    mov ax,2c00h
+    int 21h
+
+    mov al,cl
+    mov bl,3Ch
+    mul bl
+    add al,dh
+    sub al,playtime
+    mov counter,al
+
+    movecursorlocation 33,5,0
+    mov ax,0
+    mov al,counter
+    Displaynumber
+    popa
      ;/**********/
     push selectedr
     push selectedc
