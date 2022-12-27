@@ -17,7 +17,6 @@ include timer.inc
 .286
 .Stack 64
 .Data
-org(1000)
 boardWidth EQU 200
 boardHeight EQU 200
 
@@ -43,6 +42,7 @@ rowx DW 0
 colx DW 0
 
 killWC DB 0 ;counter for killed white
+
 killBC DB 0 ;counter for killed black
 
 prevR DW 0
@@ -179,8 +179,8 @@ status_msg DB "Status:-$"
 checkmate_msg DB "CheckMate$"
 black_win_msg DB "Black Win$"
 white_win_msg DB "White Win$"
-black_killed_msg DB "Black Kill: $"
-white_killed_msg DB "White Kill: $"
+black_killed_msg DB "Black Kill: $$$"
+white_killed_msg DB "White Kill: $$$"
 seperation_line DB "---------------$"
 notification_msg DB "Notification:-$"
 first_name DB "First Name:-$"
@@ -632,81 +632,7 @@ pusha
     ret;
 
 Drawtimp ENDP
-; ;/*******/
-; DrawPieceDW proc
-;     pusha
-;      ;***********Drawing the pixels
-;     mov ax,rowD
-;     mov cx,25d
-;     mul cl
-;     mov bx,ax
 
-;     mov ax,colD
-;     mul cl
-;     ;now we have begging stored at ax for colD begging
-;     ;and bx for rowD begging
-
-;     mov begr,0
-;     add begr,0
-;     add begr,bx
-
-;     mov begc,0
-;     add begc,0
-;     add begc,ax
-     
-;     mov endr,bx
-;     mov endc,ax
-
-;     add endr,25d
-;     add endc,25d
-
-;     mov cx,0
-;     mov ah,0
-;     mov ax,rowD
-;     mov bx,2
-;     div bl
-;     xor cl,ah
-
-;     mov ah,0
-;     mov ax,colD
-;     mov bx,2
-;     div bl
-;     xor cl,ah
-    
-;     mov res,cl
-
-
-;     mov BX , datalocD ; BL contains index at the current drawn pixel
-;     MOV CX,begc
-;     MOV DX,begr
-;     MOV AH,0ch
-;     drawLoopd:
-;     MOV AL,[BX]
-;     cmp al,5
-;     ja filterd
-;     cmp res,0
-;     jnz lblsecd 
-;     lblprimd:mov al,PrimaryC
-;     jmp contind
-;     lblsecd:mov al,SecondaryC
-;     jmp contind
-;     filterd: mov al,colorD
-;     contind:
-;     INT 10h 
-;     INC CX
-;     INC BX
-;     CMP CX,endc
-;     JNE drawLoopd 
-	
-;     MOV CX ,begc
-;     INC DX
-;     CMP DX ,endr
-;     JNE drawLoopd
-;     ;************end drawing the pixels
-;     popa
-; DrawPieceDW endp
-
-;/*******/
 DrawPieceW PROC
     ;local drawLoop,noerror,lblprim,lblsec,filter,contin,Nempty,exit,sec,con
     ;primaryC is primary Color for the board which is at top left coener 
@@ -865,8 +791,6 @@ popa
 ret
 inittChezzW ENDP
 
-
-
 MAIN PROC FAR
     MOV AX , @DATA
     MOV DS , AX
@@ -988,9 +912,9 @@ MAIN PROC FAR
     
     DisplayStringGraphicMode status_msg,8,25,1
     DisplayStringGraphicMode white_killed_msg,12,26,2
-    DisplaynumberGraphicMode killWC,37,2
+    ;DisplaynumberGraphicMode killWC,37,2
     DisplayStringGraphicMode black_killed_msg,12,26,3
-    DisplaynumberGraphicMode killBC,37,3
+    ;DisplaynumberGraphicMode killBC,37,3
     ;DisplayStringGraphicMode checkmate_msg,9,27,5
     ;DisplayStringGraphicMode black_win_msg,9,27,6
     ;DisplayStringGraphicMode white_win_msg,9,27,6
@@ -1016,31 +940,6 @@ MAIN PROC FAR
     lea si,chezzP
     lea di,chezzT
     DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
-
-
-    ; ; set divisor latch access bit
-
-    ; mov dx,3fbh 			; Line ContLinerol Register
-    ; mov al,10000000b		;Set Divisor Latch Access Bit
-    ; out dx,al               ;Out it
-
-    ; ;Set LSB byte of the Baud Rate Divisor Latch register.
-
-    ; mov dx,3f8h			
-    ; mov al,0ch			
-    ; out dx,al
-
-    ; ;Set MSB byte of the Baud Rate Divisor Latch register.
-
-    ; mov dx,3f9h
-    ; mov al,00h
-    ; out dx,al
-
-    ; ;Set port configuration
-    ; mov dx,3fbh
-    ; mov al,00011011b
-    ; out dx,al
-
    ;/****************************************************************************************/
    CALL INITCONECT
    ;Q means the user wants to select
@@ -1064,6 +963,9 @@ MAIN PROC FAR
     ;
     ;check king dead condition
     pusha
+      DisplaynumberGraphicMode killBC,37,3
+     ;;comment
+     DisplaynumberGraphicMode killWC,37,2
     cmp wkingdead,1
     jne wkingisalive
     jmp far ptr whitekingdead

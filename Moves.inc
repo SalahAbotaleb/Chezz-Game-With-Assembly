@@ -73,7 +73,7 @@ pop ax
 jmp far ptr SendData
 cont2:
 cmp ax,0AH
-ja black
+jae black
 jmp far ptr white
 black:
 ;now the one to be killed is balck

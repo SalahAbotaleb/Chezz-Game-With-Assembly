@@ -91,6 +91,7 @@ ENDM Displaynumber
 
 DisplaynumberGraphicMode Macro num,Column,Row
 local equalsixteen,unitth,lessnine,ENDDD
+pusha
 mov  dl, Column  
 mov  dh, Row   
 mov  bh, 0    ;Display page
@@ -133,13 +134,14 @@ int  10h
 jmp ENDDD
 
 lessnine: 
-mov  al, killWC
+mov  al, num
 add  al, '0'
 mov  bl, 0Fh  ;Color is white
 mov  bh, 0    ;Display page
 mov  ah, 0Eh  ;Teletype
 int  10h
 ENDDD:
+popa
 ENDM DisplaynumberGraphicMode
 
 ReadNumberMsg MACRO PromptMsg,outputloc ;read a number and stores in ax with a message output
