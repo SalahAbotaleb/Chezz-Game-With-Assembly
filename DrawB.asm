@@ -1021,6 +1021,7 @@ MAIN PROC FAR
     ;//check for chekcmate end
     ;////////////////////////
     updatetime
+    ;call IN_GAME_CHATTING
      pusha
     mov ax,2c00h
     int 21h
@@ -1072,11 +1073,11 @@ MAIN PROC FAR
     INT 21h
     
     noflush:
-    pop ax
-    cmp ah,3fH ; press Fn+F5 to start in game chatting
-    JNE skip
-    call IN_GAME_CHATTING
-    SKIP:cmp ah,1ch  ;press Q condition
+    ;pop ax
+    ;cmp ah,3fH ; press Fn+F5 to start in game chatting
+    ;JNE skip
+    ;call IN_GAME_CHATTING
+    SKIP:cmp ah,1ch  ;press enter condition
     JE doQ
     jmp far ptr right
    ;/****************************************************************************************/
@@ -1365,7 +1366,7 @@ MAIN PROC FAR
     ssa:
     mov ah,0
     int 16h 
-    cmp al,3Eh
+    cmp al,60h
     jmp ssa
     returntoconsole
     death2:
@@ -1373,29 +1374,32 @@ MAIN PROC FAR
     ssb:
     mov ah,0
     int 16h 
-    cmp al,3Eh
+    cmp al,60h
     jmp ssb
     returntoconsole
 MAIN ENDP
 
 
 IN_GAME_CHATTING proc near
-
+    pusha
     mainloop:
 
-    mov ah,1    ;check if a key is pressed
-    int 16h
-    jz jumpReceive   ;if not then jmp to recieving mode
-    jnz SENDa         ;if yes jmp to send mode
+    ;mov ah,1    ;check if a key is pressed
+    ;int 16h
+    ;jnz SENDa
+    ;jmp far ptr Receive
+    ;jz jumpReceive   ;if not then jmp to recieving mode
+    ;jnz SENDa         ;if yes jmp to send mode
 
     SENDa:
-    mov ah,0   ;clear buffer
-    int 16h
+    ;mov ah,0   ;clear buffer
+    ;int 16h
     mov VALUE,al  ; save the key ascii code in al
 
     CMP al, 08h   ; check backpace
-    jnz jumpenters
-    cmp initxS, 39  ; check if the cursor is in the last column
+    jz backspac
+    jmp far ptr ContLineS
+    backspac:cmp initxS, 39  ; check if the cursor is in the last column
     jne LOL
     printcharGraphics ' ',0 ; to be able to delete the last character in the right when backspacing from the line under it
     LOL:cmp initxS, 25
@@ -1407,8 +1411,8 @@ IN_GAME_CHATTING proc near
     setCursor initxS,inityS
     jmp backlines
 
-    jumpenters: jmp ENTERS
-    jumpReceive: jmp Receive
+    ;jumpenters: jmp ENTERS
+    ;jumpReceive: jmp Receive
 
     backlines: cmp initxS, 25   ; to go to the row above when it is at the last column from the left
     jne ENTERS
@@ -1421,9 +1425,10 @@ IN_GAME_CHATTING proc near
 
     
 
-    ENTERS: CMP al,0Dh    ; check if the key is enter
-    jnz ContLineS
-    jz newlineS
+    ENTERS: ;CMP al,0Dh    ; check if the key is enter
+    ;jnz ContLineS
+    jmp ContLineS
+    ;jz newlineS
 
 
 
@@ -1473,31 +1478,34 @@ IN_GAME_CHATTING proc near
     mov al,VALUE        
     out dx , al             
 
-    cmp al, 60H     ; press Esc to continue game
-    je jumpExit
+    ;cmp al, 60H     ; press Esc to continue game
+    ;je jumpExit
     saveCursorS          
-    jmp mainloop
+    ;jmp mainloop
+    ;GotoTextmode
 
+    ;jumpSend:jmp senda
 
-    jumpSend:jmp senda
-
-    jumpExit:jmp EXITT
+    ;jumpExit:jmp EXITT
 
     ;--------------------------------------------------
     ;--------------------------------------------------
     Receive:
 
-    mov ah,1            ;check if there is key pressed then go to the sending mode
-    int 16h
-    jnz jumpSend
-
+    ;mov ah,1            ;check if there is key pressed then go to the sending mode
+    ;int 16h
+    ;jnz jumpSend
+    ;jz contRec
+    ;jmp far ptr EXITT
+    contRec:
     ;Check that Data Ready
 
     mov dx , 3FDH		; Line Status Register
     in al , dx 
     test al , 1
-    JZ Receive
-
+    JnZ contRec2
+    jmp far ptr EXITT
+    contRec2:
     ;If Ready read the VALUE in Receive data register
 
     mov dx , 03F8H
@@ -1505,8 +1513,9 @@ IN_GAME_CHATTING proc near
     mov VALUE,al
 
     CMP al, 08h   ; check backpace
-    jnz jumpenterr
-    cmp initxR, 39  ; check if the cursor is in the last column
+    jz bckspace2
+    jmp far ptr ContLineR
+    bckspace2:cmp initxR, 39  ; check if the cursor is in the last column
     jne LOLL
     printcharGraphics ' ',0h    ; to be able to delete the last character in the right when backspacing from the line under it
     LOLL:cmp initxR, 25
@@ -1518,9 +1527,9 @@ IN_GAME_CHATTING proc near
     setCursor initxR,inityR
     jmp backliner
 
-    jumpenterr: jmp ENTERR
+    ;jumpenterr: jmp ENTERR
 
-    jumpExitt: jmp jumpExit
+    ;jumpExitt: jmp jumpExit
 
     backliner:cmp initxR,25  ; to go to the row above when it is at the last column from the left
     jne ENTERR
@@ -1530,13 +1539,13 @@ IN_GAME_CHATTING proc near
     setCursor 40,inityR
     saveCursorR
 
-    ENTERR:CMP VALUE,60h     ; press Esc to continue game
-    je jumpExitt
+    ENTERR:;CMP VALUE,60h     ; press Esc to continue game
+    ;je jumpExitt
 
 
-    CMP VALUE,0Dh           ;check if the key pressed is enter
-    JNZ ContLineR
-    JZ newlineR
+    ;CMP VALUE,0Dh           ;check if the key pressed is enter
+    JMP ContLineR
+    ;JZ newlineR
 
     newlineR:
     cmp inityR,24           ;check if the cursor is in the bottom of the lower screen to scrollup one line
@@ -1555,10 +1564,15 @@ IN_GAME_CHATTING proc near
     jnz printcharR
 
     CheckBottomR: cmp inityR,24    ;check if the cursor is in the bottom of the lower screen to scrollup one line
-    jnz printcharR
+    jnz jnline  ;just new line
     scrolllower
     setCursor 25,24
-
+    jmp printcharR
+    
+    jnline: ;just new line
+    mov initxR,25
+    inc inityR
+    
     printcharR:
     cmp VALUE, 60H
     JE IgnoreR
@@ -1570,10 +1584,11 @@ IN_GAME_CHATTING proc near
 
     IgnoreR:
 
-    jmp mainloop        
+    ;jmp mainloop        
 
 
     EXITT:
+    popa
 RET
 IN_GAME_CHATTING ENDP
 end main
