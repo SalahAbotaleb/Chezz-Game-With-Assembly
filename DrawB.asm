@@ -9,7 +9,7 @@ EXTRN Exist:BYTE
 EXTRN INPUT_NAME:BYTE
 EXTRN VALUER: BYTE
 
-PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW
+PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW,main
 
 include mymacros.inc
 include DrawingM.inc
@@ -1485,7 +1485,7 @@ MAIN PROC FAR
     int 16h 
     cmp al,3Eh
     jmp ssa
-    returntoconsole
+    ret
     death2:
     DisplayStringGraphicMode white_win_msg,9,27,6
     ssb:
@@ -1493,7 +1493,7 @@ MAIN PROC FAR
     int 16h 
     cmp al,3Eh
     jmp ssb
-    returntoconsole
+    ret
 MAIN ENDP
 
 

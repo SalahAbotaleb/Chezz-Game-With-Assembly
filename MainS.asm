@@ -1,8 +1,11 @@
 EXTRN SUBPROG1:FAR
-PUBLIC MSG1, MSG2, INPUT_NAME
+EXTRN Main:FAR
+EXTRN MAINC:FAR
+
+PUBLIC MSG1, MSG2, INPUT_NAME,Incomingname
 include mymacros.inc 
 .286
-.MODEL SMALL
+.MODEL MEDIUM
 .STACK 64
 .DATA
 
@@ -19,14 +22,14 @@ sendgame     DB  "You send a Game invitation to $"
 test3        DB  "Exit $" 
 
 .CODE
-MAIN PROC FAR
+SUBPROG2 PROC FAR
 mov ax,@DATA
 mov ds,ax
 
 CALL SUBPROG1
 
 GotoTextmode
-
+clearscreen
 
 looptillesc:;to keep lopping until the user press esc
 
@@ -42,7 +45,7 @@ movecursorlocation 19h,0Dh,0h    ;moves cursor to the middle of the page bellow 
 
 DisplayString escoutputmsg       ;prints the esc message
 
-drawhorizontallineinetextmode 175d  ;prints a line at row 175
+drawhorizontallineinetextmode 22d  ;prints a line at row 22
 
 MOV AH,0h
 INT 16H
@@ -50,12 +53,14 @@ CMP AH,3BH                     ; Check if user pressed F1 to go to chatting mode
 jnz GAME
 DisplayString sendchat         ;CALL Chatscreen
 DisplayString INPUT_NAME+2
+CALL mainc
 
 GAME: 
 CMP AH,3CH
 jnz EXIT
 DisplayString sendgame         ;CALL Game
 DisplayString INPUT_NAME+2
+Call MAIN
 
 EXIT:
 CMP AX,011BH
@@ -66,6 +71,8 @@ goout:
 ;returntoconsole
 mov ax,1
 add ax,1
-jnz looptillesc
-MAIN ENDP    
-END MAIN
+jz eeee
+jmp far ptr looptillesc
+eeee:
+SUBPROG2 ENDP    
+END SUBPROG2
