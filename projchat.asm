@@ -1,3 +1,4 @@
+public mainC
 scrollupper MACRO
    
 mov ah, 6               
@@ -72,7 +73,7 @@ receivermsg db  159 dup('$')
 
 .CODE
 
-main proc far
+mainC proc far
     mov ax,@data
     mov ds,ax
      
@@ -327,10 +328,7 @@ exit:
 ;--------------------------------------------
 ;--------------------------------------------
 ;--------------------------------------------
+ret
+mainC endp
 
-mov ah, 4ch
-int 21h
-
-main endp
-
-end main
+end mainC
