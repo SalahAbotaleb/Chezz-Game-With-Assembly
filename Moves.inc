@@ -2,7 +2,7 @@ include DrawingM.inc
 include mymacros.inc
 
 movepiece MACRO row,col,RecievedFlag
-local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9
 pusha
 ;RecievedFlag if 1  then skip validations and go replace it directly
 ;----
@@ -141,7 +141,20 @@ jmp far ptr exit
 ChangeRecieved:
 ; mov al,selected
 ; mov selectAtrec,al
-replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
+getdb RecievedRNEW,RecievedCNEW
+mov al,chezzT[bx]
+cmp al,-1
+jne cont9
+jmp far ptr ccc
+cont9:
+mov al,playertpye
+cmp al,1
+jne anotherr
+inc killbc
+jmp ccc
+anotherr:
+inc killwc
+ccc:replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
 deselectp
 ; pop selectedc
 ; cmp selectedc,-1

@@ -6,6 +6,7 @@ EXTRN RecievedCOLD:WORD
 EXTRN RecievedRNEW:WORD
 EXTRN RecievedCNEW:WORD
 EXTRN Exist:BYTE
+EXTRN INPUT_NAME:BYTE
 
 PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW
 
@@ -149,7 +150,7 @@ time DB 32 dup(0)
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 1;0 for white 1 for Black
+playertpye DB 0;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
