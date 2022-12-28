@@ -4,7 +4,7 @@ EXTRN SendCOLD:WORD
 EXTRN SendRNEW:WORD
 EXTRN SendCNEW:WORD
 
-PUBLIC SEND,RECIEVE,RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW,INITCONECT,Exist
+PUBLIC SEND,RECIEVE,RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW,INITCONECT,Exist,valueR
 include mymacros.inc
 .286
 .MODEL SMALL
@@ -17,6 +17,7 @@ RecievedRNEW DW -1
 RecievedCNEW DW -1
 
 Exist DB 0
+valueR DB -1
 ;/********************/
 .code
 INITCONECT PROC FAR   
@@ -103,6 +104,25 @@ RECIEVE PROC FAR
      ;If Ready read the VALUE in Receive data register
       mov dx , 03F8H
   		in al , dx 
+      ;********;
+    cmp al,'Z'
+    ja Ascii2
+    cmp al,'A'
+    jae chatR
+
+    Ascii2:cmp al,'z'
+    ja Ascii3
+    cmp al,'a'
+    jae chatR
+    Ascii3:cmp al,08h
+    je chatR
+    cmp al,20h
+    je chatR
+    jne contck
+    chatR:mov valueR,al
+    jmp GoOut
+      ;********;
+     contck:
       MOV AH,0
   		mov  RecievedROLD , AX
       
@@ -138,6 +158,8 @@ RECIEVE PROC FAR
   		in al , dx 
       MOV AH,0
   		mov  RecievedCNEW , AX
+      
+    
     GoOut:
     popa
   RET

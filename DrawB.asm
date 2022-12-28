@@ -7,6 +7,7 @@ EXTRN RecievedRNEW:WORD
 EXTRN RecievedCNEW:WORD
 EXTRN Exist:BYTE
 EXTRN INPUT_NAME:BYTE
+EXTRN VALUER: BYTE
 
 PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW
 
@@ -20,6 +21,8 @@ include timer.inc
 .Data
 boardWidth EQU 200
 boardHeight EQU 200
+
+keystrokeF DB 0
 
 SendROLD DW -1
 SendCOLD DW -1
@@ -798,6 +801,106 @@ popa
 ret
 inittChezzW ENDP
 
+
+IN_GAME_CHATTING_recieve proc far
+    pusha
+    Receive1:
+
+    ;mov ah,1            ;check if there is key pressed then go to the sending mode
+    ;int 16h
+    ;jnz jumpSend
+    ;jz contRec
+    ;jmp far ptr EXITT
+    contRec:
+    ;Check that Data Ready
+
+    ; mov dx , 3FDH		; Line Status Register
+    ; in al , dx 
+    ; and al , 1
+    ; jnz contRc2
+    ; jmp  EXITT1
+    ; contRc2: 
+    ; ;If Ready read the VALUE in Receive data register
+    ; mov dx , 03F8H
+    ; in al , dx 
+    ; ;mov VALUE,al
+    ; ;mov ah,0
+    mov al,valueR
+    CMP al, 08h   ; check backpace
+    jz bckspace2
+    jmp far ptr ContLineR
+    bckspace2:cmp initxR, 39  ; check if the cursor is in the last column
+    jne LOLL
+    printcharGraphics ' ',0h    ; to be able to delete the last character in the right when backspacing from the line under it
+    LOLL:cmp initxR, 25
+    JBE backliner   ; check if it is the last column in the left, so that we don't remove parts of the board
+    dec initxR
+    setCursor initxR,inityR
+    printcharGraphics ' ',0h    ; to delete when backspacing
+    inc initxR
+    setCursor initxR,inityR
+    jmp backliner
+
+    ;jumpenterr: jmp ENTERR
+
+    ;jumpExitt: jmp jumpExit
+
+    backliner:cmp initxR,25  ; to go to the row above when it is at the last column from the left
+    jne ENTERR
+    cmp inityR, 18     ; here to compare if it is the last row in the top or not, so that it doesn't delete any text or board drawing
+    je ENTERR
+    dec inityR
+    setCursor 40,inityR
+    saveCursorR
+
+    ENTERR:;CMP VALUE,60h     ; press Esc to continue game
+    ;je jumpExitt
+
+
+    ;CMP VALUE,0Dh           ;check if the key pressed is enter
+    JMP ContLineR
+    ;JZ newlineR
+
+    newlineR:
+    cmp inityR,24           ;check if the cursor is in the bottom of the lower screen to scrollup one line
+    jnz notlastlineR
+    scrolllower
+    setCursor 25,24     ; if so, leave at the bottom line after scrolling up one line
+    jmp printcharR
+
+    notlastlineR: inc inityR
+    mov initxR,25
+
+    ContLineR:
+    setCursor initxR,inityR     ; setting the cursor after newlineR
+    CMP initxR,39               ; here we need to check when the x passes 79 so go to a newline
+    JZ CheckBottomR                  ; so we must check if it is in the bottom line or not
+    jnz printcharR
+
+    CheckBottomR: cmp inityR,24    ;check if the cursor is in the bottom of the lower screen to scrollup one line
+    jNE jnline  ;just new line
+    scrolllower
+    setCursor 25,24
+    jmp printcharR
+    
+    jnline: ;just new line
+    mov initxR,25
+    inc inityR
+    
+    printcharR:
+    cmp VALUEr, 60H
+    JE IgnoreR
+    printcharGraphics VALUEr, 0fh             ; printing the char
+    saveCursorR
+    cmp initxR,25
+    JAE IgnoreR
+    setCursor 25,inityR
+
+    EXITT1:
+    IgnoreR:
+    popa
+    ret
+IN_GAME_CHATTING_recieve ENDP
 MAIN PROC FAR
     MOV AX , @DATA
     MOV DS , AX
@@ -964,25 +1067,9 @@ MAIN PROC FAR
    CALL INITCONECT
    ;Q means the user wants to select
     Q:
-    ;saving king coordinates
-    ; pusha
-    ; mov ax,chezznrev[4h]
-    ; mov bx,00h
-    ; mov bl,ah
-    ; mov bkingr,bx
-    ; mov bl,al
-    ; mov bkingC,bx
-    ; mov ax,chezznrev[14h]
-    ; mov bx,00h
-    ; mov bl,ah
-    ; mov bkingr,bx
-    ; mov bl,al
-    ; mov bkingC,bx
-    
-    
-    ;
     ;check king dead condition
     pusha
+    mov keystrokeF,0
       DisplaynumberGraphicMode killBC,37,3
      ;;comment
      DisplaynumberGraphicMode killWC,37,2
@@ -1021,7 +1108,6 @@ MAIN PROC FAR
     ;//check for chekcmate end
     ;////////////////////////
     updatetime
-    ;call IN_GAME_CHATTING
      pusha
     mov ax,2c00h
     int 21h
@@ -1042,8 +1128,20 @@ MAIN PROC FAR
     push selectedr
     push selectedc
     mov AvoidLp,0
+    mov exist,0
+    mov valueR,-1
     CALL RECIEVE
-    cmp EXIST,4
+    cmp valueR,-1
+    JE recCorr
+    
+    mov ah,0
+    mov al,valueR
+    movecursorlocation 1,1,0
+    Displaynumber 
+    call IN_GAME_CHATTING_recieve
+    
+    jmp far ptr NoUpdate
+    recCorr:cmp EXIST,4
     JE ContUpdate
     jmp far ptr NoUpdate
     ContUpdate:
@@ -1065,19 +1163,23 @@ MAIN PROC FAR
     ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,selectedr,selectedc,success,begr,begc,endr,endc,res
     ;/**********/
     NoUpdate:
+    mov ax,0
     MOV AH,1;every time looping we check here whether a key was selected or not
     INT 16h
     push ax
     jz noflush
     mov ah,0Ch
     INT 21h
+    mov keystrokeF,1
     
     noflush:
-    ;pop ax
+    pop ax
+    ;****
     ;cmp ah,3fH ; press Fn+F5 to start in game chatting
     ;JNE skip
+    ;****
     ;call IN_GAME_CHATTING
-    SKIP:cmp ah,1ch  ;press enter condition
+    SKIP:cmp ah,1ch  ;press Q condition
     JE doQ
     jmp far ptr right
    ;/****************************************************************************************/
@@ -1220,7 +1322,22 @@ MAIN PROC FAR
     down:
     cmp ah,50H   ;down condition
     JE skipthis 
-    jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
+    
+    cmp ah,0Eh
+    je chat
+    cmp al,'Z'
+    ja Ascii2
+    cmp al,'A'
+    jae chat
+    ;jmp retMain
+    Ascii2:cmp al,'z'
+    ja Ascii3
+    cmp al,'a'
+    jae chat
+    Ascii3:cmp ah,39h
+    jne retMain
+    chat:call IN_GAME_CHATTING_send
+    retMain:jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
     skipthis:
     inc row
 
@@ -1366,7 +1483,7 @@ MAIN PROC FAR
     ssa:
     mov ah,0
     int 16h 
-    cmp al,60h
+    cmp al,3Eh
     jmp ssa
     returntoconsole
     death2:
@@ -1374,13 +1491,13 @@ MAIN PROC FAR
     ssb:
     mov ah,0
     int 16h 
-    cmp al,60h
+    cmp al,3Eh
     jmp ssb
     returntoconsole
 MAIN ENDP
 
 
-IN_GAME_CHATTING proc near
+IN_GAME_CHATTING_send proc near
     pusha
     mainloop:
 
@@ -1469,14 +1586,15 @@ IN_GAME_CHATTING proc near
 
     mov dx,3FDH 		; Line Status Register
     AGAIN:In al , dx 	;Read Line Status
-    test al , 00100000b
-    jz Receive          ; Not empty
+    and al , 00100000b
+    jz AGAIN          ; Not empty
 
     ;If empty put the VALUE in Transmit data register
 
     mov dx , 3F8H		; Transmit data register
     mov al,VALUE        
-    out dx , al             
+    out dx , al    
+        
 
     ;cmp al, 60H     ; press Esc to continue game
     ;je jumpExit
@@ -1490,105 +1608,12 @@ IN_GAME_CHATTING proc near
 
     ;--------------------------------------------------
     ;--------------------------------------------------
-    Receive:
-
-    ;mov ah,1            ;check if there is key pressed then go to the sending mode
-    ;int 16h
-    ;jnz jumpSend
-    ;jz contRec
-    ;jmp far ptr EXITT
-    contRec:
-    ;Check that Data Ready
-
-    mov dx , 3FDH		; Line Status Register
-    in al , dx 
-    test al , 1
-    JnZ contRec2
-    jmp far ptr EXITT
-    contRec2:
-    ;If Ready read the VALUE in Receive data register
-
-    mov dx , 03F8H
-    in al , dx 
-    mov VALUE,al
-
-    CMP al, 08h   ; check backpace
-    jz bckspace2
-    jmp far ptr ContLineR
-    bckspace2:cmp initxR, 39  ; check if the cursor is in the last column
-    jne LOLL
-    printcharGraphics ' ',0h    ; to be able to delete the last character in the right when backspacing from the line under it
-    LOLL:cmp initxR, 25
-    JBE backliner   ; check if it is the last column in the left, so that we don't remove parts of the board
-    dec initxR
-    setCursor initxR,inityR
-    printcharGraphics ' ',0h    ; to delete when backspacing
-    inc initxR
-    setCursor initxR,inityR
-    jmp backliner
-
-    ;jumpenterr: jmp ENTERR
-
-    ;jumpExitt: jmp jumpExit
-
-    backliner:cmp initxR,25  ; to go to the row above when it is at the last column from the left
-    jne ENTERR
-    cmp inityR, 18     ; here to compare if it is the last row in the top or not, so that it doesn't delete any text or board drawing
-    je ENTERR
-    dec inityR
-    setCursor 40,inityR
-    saveCursorR
-
-    ENTERR:;CMP VALUE,60h     ; press Esc to continue game
-    ;je jumpExitt
-
-
-    ;CMP VALUE,0Dh           ;check if the key pressed is enter
-    JMP ContLineR
-    ;JZ newlineR
-
-    newlineR:
-    cmp inityR,24           ;check if the cursor is in the bottom of the lower screen to scrollup one line
-    jnz notlastlineR
-    scrolllower
-    setCursor 25,24     ; if so, leave at the bottom line after scrolling up one line
-    jmp printcharR
-
-    notlastlineR: inc inityR
-    mov initxR,25
-
-    ContLineR:
-    setCursor initxR,inityR     ; setting the cursor after newlineR
-    CMP initxR,39               ; here we need to check when the x passes 79 so go to a newline
-    JZ CheckBottomR                  ; so we must check if it is in the bottom line or not
-    jnz printcharR
-
-    CheckBottomR: cmp inityR,24    ;check if the cursor is in the bottom of the lower screen to scrollup one line
-    jnz jnline  ;just new line
-    scrolllower
-    setCursor 25,24
-    jmp printcharR
-    
-    jnline: ;just new line
-    mov initxR,25
-    inc inityR
-    
-    printcharR:
-    cmp VALUE, 60H
-    JE IgnoreR
-    printcharGraphics VALUE, 0fh             ; printing the char
-    saveCursorR
-    cmp initxR,25
-    JAE IgnoreR
-    setCursor 25,inityR
-
-    IgnoreR:
-
     ;jmp mainloop        
 
 
     EXITT:
     popa
 RET
-IN_GAME_CHATTING ENDP
+IN_GAME_CHATTING_send ENDP
+
 end main
