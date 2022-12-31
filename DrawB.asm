@@ -1090,8 +1090,8 @@ MAIN PROC FAR
     
     mov ah,0
     mov al,valueR
-    movecursorlocation 1,1,0
-    Displaynumber 
+    ;movecursorlocation 1,1,0
+    ;Displaynumber 
     call IN_GAME_CHATTING_recieve
     
     jmp far ptr NoUpdate
@@ -1484,7 +1484,7 @@ IN_GAME_CHATTING_send proc near
     printcharGraphicsR VALUE, 0fh             ; printing the char
     
     inc initxS
-    cmp initxS,39d
+    cmp initxS,40d
     JE resolveEndS
     jmp IgnoreS
     resolveEndS:
