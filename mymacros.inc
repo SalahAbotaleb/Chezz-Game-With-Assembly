@@ -518,3 +518,14 @@ mov  ah, 0Eh
 int  10h
 popa
 ENDM printcharGraphics
+
+printcharGraphicsR MACRO x,color
+pusha
+mov  al, x
+mov  bl, color
+mov  bh, 0    ;Display page
+mov  ah, 9
+mov cx,1
+int  10h
+popa
+ENDM printcharGraphicsR
