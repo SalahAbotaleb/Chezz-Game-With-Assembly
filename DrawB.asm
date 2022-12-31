@@ -890,6 +890,7 @@ IN_GAME_CHATTING_recieve proc far
     printcharR:
     cmp VALUEr, 60H
     JE IgnoreR
+    setCursor initxr,inityr
     printcharGraphics VALUEr, 0fh             ; printing the char
     saveCursorR
     cmp initxR,25
