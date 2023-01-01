@@ -1624,7 +1624,7 @@ popa
 ENDM kill
 
 replace MACRO oldr,oldc,newr,newc
-local sec,con,typ,typ2
+local sec,con,typ,typ2,setTimer,noset,white,blck,contRepl,set
 ;-1 means empty location
 pusha
 
@@ -1681,6 +1681,38 @@ mov bl,cl
 mov time[bx],3
 add bx,bx
 mov chezznrev[BX],dx
+;;;
+; add bx,bx
+; mov chezznrev[BX],dx
+
+; getdb oldr,oldc
+; cmp playertpye,1
+
+; JE white
+; jmp blck
+; white:
+; cmp chezzT[BX],10h
+; jb settimer
+; jmp noset
+; blck:
+; cmp chezzT[BX],10h
+; jae setTimer
+; jmp noSet
+
+; setTimer:
+
+; getdb newr,newc
+; mov cl,chezzN[bx]
+; mov bx,0
+; mov bl,cl
+; mov time[bx],3
+; jmp set
+
+; noset:
+; popa
+; jmp contRepl
+
+; set:
 popa
 ;under checking
 ;;;///////////////////////
@@ -1696,7 +1728,7 @@ mov Timer[bx],dh
 popa
 
 
-
+contRepl:
 getdw oldr,oldc
 mov si,bx
 getdw newr,newc
@@ -1742,11 +1774,26 @@ ENDM replace
 
 
 drawtim MACRO number
+local exitttt,contDraw,blckx
 ;this was a macro now it only cals the proc
+getdb rowx,colx
+    cmp playertpye,0
+
+    JNE blckx
+    cmp chezzT[BX],10h
+    jb contDraw
+    jmp far ptr exitttt
+    blckx:
+    cmp chezzT[BX],10h
+    jae contDraw
+    jmp far ptr exitttt
+
+    contDraw:
 push ax 
 mov ax,number
 mov tmpnumber,ax
 call Drawtimp 
 pop ax
+exitttt:
 ENDM drawtim
 

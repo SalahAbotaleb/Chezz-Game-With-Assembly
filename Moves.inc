@@ -2,7 +2,7 @@ include DrawingM.inc
 include mymacros.inc
 
 movepiece MACRO row,col,RecievedFlag
-local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9,nopromotion
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9,blck,disptimer,nopromotion
 pusha
 ;RecievedFlag if 1  then skip validations and go replace it directly
 ;----
@@ -89,6 +89,19 @@ kill movr,movc
 cont3: 
 ;replace and timer
 replace selectedr,selectedc,movr,movc
+getdb movr,movc
+cmp playertpye,0
+
+JNE blck
+cmp chezzT[BX],10h
+jb disptimer
+jmp SendData
+blck:
+cmp chezzT[BX],10h
+jae disptimer
+jmp SendData
+
+disptimer:
 push ax
 mov ax,row
 mov rowx,ax
@@ -155,12 +168,22 @@ jmp ccc
 anotherr:
 inc killwc
 ccc:replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
-deselectp
 ; pop selectedc
 ; cmp selectedc,-1
 ; push selectedc
 ; je exit
 ; mov selected,1
+mov ax,selectedr
+xor RecievedRNEW,ax
+mov ax,selectedc
+xor RecievedCNEW,ax
+mov ax,RecievedCNEW
+
+deselectp
+or ax,RecievedRNEW
+JNZ exit
+mov selected,0
+mov selectAtrec,0
 jmp far ptr exit
 ;cont7:
 ;replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
@@ -1138,6 +1161,194 @@ exitright:
 leaveall:
 popa
 
+ENDM
+
+deinitAll MACRO 
+mov keystrokeF , 0
+
+mov SendROLD , -1
+mov SendCOLD , -1
+
+mov SendRNEW , -1
+mov SendCNEW , -1
+
+mov begr , 0
+mov begc , 0
+mov endr , 0
+mov endc , 0
+mov res , 0
+
+mov tmpx , 0
+mov tmpy , 0
+
+mov row , 0
+mov col , 0
+
+mov rowx , 0
+mov colx , 0
+
+mov killWC , 0 ;counter for killed white
+
+mov killBC , 0 ;counter for killed black
+
+mov prevR , 0
+mov prevC , 0
+
+mov wkingR , 0
+mov wkingC , 0
+
+mov bkingR , 0
+mov bkingC , 0
+
+mov wkingdead , 0
+mov bkingdead , 0
+ 
+mov threat , 0
+
+mov chooseR , 0
+mov chooseC , 0
+
+mov NUMCOLOR , 0Bh;color for timer number
+mov backc , 06h ;color for background of timer
+;temp variables first general, second for row, tird for col
+mov tmpdb , 0
+mov tmpdbr , 0
+mov tmpdbc , 0
+mov tmptype , 0
+mov currtype , 0
+mov nexttype , 0
+mov tmpr , 0
+mov tmpc , 0
+mov movr , 0
+mov movc , 0
+mov tmpdb2 , 0
+mov tmpnumber , 0h  ;number for timer put number in this variable before calling timer function proc
+mov passer , 0h ;variable to be passed to procs
+;selected variables and colors
+mov selectedr , -1
+mov selectedc , -1
+mov selected , 0
+mov selectAtrec , 0
+mov moveavailc , 0Ah
+mov takeavailc , 4h 
+
+mov success , 0 ;0 for fail 1 for success
+mov AvoidLp , 0
+mov head , 0
+mov VALUE  , 0     ;VALUE which will be sent or Received by user
+mov initxS , 25     ;initial position for sender column
+mov inityS , 9     ;initial position for sender row
+mov initxR , 25     ;initial position for receiver column
+mov inityR , 18    ;initial position for receiver row
+mov rowInitChezz , 0
+mov colInitChezz ,  0
+mov typeInitChezz , 0
+mov picInitChezz   , 0
+;/*****************************************/
+mov colorD , 0
+mov rowD , 0
+mov colD , 0
+mov datalocD , 0
+
+mov playtime , 0
+mov playtimeS , 0
+mov playtimeH , 0
+mov counter , 0
+;/*****************************************/
+ENDM
+
+deinitAll MACRO 
+mov keystrokeF , 0
+
+mov SendROLD , -1
+mov SendCOLD , -1
+
+mov SendRNEW , -1
+mov SendCNEW , -1
+
+mov begr , 0
+mov begc , 0
+mov endr , 0
+mov endc , 0
+mov res , 0
+
+mov tmpx , 0
+mov tmpy , 0
+
+mov row , 0
+mov col , 0
+
+mov rowx , 0
+mov colx , 0
+
+mov killWC , 0 ;counter for killed white
+
+mov killBC , 0 ;counter for killed black
+
+mov prevR , 0
+mov prevC , 0
+
+mov wkingR , 0
+mov wkingC , 0
+
+mov bkingR , 0
+mov bkingC , 0
+
+mov wkingdead , 0
+mov bkingdead , 0
+ 
+mov threat , 0
+
+mov chooseR , 0
+mov chooseC , 0
+
+mov NUMCOLOR , 0Bh;color for timer number
+mov backc , 06h ;color for background of timer
+;temp variables first general, second for row, tird for col
+mov tmpdb , 0
+mov tmpdbr , 0
+mov tmpdbc , 0
+mov tmptype , 0
+mov currtype , 0
+mov nexttype , 0
+mov tmpr , 0
+mov tmpc , 0
+mov movr , 0
+mov movc , 0
+mov tmpdb2 , 0
+mov tmpnumber , 0h  ;number for timer put number in this variable before calling timer function proc
+mov passer , 0h ;variable to be passed to procs
+;selected variables and colors
+mov selectedr , -1
+mov selectedc , -1
+mov selected , 0
+mov selectAtrec , 0
+mov moveavailc , 0Ah
+mov takeavailc , 4h 
+
+mov success , 0 ;0 for fail 1 for success
+mov AvoidLp , 0
+mov head , 0
+mov VALUE  , 0     ;VALUE which will be sent or Received by user
+mov initxS , 25     ;initial position for sender column
+mov inityS , 9     ;initial position for sender row
+mov initxR , 25     ;initial position for receiver column
+mov inityR , 18    ;initial position for receiver row
+mov rowInitChezz , 0
+mov colInitChezz ,  0
+mov typeInitChezz , 0
+mov picInitChezz   , 0
+;/*****************************************/
+mov colorD , 0
+mov rowD , 0
+mov colD , 0
+mov datalocD , 0
+
+mov playtime , 0
+mov playtimeS , 0
+mov playtimeH , 0
+mov counter , 0
+;/*****************************************/
 ENDM
 
 

@@ -4,7 +4,7 @@ pusha
 ;gets current time dx seconds and parts of a second ,cx hours and minutes
 mov ax,2c00h
 int 21h
-mov di,0
+mov di,timerBeg
 looper:
 ;jmp far ptr outofloop
 mov al,timer[di]
@@ -58,7 +58,7 @@ cont:
 
 skipinteration:
 inc di
-cmp di,32
+cmp di,timerEnd
 je outofloop
 jmp far ptr looper
 outofloop:
