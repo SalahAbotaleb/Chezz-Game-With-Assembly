@@ -54,6 +54,7 @@ jnz GAME
 DisplayString sendchat         ;CALL Chatscreen
 DisplayString INPUT_NAME+2
 CALL mainc
+clearscreen
 
 GAME: 
 CMP AH,3CH
@@ -61,11 +62,17 @@ jnz EXIT
 DisplayString sendgame         ;CALL Game
 DisplayString INPUT_NAME+2
 Call MAIN
+GotoTextmode
+clearscreen
+
+
 
 EXIT:
-CMP AX,011BH
+CMP Ah,1
 Jnz goout
 DisplayString test3       ;returntoconsole  ;Close Program
+clearscreen
+returntoconsole
 
 goout:
 ;returntoconsole
