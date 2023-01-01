@@ -2,7 +2,7 @@ include DrawingM.inc
 include mymacros.inc
 
 movepiece MACRO row,col,RecievedFlag
-local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9,nopromotion
 pusha
 ;RecievedFlag if 1  then skip validations and go replace it directly
 ;----
@@ -1139,3 +1139,48 @@ leaveall:
 popa
 
 ENDM
+
+
+promote macro row,col
+local nopromotion,promotion1,promotion2,mightpromomte,promotion3
+;//////////////////////////////////////////
+;check for promotion
+;ispawn?
+getdb row,col
+mov al,chezzT[bx]
+and al,0fh
+cmp al,5
+jz promotion1
+jmp far ptr nopromotion
+promotion1:
+cmp row,0
+jz promotion2
+jmp far ptr mightpromomte
+promotion2:
+;///////////////////white promote to queen
+mov al,chezzT[BX]
+sub al,4
+mov chezzT[bx],al
+mov ax,chezzP[bx]
+mov ax,offset queenData;//might not work
+add bx,bx
+mov chezzP[bx],ax
+DrawPieceDB PrimaryC,SecondaryC,0,0,0Fh,row,col,begr,begc,endr,endc,res ;drawing the piece at the new location
+jmp far ptr nopromotion
+mightpromomte:
+cmp row,7
+jz promotion3
+jmp far ptr nopromotion
+
+promotion3:
+;///////////////////black promote to queen
+mov al,chezzT[BX]
+sub al,4
+mov chezzT[bx],al
+mov ax,chezzP[bx]
+mov ax,offset queenData;//might not work
+add bx,bx
+mov chezzP[bx],ax
+DrawPieceDB PrimaryC,SecondaryC,0,0,0,row,col,begr,begc,endr,endc,res ;drawing the piece at the new location
+nopromotion:
+endm promote

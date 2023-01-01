@@ -141,7 +141,7 @@ kingData DB piecew*pieceh dup(0)
 soliderData DB piecew*pieceh dup(0)
 errormsg db 'canot laod image file$'
 
-;chezzP array of pointer for chezz pictures, chezzT array of type of each piece, chezzT array for chezz box color
+;chezzP array of pointer for chezz pictures, chezzT array of type of each piece, chezzC array for chezz box color
 chezzP DW 64 dup(-1)
 chezzT DB 64 dup(-1)
 chezzC DB 64 dup(-1)
@@ -153,7 +153,7 @@ time DB 32 dup(0)
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 0;0 for white 1 for Black
+playertpye DB 1;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -1122,6 +1122,7 @@ MAIN PROC FAR
     mov al,selected
     mov selectAtrec,al
     movepiece RecievedRNEW,RecievedCNEW,1
+    promote RecievedRNEW,RecievedCNEW
     mov AvoidLp,1
     jmp far ptr Reselectp
     ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,selectedr,selectedc,success,begr,begc,endr,endc,res
@@ -1172,6 +1173,7 @@ MAIN PROC FAR
     push row
     push col
     movepiece row,col,0
+    promote row,col
     pop col
     pop row
     jmp far ptr DrawBckGnd ;need to be modified ;;
@@ -1409,34 +1411,34 @@ MAIN PROC FAR
 
     ;black wins the game
     ;drawkingdead
-    pusha
-    mov cx,60 ;Column
-    mov dx,120 ;Row
-    mov al,5 ;Pixel color
-    mov ah,0ch ;Draw Pixel Command
-    theultimateloopb:int 10h 
-    inc cx
-    cmp cx,120
-    jne theultimateloopb
-    mov cx,60 ;Column
-    inc dx
-    cmp dx,150
-    jne theultimateloopb
-    popa
+    ; pusha
+    ; mov cx,60 ;Column
+    ; mov dx,120 ;Row
+    ; mov al,5 ;Pixel color
+    ; mov ah,0ch ;Draw Pixel Command
+    ; theultimateloopb:int 10h 
+    ; inc cx
+    ; cmp cx,120
+    ; jne theultimateloopb
+    ; mov cx,60 ;Column
+    ; inc dx
+    ; cmp dx,150
+    ; jne theultimateloopb
+    ; popa
     jmp far ptr death1
     ;/****************************************************************************************/
     ;black king dead
     blackkingdead:
-    pusha
-    mov cx,60 ;Column
-    mov dx,120 ;Row
-    mov al,3  ;Pixel color
-    mov ah,0ch ;Draw Pixel Command
-    theultimateloopw:int 10h 
-    inc cx
-    cmp cx,120
-    jne theultimateloopw
-    popa
+    ; pusha
+    ; mov cx,60 ;Column
+    ; mov dx,120 ;Row
+    ; mov al,3  ;Pixel color
+    ; mov ah,0ch ;Draw Pixel Command
+    ; theultimateloopw:int 10h 
+    ; inc cx
+    ; cmp cx,120
+    ; jne theultimateloopw
+    ; popa
     jmp far ptr death2
     ;white wins the game
 
