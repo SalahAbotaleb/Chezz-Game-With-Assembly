@@ -211,6 +211,8 @@ playtimeS DB 0
 playtimeH DB 0
 counter DB 0
 ;/*****************************************/
+StackPA DW 0
+StackPB DW 0
 .Code
 
 ;/*****************************************/
@@ -861,7 +863,8 @@ MAIN PROC FAR
     MOV AH, 0
     MOV AL, 13h
     INT 10h
-
+    pop StackPA
+    pop StackPB
 	;DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
     
 
@@ -1000,6 +1003,13 @@ MAIN PROC FAR
     mov playtime,al
     popa
     ;-------
+
+    ;/******************test area***************************/
+        
+         ;replace 6,7,5,4
+         ;replace 6,3,2,3
+
+    ;/******************end of test area***************************/
     
     ;/******************test area***************************/
         
@@ -1437,16 +1447,20 @@ MAIN PROC FAR
     ssa:
     mov ah,0
     int 16h 
-    cmp al,3Eh
-    jmp ssa
+    cmp ah,1
+    jne ssa
+    push StackPB
+    push StackPA
     ret
     death2:
     DisplayStringGraphicMode white_win_msg,9,27,6
     ssb:
     mov ah,0
     int 16h 
-    cmp al,3Eh
-    jmp ssb
+    cmp ah,1
+    jne ssb
+    push StackPB
+    push StackPA
     ret
 MAIN ENDP
 

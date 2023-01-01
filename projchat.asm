@@ -63,12 +63,13 @@ ENDM printchar
 LINE  db 80 dup('-'),'$'
 firstname db "First Name:-$"
 secondname db "Second Name:-$"
-returnmsg db "- To end Chat. Press ~ Key$"
+returnmsg db "- To end Chat Press F3 Key$"
 VALUE  db ?     ;VALUE which will be sent or Received by user
 initxS db 0     ;initial position for sender column
 inityS db 1     ;initial position for sender row
 initxR db 0     ;initial position for receiver column
 inityR db 13    ;initial position for receiver row
+scanCode db 0   ;scan code of entered key 
 receivermsg db  159 dup('$')                                       
 
 .CODE
@@ -76,7 +77,12 @@ receivermsg db  159 dup('$')
 mainC proc far
     mov ax,@data
     mov ds,ax
-     
+;intialize items
+mov initxS , 0     ;initial position for sender column
+mov inityS , 1     ;initial position for sender row
+mov initxR , 0     ;initial position for receiver column
+mov inityR , 13    ;initial position for receiver row
+
 ; set divisor latch access bit
 
 mov dx,3fbh 			; Line ContLinerol Register
@@ -142,15 +148,23 @@ out dx,al
 
 call chatting
 
+exit:
+
+;; HERE SHOULD BE THE RETURN TO THE MAIN MENU
+;--------------------------------------------
+;--------------------------------------------
+;--------------------------------------------
+ret
+mainC endp
+
 chatting proc
 
 mainloop:
 
 mov ah,1    ;check if a key is pressed
 int 16h
-jz jumpReceive   ;if not then jmp to recieving mode
 jnz send         ;if yes jmp to send mode
-
+jmp jumpReceive   ;if not then jmp to recieving mode
 
 
 send:
@@ -159,6 +173,7 @@ mov ah,0   ;clear buffer
 int 16h
 
 mov VALUE,al  ; save the key ascii code in al
+mov scanCode,ah ;save scan code in ah
 
 CMP al, 08h   ; check backpace
 jnz ENTERS
@@ -227,7 +242,8 @@ mov dx , 3F8H		; Transmit data register
 mov al,VALUE        
 out dx , al         
 
-CMP al,7Eh           ; check Esc key to end chatting mode
+mov ah,scanCode
+CMP ah,3Dh           ; check F3 key to end chatting mode
 JZ jumpExit
 saveCursorS          
 jmp mainloop        
@@ -235,7 +251,7 @@ jmp mainloop
 
 jumpSend:jmp send
 
-jumpExit:jmp exit
+jumpExit:jmp exitn
 
 Receive:
 
@@ -303,7 +319,7 @@ CMP initxR,79               ; here we need to check when the x passes 79 so go t
 JZ CheckBottomR                  ; so we must check if it is in the bottom line or not
 jnz printcharR
 
-jumpExitt: jmp EXIT
+jumpExitt: jmp EXITn
 
 CheckBottomR: cmp inityR,22     ;check if the cursor is in the bottom of the lower screen to scrollup one line
 jnz printcharR
@@ -318,17 +334,8 @@ saveCursorR
 
 jmp mainloop        
 
-
+Exitn:ret
 chatting endp
 
-
-exit:
-
-;; HERE SHOULD BE THE RETURN TO THE MAIN MENU
-;--------------------------------------------
-;--------------------------------------------
-;--------------------------------------------
-ret
-mainC endp
 
 end mainC
