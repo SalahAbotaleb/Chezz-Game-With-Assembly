@@ -55,6 +55,7 @@ DisplayString sendchat         ;CALL Chatscreen
 DisplayString INPUT_NAME+2
 CALL mainc
 clearscreen
+jmp looptillesc
 
 GAME: 
 CMP AH,3CH
@@ -64,8 +65,7 @@ DisplayString INPUT_NAME+2
 Call MAIN
 GotoTextmode
 clearscreen
-
-
+jmp looptillesc
 
 EXIT:
 CMP Ah,1
