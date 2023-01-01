@@ -1703,6 +1703,9 @@ getdw newr,newc
 mov cx,chezzP[si]
 mov chezzP[bx],cx
 mov chezzP[si],-1
+;trying promotion
+
+
 ;/*****end replacing data*****/
     mov cx,0
     mov ah,0
