@@ -92,6 +92,9 @@ pieceh EQU 25
 PrimaryC DB 6h
 SecondaryC DB 7h
 
+constPrim DB 6h
+constSec DB 7h
+
 NUMCOLOR DB 0Bh;color for timer number
 backc DB 06h ;color for background of timer
 ;temp variables first general, second for row, tird for col
@@ -149,11 +152,14 @@ chezzN DB 64 dup(-1) ;numbering of each piece
 chezznrev Dw 32 dup(-1) ;reverse numbering of each piece
 Timer  DB 32 dup(-1)
 time DB 32 dup(0) 
+
+timerBeg dw 0
+timerEnd dw 32
 ;0 to 15 black pieces
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 0;0 for white 1 for Black
+playertpye DB 1;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -220,6 +226,7 @@ StackPB DW 0
 Drawtimp PROC
 ; local num1,num2,num3,notnum1,notnum2,notnum3,lop1,lop2,lop3,lop22,lop33,lop23,lop32,lop12,lop13
 pusha
+    
     mov ax,tmpnumber
     cmp ax,1
     je num1
@@ -641,6 +648,7 @@ pusha
 
     notnum3:
     popa
+    exittt:
     ret;
 
 Drawtimp ENDP
@@ -656,6 +664,14 @@ DrawPieceW PROC
     ;roffset for row offset
     ;coffset for col offset
     pusha
+    getdb rowW,colW
+    cmp chezzC[bx],-1
+    je contDra
+    mov al,chezzC[bx]
+    mov PrimaryC,al
+    mov al,chezzC[bx]
+    mov SecondaryC,al
+    contDra:
     cmp rowW,0FFh
     jne nn
     ;returntoconsole
@@ -774,6 +790,10 @@ DrawPieceW PROC
     ;////////////////////
     exitw:
     popa
+    mov al,constPrim
+    mov PrimaryC ,al
+    mov al,constSec
+    mov SecondaryC,al
     ret
 DrawPieceW ENDP
 
@@ -865,6 +885,7 @@ MAIN PROC FAR
     INT 10h
     pop StackPA
     pop StackPB
+    deinitAll
 	;DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
     
 
@@ -1002,7 +1023,22 @@ MAIN PROC FAR
     add Al,dh
     mov playtime,al
     popa
+    ;-------initializations
+
+    ; cmp playertpye,0
+
+    ; JE whiteb
+    ; jmp blck
+    ; whiteb:
+    ; mov timerBeg,16
+    ; mov timerend,32
+    ; jmp initEnd
+    ; blck:
+    ; mov timerBeg,0
+    ; mov timerend,16
+    initEnd:
     ;-------
+
 
     ;/******************test area***************************/
         
@@ -1199,6 +1235,7 @@ MAIN PROC FAR
     push row
     push col
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,chooseR,chooseC,success,begr,begc,endr,endc,res
+    ;updatetime
     pop col
     pop row
     cmp avoidlp,0
