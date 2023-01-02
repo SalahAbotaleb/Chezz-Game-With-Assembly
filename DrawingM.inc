@@ -1624,7 +1624,7 @@ popa
 ENDM kill
 
 replace MACRO oldr,oldc,newr,newc
-local sec,con,typ,typ2,setTimer,noset,white,blck,contRepl,set
+local sec,con,typ,typ2,setTimer,noset,white,blck,contRepl,set,whitetimersetthere,blacktimersetthere
 ;-1 means empty location
 pusha
 
@@ -1677,8 +1677,23 @@ getdb newr,newc
 mov cl,chezzN[bx]
 mov bx,0
 mov bl,cl
-
-mov time[bx],3
+;this part is for the time bonus
+pusha
+cmp chezzT[BX],10h
+jae blacktimersetthere
+mov ax,blacktimer
+jmp whitetimersetthere
+blacktimersetthere:
+mov ax,blacktimer
+whitetimersetthere:
+mov tmptimer,ax
+popa
+push ax
+mov ax,tmptimer
+;////////////////////////////////
+mov time[bx],al
+pop AX
+;;;;;;;;;;;;;;;both using it
 add bx,bx
 mov chezznrev[BX],dx
 ;;;
@@ -1797,3 +1812,130 @@ pop ax
 exitttt:
 ENDM drawtim
 
+drawpowerup macro clockbr,clockbc
+local theultimateloopb1,theultimateloopb2,theultimateloopb3,theultimateloopb4,theultimateloopb5,theultimateloopb6,theultimateloopb7,theultimateloopb8,theultimateloopb9,theultimateloopb10,theultimateloopb11,theultimateloopb12
+    pusha
+    mov ax,0
+    mov al,clockbr
+    mov cx,25d
+    mul cl
+    mov dx,ax
+
+    mov ax,0
+    mov al,clockbc
+    mul cl
+    add cl,3
+    ;mov cx,60 ;Column
+    ;mov dx,120 ;Row
+    mov al,powerupcolor ;Pixel color
+
+    ;end of initial conditions
+    add cx,00
+    add dx,00
+    mov ah,0ch ;Draw Pixel Command
+
+    mov bx,7
+    theultimateloopb1:int 10h 
+    inc cx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb1
+
+    mov bx,5
+    theultimateloopb2:int 10h 
+    inc cx
+    int 10h 
+    inc dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb2
+
+    mov bx,7
+    theultimateloopb3:int 10h 
+    inc dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb3
+
+    mov bx,5
+    theultimateloopb4:int 10h 
+    dec cx
+    int 10h 
+    inc dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb4
+
+    mov bx,7
+    theultimateloopb5:int 10h 
+    dec cx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb5    
+
+    mov bx,5
+    theultimateloopb6:int 10h 
+    dec cx
+    int 10h 
+    dec dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb6
+
+    mov bx,7
+    theultimateloopb7:int 10h 
+    dec dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb7
+
+    mov bx,5
+    theultimateloopb8:int 10h 
+    inc cx
+    int 10h 
+    dec dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb8
+    ;;;;the plus sign
+
+    add dx,8
+    sub cx,3
+    
+    mov bx,14
+    theultimateloopb9:int 10h 
+    inc cx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb9   
+
+    inc dx
+    dec cx
+    mov bx,14
+    theultimateloopb10:int 10h 
+    dec cx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb10  
+
+    add dx,6d
+    add cx,8d
+
+    mov bx,14
+    theultimateloopb11:int 10h 
+    dec dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb11  
+
+    inc dx
+    dec cx
+    mov bx,14
+    theultimateloopb12:int 10h 
+    inc dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb12  
+    
+    popa
+ENDM drawpowerup

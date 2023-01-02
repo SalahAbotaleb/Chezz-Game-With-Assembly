@@ -2,7 +2,7 @@ include DrawingM.inc
 include mymacros.inc
 
 movepiece MACRO row,col,RecievedFlag
-local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9,blck,disptimer,nopromotion
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9,blck,disptimer,nopromotion,blacktimersethere,blacktimersetthere,whitetimersethere,whitetimersetthere
 pusha
 ;RecievedFlag if 1  then skip validations and go replace it directly
 ;----
@@ -68,7 +68,20 @@ mov ax,row
 mov rowx,ax
 mov ax,col
 mov colx,ax
-Drawtim 3
+;this part is for the time bonus
+pusha
+getdb movr,movc
+cmp chezzT[BX],10h
+jae blacktimersetthere
+mov ax,blacktimer
+jmp whitetimersetthere
+blacktimersetthere:
+mov ax,blacktimer
+whitetimersetthere:
+mov tmptimer,ax
+popa
+;////////////////////////////////
+Drawtim tmptimer;;;;;;
 pop ax
 jmp far ptr SendData
 cont2:
@@ -107,7 +120,19 @@ mov ax,row
 mov rowx,ax
 mov ax,col
 mov colx,ax
-Drawtim 3
+;this part is for the time bonus
+pusha
+cmp chezzT[BX],10h
+jae blacktimersethere
+mov ax,blacktimer
+jmp whitetimersethere
+blacktimersethere:
+mov ax,blacktimer
+whitetimersethere:
+mov tmptimer,ax
+popa
+;////////////////////////////////
+Drawtim tmptimer;;;;;;;
 pop ax
 SendData:
 ;/******/
