@@ -20,6 +20,9 @@
 ;getcursorlocation MACRO ----- This function returns cursor location 
 ;printchar ----- print a character in text mode
 ;setCursor ----- sets cursor to a position x and y and pagenumber (0)
+;saveCursor ----- gets the cursor position and put it in initx & inity for sender & receiver
+;scrollupper ----- used to scroll the upper part (sender) by one line
+;scrolllower ----- used to scroll the lower part (receiver) by one line
 DisplayString MACRO STR
 push ax
 mov ah,9
@@ -449,7 +452,7 @@ mov dl,x
 mov dh,y
 int 10h
 ENDM setCursor
-;This is a macro to clear the upper half of the screen when it's compleltely full of charachters
+
 scrollupper MACRO
 pusha
 mov ah, 6               
@@ -462,8 +465,7 @@ mov dl, 39              ; col right
 int 10h 
 popa
 ENDM scrollupper 
-;-----------------------------------------------------------------------------------------------
-;This is a macro to clear the lower half of the screen when it's compleltely full of charachters
+
 
 scrolllower MACRO
 pusha
@@ -487,8 +489,7 @@ mov initxS,dl
 mov inityS,dh
 popa
 ENDM saveCursorS  
-;---------------------------------------------------------------------------------------------------
-;this is a macro to get the cursor position of the Receive mode in dx "we need to save the cursor position every time we go to revieve mode or send mode"
+
 saveCursorR MACRO
 pusha
 mov ah,3h
@@ -529,3 +530,136 @@ mov cx,1
 int  10h
 popa
 ENDM printcharGraphicsR
+
+concatStr MACRO str1,str2,dest
+local newstr,newstr2,chck2,ext
+pusha
+mov si,0
+mov bx,0
+
+newstr:
+mov al,str1[si]
+mov dest[bx],al
+inc si
+inc bx
+mov al,0
+cmp str1[si],'$'
+je chck2
+cmp str1[si],13d
+je chck2
+jmp newstr
+chck2:
+
+mov dest[bx],' '
+inc bx
+mov si,0
+
+newstr2:
+mov al,str2[si]
+mov dest[bx],al
+inc si
+inc bx
+cmp str2[si],'$'
+je ext
+cmp str2[si],13d
+je ext
+jmp newstr2
+ext:
+popa
+endm concatStr
+
+filtername MACRO origin,dest
+local newstr,incr,Lcheck,ext,fext,repeat,goout
+mov si,0
+mov bx,0
+newstr2:
+mov al,origin[si]
+cmp al,64
+jbe incr
+mov dest[bx],al
+inc bx
+incr:inc si
+cmp origin[si],'$'
+je Lcheck
+ 
+jmp newstr2
+Lcheck:
+dec bx
+dec si
+mov al,dest
+cmp al,dest[bx]
+je ext
+mov al,dest[bx]
+mov si,bx
+dec si
+repeat:
+cmp si,-1
+je fext
+mov ah,dest[si]
+mov dest[bx],ah
+dec bx
+dec si
+jmp repeat
+ext:
+mov dest[bx],'$'
+jmp goout
+fext:
+mov dest[bx],al
+goout:
+ENDM
+
+scrollupperC MACRO
+   
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 7               ; attribute
+mov ch, 1               ; row top
+mov cl, 0               ; col left
+mov dh, 10              ; row bottom
+mov dl, 79              ; col right
+int 10h 
+  
+ENDM scrollupperC 
+
+scrolllowerC MACRO
+   
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 7               ; attribute
+mov ch, 13              ; row top
+mov cl, 0               ; col left
+mov dh, 22              ; row bottom
+mov dl, 79              ; col right
+int 10h 
+  
+ENDM scrolllowerC
+
+saveCursorSC MACRO
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxS,dl
+mov inityS,dh
+ENDM saveCursorSC
+
+saveCursorRC MACRO
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxR,dl
+mov inityR,dh
+ENDM saveCursorRC
+
+setCursorC MACRO x,y
+mov ah,2
+mov bh,0
+mov dl,x
+mov dh,y
+int 10h
+ENDM setCursorC
+
+printcharC MACRO x
+mov ah,2          ; printing the char
+mov dl,x
+int 21h
+ENDM printcharC
