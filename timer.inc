@@ -65,3 +65,50 @@ outofloop:
 
 popa
 ENDM updatetime
+
+drawrandomobject macro
+local dontdraw,continuedraw1,continuedraw2
+
+pusha
+cmp clockbalive,1
+jnz continuedraw1
+jmp far ptr dontdraw
+continuedraw1:
+mov ax,2c00h
+int 21h
+mov ah,0
+mov al,dh
+mov cx,15d
+div cl
+cmp ah,12
+ja continuedraw2
+jmp far ptr dontdraw
+continuedraw2:
+untillaemptyposarrives:
+;drawandsetposition
+mov ax,2c00h
+int 21h
+mov al,dh
+mov ah,0
+and al,0fh
+mov cx,7d
+div cl
+mov ah,cl
+mov dl,dh
+mov dh,0
+;dx row
+;cx col
+mov tmpr,dx
+mov tmpc,cx
+getdb tmpr,tmpc
+
+
+cmp chezzT[bx],-1
+jnz untillaemptyposarrives
+mov clockbr,dl
+mov clockbc,cl
+mov clockbalive,1
+drawpowerup clockbr,clockbc
+dontdraw:
+popa
+endm drawrandomobject

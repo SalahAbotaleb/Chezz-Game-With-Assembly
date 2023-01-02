@@ -120,8 +120,15 @@ selectedc DW -1
 selected DB 0
 selectAtrec DB 0
 
-
-
+blacktimer DW 3
+whitetimer Dw 3
+tmptimer Dw 0
+;;;;;;;;;;
+clockbr db 0
+clockbc db 1
+clockbalive db 0
+powerupcolor db 1
+;;;;;;;;;;
 moveavailc DB 0Ah
 takeavailc db 4h 
 
@@ -162,7 +169,7 @@ timerEnd dw 32
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 1;0 for white 1 for Black
+playertpye DB 1;0 for white 1 for Black;
 ;probably serial port
 ;you need to set player type
 
@@ -199,6 +206,7 @@ notification_msg DB "Notification:-$"
 first_name DB "First Name:-$"
 second_name DB "Second Name:-$"
 Timer_Counter DB "Timer: $"
+empty_string DB "           $"
 
 VALUE  db ?     ;VALUE which will be sent or Received by user
 initxS db 25     ;initial position for sender column
@@ -1046,7 +1054,7 @@ MAIN PROC FAR
 
 
     ;/******************test area***************************/
-        
+        drawpowerup 4,4
          ;replace 6,7,5,4
          ;replace 6,3,2,3
 
@@ -1091,11 +1099,15 @@ MAIN PROC FAR
     pusha
     mov bx,0
     mov bl,playertpye
-    shr bl,1
-    shr bl,1
-    shr bl,1
-    shr bl,1
-    add bl,5
+    ;/////////////////////////
+    cmp playertpye,0
+    jz checkforwhitemate
+    mov bx,028d
+    jmp checkforblackmate
+    checkforwhitemate:
+    mov bx,05d
+    checkforblackmate:
+    ;/////////////////////////
     mov ax,chezznrev[bx]
     mov cx,0
     mov cl,ah
@@ -1103,17 +1115,23 @@ MAIN PROC FAR
     mov cx,0
     mov cl,al
     mov colcheck,cx
-    checkformate playertpye,threat,rowcheck,colcheck,7
+    ;checkformate playertpye,threat,rowcheck,colcheck,7
     cmp threat,1
-    jne notcheckmateend
+    ;jne notcheckmateend
     ;something needs to happen when his is checked
-    DisplayStringGraphicMode checkmate_msg,9,26,6
-    notcheckmateend:
+    ; DisplayStringGraphicMode checkmate_msg,9,26,6
+    ; jmp checkmated
+    ; notcheckmateend:
+    ; DisplayStringGraphicMode empty_string,9,26,6
+    ; checkmated:
     popa
     ;//check for chekcmate end
+    ;/////////////////////////drawing the object
+    drawrandomobject
     ;/////////////////////////
+
     updatetime
-     pusha
+    pusha
     mov ax,2c00h
     int 21h
 
