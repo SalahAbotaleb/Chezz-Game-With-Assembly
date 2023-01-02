@@ -529,3 +529,40 @@ mov cx,1
 int  10h
 popa
 ENDM printcharGraphicsR
+
+concatStr MACRO str1,str2,dest
+local newstr,newstr2,chck2,ext
+pusha
+mov si,0
+mov bx,0
+
+newstr:
+mov al,str1[si]
+mov dest[bx],al
+inc si
+inc bx
+mov al,0
+cmp str1[si],'$'
+je chck2
+cmp str1[si],13d
+je chck2
+jmp newstr
+chck2:
+
+mov dest[bx],' '
+inc bx
+mov si,0
+
+newstr2:
+mov al,str2[si]
+mov dest[bx],al
+inc si
+inc bx
+cmp str2[si],'$'
+je ext
+cmp str2[si],13d
+je ext
+jmp newstr2
+ext:
+popa
+endm concatStr
