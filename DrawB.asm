@@ -9,6 +9,8 @@ EXTRN Exist:BYTE
 EXTRN INPUT_NAME:BYTE
 EXTRN VALUER: BYTE
 EXTRN playertpye:BYTE
+EXTRN first_name:BYTE
+EXTRN second_name:BYTE
 
 PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW,main
 
@@ -204,8 +206,8 @@ black_killed_msg DB "Black Kill: $$$"
 white_killed_msg DB "White Kill: $$$"
 seperation_line DB "---------------$"
 notification_msg DB "Notification:-$"
-first_name DB "First Name:-$"
-second_name DB "Second Name:-$"
+;first_name DB "First Name:-$"
+;second_name DB "Second Name:-$"
 Timer_Counter DB "Timer: $"
 empty_string DB "           $"
 
@@ -1023,9 +1025,16 @@ MAIN PROC FAR
     ;DisplayStringGraphicMode black_win_msg,9,27,6
     ;DisplayStringGraphicMode white_win_msg,9,27,6
     DisplayStringGraphicMode seperation_line,15,25,7
-    DisplayStringGraphicMode first_name,12,25,8
+
+    movecursorlocation 25,8,0
+    DisplayString first_name
+
+    ;DisplayStringGraphicMode first_name,12,25,8
+    
     DisplayStringGraphicMode seperation_line,15,25,16
-    DisplayStringGraphicMode second_name,13,25,17
+    movecursorlocation 25,17,0
+    DisplayString second_name
+    ;DisplayStringGraphicMode second_name,13,25,17
     pusha
     mov ax,2c00h
     int 21h
@@ -1098,39 +1107,39 @@ MAIN PROC FAR
     popa
     ;//check for checkmate
     pusha
-    mov bx,0
-    mov bl,playertpye
-    ;/////////////////////////
-    cmp playertpye,0
-    jz checkforwhitemate
-    mov bx,028d
-    jmp checkforblackmate
-    checkforwhitemate:
-    mov bx,05d
-    checkforblackmate:
-    ;/////////////////////////
-    mov ax,chezznrev[bx]
-    mov cx,0
-    mov cl,ah
-    mov rowcheck,cx
-    mov cx,0
-    mov cl,al
-    mov colcheck,cx
-    ;checkformate playertpye,threat,rowcheck,colcheck,7
-    cmp threat,1
-    ;jne notcheckmateend
-    ;something needs to happen when his is checked
-    ; DisplayStringGraphicMode checkmate_msg,9,26,6
-    ; jmp checkmated
-    ; notcheckmateend:
-    ; DisplayStringGraphicMode empty_string,9,26,6
-    ; checkmated:
+    ; mov bx,0
+    ; mov bl,playertpye
+    ; ;/////////////////////////
+    ; cmp playertpye,0
+    ; jz checkforwhitemate
+    ; mov bx,028d
+    ; jmp checkforblackmate
+    ; checkforwhitemate:
+    ; mov bx,05d
+    ; checkforblackmate:
+    ; ;/////////////////////////
+    ; mov ax,chezznrev[bx]
+    ; mov cx,0
+    ; mov cl,ah
+    ; mov rowcheck,cx
+    ; mov cx,0
+    ; mov cl,al
+    ; mov colcheck,cx
+    ; ;checkformate playertpye,threat,rowcheck,colcheck,7
+    ; cmp threat,1
+    ; ;jne notcheckmateend
+    ; ;something needs to happen when his is checked
+    ; ; DisplayStringGraphicMode checkmate_msg,9,26,6
+    ; ; jmp checkmated
+    ; ; notcheckmateend:
+    ; ; DisplayStringGraphicMode empty_string,9,26,6
+    ; ; checkmated:
     popa
     ;//check for chekcmate end
     ;/////////////////////////drawing the object
-    drawrandomobject
+    ;drawrandomobject
     ;/////////////////////////
-
+    
     updatetime
     pusha
     mov ax,2c00h
@@ -1364,7 +1373,11 @@ MAIN PROC FAR
     Ascii3:cmp ah,39h
     jne retMain
     chat:call IN_GAME_CHATTING_send
-    retMain:jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
+    retMain:
+    cmp ah,03Eh
+    jne rretmain
+    jmp far ptr finalext
+    rretmain:jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
     skipthis:
     inc row
 
@@ -1510,7 +1523,7 @@ MAIN PROC FAR
     ssa:
     mov ah,0
     int 16h 
-    cmp ah,1
+    cmp ah,03Eh
     jne ssa
     push StackPB
     push StackPA
@@ -1520,8 +1533,9 @@ MAIN PROC FAR
     ssb:
     mov ah,0
     int 16h 
-    cmp ah,1
+    cmp ah,03EH
     jne ssb
+    finalext:
     push StackPB
     push StackPA
     ret
