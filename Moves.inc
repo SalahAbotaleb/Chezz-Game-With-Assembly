@@ -1281,3 +1281,50 @@ mov playtimeH , 0
 mov counter , 0
 ;/*****************************************/
 ENDM
+
+
+promote macro row,col
+local nopromotion,promotion1,promotion2,mightpromomte,promotion3
+;//////////////////////////////////////////
+;check for promotion
+;ispawn?
+getdb row,col
+mov al,chezzT[bx]
+and al,0fh
+cmp al,5
+jz promotion1
+jmp far ptr nopromotion
+promotion1:
+cmp row,0
+jz promotion2
+jmp far ptr mightpromomte
+promotion2:
+;///////////////////white promote to queen
+mov promotflag,1
+mov al,chezzT[BX]
+sub al,4
+mov chezzT[bx],al
+mov ax,chezzP[bx]
+mov ax,offset queenData;//might not work
+add bx,bx
+mov chezzP[bx],ax
+DrawPieceDB PrimaryC,SecondaryC,0,0,0Fh,row,col,begr,begc,endr,endc,res ;drawing the piece at the new location
+jmp far ptr nopromotion
+mightpromomte:
+cmp row,7
+jz promotion3
+jmp far ptr nopromotion
+
+promotion3:
+;///////////////////black promote to queen
+mov promotflag,1
+mov al,chezzT[BX]
+sub al,4
+mov chezzT[bx],al
+mov ax,chezzP[bx]
+mov ax,offset queenData;//might not work
+add bx,bx
+mov chezzP[bx],ax
+DrawPieceDB PrimaryC,SecondaryC,0,0,0,row,col,begr,begc,endr,endc,res ;drawing the piece at the new location
+nopromotion:
+endm promote
