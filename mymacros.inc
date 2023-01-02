@@ -566,3 +566,22 @@ jmp newstr2
 ext:
 popa
 endm concatStr
+
+filtername MACRO origin,dest
+local ext,incr,newstr2
+mov si,0
+mov bx,0
+newstr2:
+mov al,origin[si]
+cmp al,20
+jbe incr
+mov dest[bx],al
+inc bx
+incr:inc si
+cmp origin[si],'$'
+je ext
+
+jmp newstr2
+ext:
+    
+ENDM

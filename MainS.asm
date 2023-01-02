@@ -123,49 +123,18 @@ mov cl,0
 mov dl,79
 INT 10h 
 
-;size of current name
-AGAIN3: 
-    mov dx , 3FDH
-        In al , dx 			;Read Line Status
-  		AND al , 00100000b
-JZ AGAIN3
-mov dx , 3F8H		; Transmit data register
-mov  al,INPUT_SIZE
-out dx , al 
-
-AGAIN34: 
-    mov dx , 3FDH
-        In al , dx 			;Read Line Status
-  		AND al , 00100000b
-JZ AGAIN34
-
-;size of other name
-recieveSz:
-
-  mov dx , 3FDH		; Line Status Register
-	CHK4:	in al , dx 
-  		AND al , 1
-  	JNZ recieved
-    jmp firstTime
-    recieved:
- mov dx , 03F8H
- in al , dx 
- 
-   mov dx , 3FDH
- 
-
-; cmp al,0
-; JE recieveSz
- mov INCOME_SIZE, al
-
+mov INPUT_SIZE,20
+mov INCOME_SIZE,20
+mov cx,5
+repeat:
 mov si,0
 mov bx,0
 
-mov dx , 3FDH		; Line Status Register
-in al , dx 
-AND al , 1
-JZ Again
-jmp recieveName
+; mov dx , 3FDH		; Line Status Register
+; in al , dx 
+; AND al , 1
+; JZ Again
+; jmp recieveName
 AGAIN: 
 
         mov ax,0
@@ -187,33 +156,31 @@ AGAIN:
   		mov  al,CURR_NAME[si]
   		out dx , al 
         inc si
-    jmp again
 
-recieveName:
-
-    mov ax,0
-    mov al,INCOME_SIZE
-    cmp bx,ax
-    JNE contRec
-    jmp chkexit
-	contRec:
-    mov dx , 3FDH		; Line Status Register
-	CHK1:	in al , dx 
+         recieveName:
+         mov ax,0
+        mov al,INCOME_SIZE
+        cmp bx,ax
+        JNE contRec
+        jmp chkexit
+	    contRec:
+        mov dx , 3FDH		; Line Status Register
+	    CHK1:	in al , dx 
   		AND al , 1
-  	JZ CHK1
-    mov dx , 03F8H
-    in al , dx 
-    mov INCOME_NAME[bx],al
-    inc bx
-    jmp recieveName
+  	    JZ chk1
+        mov dx , 03F8H
+        in al , dx 
+        mov INCOME_NAME[bx],al
+        inc bx
+        cmp bx,15D
+        je chkexit
+        jmp again
     
 chkexit: 
-mov ax,0
-mov al,INPUT_SIZE
-cmp si,ax
-je  looptillesc
-jmp again
-
+; mov ax,0
+; mov al,INPUT_SIZE
+; cmp si,ax
+; jmp again
 
 ;---------
 looptillesc:;to keep lopping until the user press esc
