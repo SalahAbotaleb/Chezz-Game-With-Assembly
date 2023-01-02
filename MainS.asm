@@ -17,6 +17,9 @@ INPUT_SIZE DB ?
 CURR_NAME DB 30 DUP('$')
 INCOME_SIZE DB 0
 INCOME_NAME DB  30 DUP('$')
+first_name db 30 dup('$')
+second_name db 30 dup('$')
+tmp_name db 30 dup('$')
 
 F1outputmsg  DB  "To start  chating  press F1 $"
 F2outputmsg  DB  "To start the game  press F2 $"
@@ -33,12 +36,22 @@ disp2 db 150 dup('$')
 disp3 db 150 dup('$')
 prevR db 7
 prevS db 0
+
+AlAWL DB 0
+dummyF DB 0
 .CODE
 SUBPROG2 PROC FAR
 mov ax,@DATA
 mov ds,ax
 
 CALL SUBPROG1
+
+;-------------test
+mov bl,INPUT_SIZE
+mov bh,0
+mov al,CURR_NAME
+mov CURR_NAME[bx],al
+;-------------test
 
 GotoTextmode
 clearscreen
@@ -56,7 +69,7 @@ clearscreen
     out dx,al
     ;/********************/
     mov dx,3fbh
-    mov al,00011011b
+    mov al,00011111b
     ;0:Access to Receiver buffer, Transmitter buffer
     ;0:Set Break disabled
     ;011:Even Parity
@@ -130,11 +143,30 @@ repeat:
 mov si,0
 mov bx,0
 
-; mov dx , 3FDH		; Line Status Register
+
+mov dx , 3FDH		; Line Status Register
+in al , dx 
+AND al , 1
+JZ AGAIN235
+ mov initalF,1
+    mov dummyF,1
+AGAIN235:  	
+        mov dx , 3FDH
+        In al , dx 			;Read Line Status
+  		AND al , 00100000b
+JZ AGAIN235
+mov dx , 3F8H		; Transmit data register
+  	mov  al,3
+out dx , al 
+
+cmp initalF,1
+je bagain
+jmp repeat
+
+bagain:
+; mov dx , 03F8H
 ; in al , dx 
-; AND al , 1
-; JZ Again
-; jmp recieveName
+
 AGAIN: 
 
         mov ax,0
@@ -159,7 +191,7 @@ AGAIN:
 
          recieveName:
          mov ax,0
-        mov al,INCOME_SIZE
+        mov al,14
         cmp bx,ax
         JNE contRec
         jmp chkexit
@@ -177,15 +209,15 @@ AGAIN:
         jmp again
     
 chkexit: 
-; mov ax,0
-; mov al,INPUT_SIZE
-; cmp si,ax
-; jmp again
+
+
+;-----------first char check
 
 ;---------
 looptillesc:;to keep lopping until the user press esc
 movecursorlocation 0,0d,0
-DisplayString INCOME_NAME
+filtername INCOME_NAME,second_name
+DisplayString second_name
 movecursorlocation 1,1d,0
 DisplayString CURR_NAME
 ;mov dx , 03F8H
@@ -218,19 +250,28 @@ CMP AH,3BH                     ; Check if user pressed F1 to go to chatting mode
 jnz GAME
 DisplayString sendchat         ;CALL Chatscreen
 DisplayString INPUT_NAME+2
+
+mov dx , 3FDH		; Line Status Register
+	in al , dx 
+  	AND al , 1
+  	JZ contProg
+    mov dx , 03F8H
+    in al , dx 
+    ;mov tmp_name,al
+contProg:
 CALL mainc
 clearscreen
-jmp loopconnectOther
+jmp looptillesc
 
 GAME: 
 CMP AH,3CH
 jnz EXIT
 DisplayString sendgame         ;CALL Game
 DisplayString INPUT_NAME+2
-Call MAIN
+;Call MAIN
 GotoTextmode
 clearscreen
-jmp loopconnectOther
+jmp looptillesc
 
 EXIT:
 CMP Ah,1
@@ -244,7 +285,7 @@ goout:
 mov ax,1
 add ax,1
 jz eeee
-jmp far ptr loopconnectOther
+jmp far ptr looptillesc
 eeee:
 SUBPROG2 ENDP    
 END SUBPROG2

@@ -568,20 +568,41 @@ popa
 endm concatStr
 
 filtername MACRO origin,dest
-local ext,incr,newstr2
+local newstr,incr,Lcheck,ext,fext,repeat,goout
 mov si,0
 mov bx,0
 newstr2:
 mov al,origin[si]
-cmp al,20
+cmp al,64
 jbe incr
 mov dest[bx],al
 inc bx
 incr:inc si
 cmp origin[si],'$'
-je ext
-
+je Lcheck
+ 
 jmp newstr2
+Lcheck:
+dec bx
+dec si
+mov al,dest
+cmp al,dest[bx]
+je ext
+mov al,dest[bx]
+mov si,bx
+dec si
+repeat:
+cmp si,-1
+je fext
+mov ah,dest[si]
+mov dest[bx],ah
+dec bx
+dec si
+jmp repeat
 ext:
-    
+mov dest[bx],'$'
+jmp goout
+fext:
+mov dest[bx],al
+goout:
 ENDM
