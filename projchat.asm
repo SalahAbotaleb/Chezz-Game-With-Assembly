@@ -1,3 +1,5 @@
+EXTRN first_name:BYTE
+EXTRN second_name:BYTE
 public mainC
 
 include mymacros.inc
@@ -14,7 +16,9 @@ initxS db 0     ;initial position for sender column
 inityS db 1     ;initial position for sender row
 initxR db 0     ;initial position for receiver column
 inityR db 13    ;initial position for receiver row
-scanCode db 0   ;scan code of entered key                                       
+scanCode db 0   ;scan code of entered key 
+receivermsg db  159 dup('$')                                       
+lastIter db 0
 
 .CODE
 
@@ -60,7 +64,7 @@ out dx,al
    int 10h
 
    mov ah, 9
-   mov dx, offset firstname
+   mov dx, offset first_name
    int 21h 
 
    setCursorC 0,11       ;setting cursor to middle of screen to printc the seperation line
@@ -72,7 +76,7 @@ out dx,al
    setCursorC 0,12
 
    mov ah, 9
-   mov dx, offset secondname
+   mov dx, offset second_name
    int 21h
 
    setCursorC 0,23       ;setting cursor to end of screen to print the seperation line for the return message
@@ -220,6 +224,10 @@ mov dx , 03F8H
 in al , dx 
 mov VALUE,al
 
+cmp Value,3DH 
+jne contc
+ret
+contc:
 CMP al, 08h   ; check backpace
 jnz ENTERR
 cmp initxR, 79  ; check if the cursor is in the last column
@@ -282,7 +290,20 @@ saveCursorRC
 
 jmp mainloop        
 
-Exitn:ret
+Exitn:
+
+AGAIN3:  
+        mov dx , 3FDH
+        In al , dx 			;Read Line Status
+  		AND al , 00100000b
+        JZ AGAIN3
+ 
+  		mov dx , 3F8H		; Transmit data register
+        mov al,3Dh
+        out dx , al
+
+
+ret
 chatting endp
 
 

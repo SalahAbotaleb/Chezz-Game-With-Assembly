@@ -531,6 +531,83 @@ int  10h
 popa
 ENDM printcharGraphicsR
 
+concatStr MACRO str1,str2,dest
+local newstr,newstr2,chck2,ext
+pusha
+mov si,0
+mov bx,0
+
+newstr:
+mov al,str1[si]
+mov dest[bx],al
+inc si
+inc bx
+mov al,0
+cmp str1[si],'$'
+je chck2
+cmp str1[si],13d
+je chck2
+jmp newstr
+chck2:
+
+mov dest[bx],' '
+inc bx
+mov si,0
+
+newstr2:
+mov al,str2[si]
+mov dest[bx],al
+inc si
+inc bx
+cmp str2[si],'$'
+je ext
+cmp str2[si],13d
+je ext
+jmp newstr2
+ext:
+popa
+endm concatStr
+
+filtername MACRO origin,dest
+local newstr,incr,Lcheck,ext,fext,repeat,goout
+mov si,0
+mov bx,0
+newstr2:
+mov al,origin[si]
+cmp al,64
+jbe incr
+mov dest[bx],al
+inc bx
+incr:inc si
+cmp origin[si],'$'
+je Lcheck
+ 
+jmp newstr2
+Lcheck:
+dec bx
+dec si
+mov al,dest
+cmp al,dest[bx]
+je ext
+mov al,dest[bx]
+mov si,bx
+dec si
+repeat:
+cmp si,-1
+je fext
+mov ah,dest[si]
+mov dest[bx],ah
+dec bx
+dec si
+jmp repeat
+ext:
+mov dest[bx],'$'
+jmp goout
+fext:
+mov dest[bx],al
+goout:
+ENDM
+
 scrollupperC MACRO
    
 mov ah, 6               
