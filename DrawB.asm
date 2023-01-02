@@ -216,6 +216,8 @@ playtime DB 0
 playtimeS DB 0
 playtimeH DB 0
 counter DB 0
+
+promotflag DB 0
 ;/*****************************************/
 StackPA DW 0
 StackPB DW 0
@@ -1158,7 +1160,7 @@ MAIN PROC FAR
     mov al,selected
     mov selectAtrec,al
     movepiece RecievedRNEW,RecievedCNEW,1
-    promote RecievedRNEW,RecievedCNEW
+    ;-----------------------------------------------promote RecievedRNEW,RecievedCNEW
     mov AvoidLp,1
     jmp far ptr Reselectp
     ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,selectedr,selectedc,success,begr,begc,endr,endc,res
@@ -1209,7 +1211,7 @@ MAIN PROC FAR
     push row
     push col
     movepiece row,col,0
-    promote row,col
+    ;------------------------------------------------------promote row,col
     pop col
     pop row
     jmp far ptr DrawBckGnd ;need to be modified ;;
