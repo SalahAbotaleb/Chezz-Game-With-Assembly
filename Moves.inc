@@ -781,15 +781,15 @@ mov head,0
 popa
 ENDM deselectp
 
-checkformate MACRO playertpye,threat,row,col,steps
-    local lop,kingndown,kingn,exitup,exitdown,exitleft,exitright,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5,queennchup,queennchdown,rooknchup,rooknchdown,leaveall
+checkformate MACRO playertpye,threat,rowcheck,colcheck,steps
+    local lop,kingndown,kingn,kingnup,kingnright,kingnleft,exitup,exitdown,exitleft,exitright,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5up,cont5down,cont5right,cont5left,queennchup,queennchdown,rooknchup,rooknchdown,leaveall
 ;this macro checks if the king is in a threat or not
 ;check above
 ;//up///////////////////////////////////////////////////////
 ;///////////////////////////////////////////////////////////
 pusha
 mov threat,0
-getdb row,col
+getdb rowcheck,colcheck
 mov ax,0
 mov al,chezzT[bx]
 cmp ax,0Ah
@@ -800,8 +800,8 @@ typup:
 mov currtype,1
 typ2up:
 mov dx,0 ;counter
-mov cx,row
-mov ax,col
+mov cx,rowcheck
+mov ax,colcheck
 lopup:
 dec cx
 cmp cx,0
@@ -831,10 +831,10 @@ getdb tmpr,tmpc
 
 mov ax,0
 mov al,chezzT[bx]
-; cmp al,-1
-; jne cont5
-; jmp far ptr highlightG
-; cont5:
+cmp al,-1
+jne cont5up
+jmp far ptr kingnup
+cont5up:
 cmp ax,0Ah
 ja typnup ;to be removed if needed
 mov nexttype,0
@@ -852,16 +852,16 @@ jne highlightRup
 jmp far ptr exitup
 highlightRup:
 getdb tmpr,tmpc
-mov chezzC[bx],4h
+; mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
 cmp al,1
-jz queennchup
+jnz queennchup
 mov threat,1
 jmp far ptr leaveall 
 queennchup:
 cmp al,2
-jz rooknchup
+jnz rooknchup
 mov threat,1
 jmp far ptr leaveall 
 rooknchup:
@@ -882,7 +882,7 @@ exitup:
 ;///////////////////////////////////////////////////////////////////////////////
 pusha
 mov threat,0
-getdb row,col
+getdb rowcheck,colcheck
 mov ax,0
 mov al,chezzT[bx]
 cmp ax,0Ah
@@ -893,8 +893,8 @@ typdown:
 mov currtype,1
 typ2down:
 mov dx,0 ;counter
-mov cx,row
-mov ax,col
+mov cx,rowcheck
+mov ax,colcheck
 lopdown:
 inc cx
 cmp cx,0
@@ -924,10 +924,10 @@ getdb tmpr,tmpc
 
 mov ax,0
 mov al,chezzT[bx]
-; cmp al,-1
-; jne cont5
-; jmp far ptr highlightG
-; cont5:
+cmp al,-1
+jne cont5down
+jmp far ptr kingndown
+cont5down:
 cmp ax,0Ah
 ja typndown ;to be removed if needed
 mov nexttype,0
@@ -949,12 +949,12 @@ mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
 cmp al,1
-jz queennchdown
+jnz queennchdown
 mov threat,1
 jmp far ptr leaveall 
 queennchdown:
 cmp al,2
-jz rooknchdown
+jnz rooknchdown
 mov threat,1
 jmp far ptr leaveall 
 rooknchdown:
@@ -975,7 +975,7 @@ exitdown:
 ;///////////////////////////////////////////////////////////////////////////////
 pusha
 mov threat,0
-getdb row,col
+getdb rowcheck,colcheck
 mov ax,0
 mov al,chezzT[bx]
 cmp ax,0Ah
@@ -986,8 +986,8 @@ typleft:
 mov currtype,1
 typ2left:
 mov dx,0 ;counter
-mov cx,row
-mov ax,col
+mov cx,rowcheck
+mov ax,colcheck
 lopleft:
 dec ax
 cmp ax,0
@@ -1017,10 +1017,10 @@ getdb tmpr,tmpc
 
 mov ax,0
 mov al,chezzT[bx]
-; cmp al,-1
-; jne cont5
-; jmp far ptr highlightG
-; cont5:
+cmp al,-1
+jne cont5left
+jmp far ptr kingnleft
+cont5left:
 cmp ax,0Ah
 ja typnleft;to be removed if needed
 mov nexttype,0
@@ -1042,12 +1042,12 @@ mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
 cmp al,1
-jz queennchleft
+jnz queennchleft
 mov threat,1
 jmp far ptr leaveall 
 queennchleft:
 cmp al,2
-jz rooknchleft
+jnz rooknchleft
 mov threat,1
 jmp far ptr leaveall 
 rooknchleft:
@@ -1067,7 +1067,7 @@ exitleft:
 ;///////////////////////////////////////////////////////////////////////////////
 pusha
 mov threat,0
-getdb row,col
+getdb rowcheck,colcheck
 mov ax,0
 mov al,chezzT[bx]
 cmp ax,0Ah
@@ -1078,8 +1078,8 @@ typright:
 mov currtype,1
 typ2right:
 mov dx,0 ;counter
-mov cx,row
-mov ax,col
+mov cx,rowcheck
+mov ax,colcheck
 lopright:
 inc ax
 cmp ax,0
@@ -1109,10 +1109,10 @@ getdb tmpr,tmpc
 
 mov ax,0
 mov al,chezzT[bx]
-; cmp al,-1
-; jne cont5
-; jmp far ptr highlightG
-; cont5:
+cmp al,-1
+jne cont5right
+jmp far ptr kingnright
+cont5right:
 cmp ax,0Ah
 ja typnright ;to be removed if needed
 mov nexttype,0
@@ -1134,12 +1134,12 @@ mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
 cmp al,1
-jz queennchright
+jnz queennchright
 mov threat,1
 jmp far ptr leaveall 
 queennchright:
 cmp al,2
-jz rooknchright
+jnz rooknchright
 mov threat,1
 jmp far ptr leaveall 
 rooknchright:
@@ -1161,7 +1161,7 @@ exitright:
 leaveall:
 popa
 
-ENDM
+ENDM checkformate
 
 deinitAll MACRO 
 mov keystrokeF , 0
