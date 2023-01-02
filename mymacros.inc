@@ -20,6 +20,9 @@
 ;getcursorlocation MACRO ----- This function returns cursor location 
 ;printchar ----- print a character in text mode
 ;setCursor ----- sets cursor to a position x and y and pagenumber (0)
+;saveCursor ----- gets the cursor position and put it in initx & inity for sender & receiver
+;scrollupper ----- used to scroll the upper part (sender) by one line
+;scrolllower ----- used to scroll the lower part (receiver) by one line
 DisplayString MACRO STR
 push ax
 mov ah,9
@@ -449,7 +452,7 @@ mov dl,x
 mov dh,y
 int 10h
 ENDM setCursor
-;This is a macro to clear the upper half of the screen when it's compleltely full of charachters
+
 scrollupper MACRO
 pusha
 mov ah, 6               
@@ -462,8 +465,7 @@ mov dl, 39              ; col right
 int 10h 
 popa
 ENDM scrollupper 
-;-----------------------------------------------------------------------------------------------
-;This is a macro to clear the lower half of the screen when it's compleltely full of charachters
+
 
 scrolllower MACRO
 pusha
@@ -487,8 +489,7 @@ mov initxS,dl
 mov inityS,dh
 popa
 ENDM saveCursorS  
-;---------------------------------------------------------------------------------------------------
-;this is a macro to get the cursor position of the Receive mode in dx "we need to save the cursor position every time we go to revieve mode or send mode"
+
 saveCursorR MACRO
 pusha
 mov ah,3h
