@@ -111,7 +111,7 @@ Drawtim 3
 pop ax
 SendData:
 ;/******/
-
+; promote row, col
 mov BX,RecievedFlag
 cmp BX,1
 JNE CONT6
@@ -1369,6 +1369,7 @@ jz promotion2
 jmp far ptr mightpromomte
 promotion2:
 ;///////////////////white promote to queen
+mov promotflag,1
 mov al,chezzT[BX]
 sub al,4
 mov chezzT[bx],al
@@ -1385,6 +1386,7 @@ jmp far ptr nopromotion
 
 promotion3:
 ;///////////////////black promote to queen
+mov promotflag,1
 mov al,chezzT[BX]
 sub al,4
 mov chezzT[bx],al

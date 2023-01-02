@@ -1766,7 +1766,7 @@ mov chezzP[si],-1
     con:mov res,al
     Drawsquare oldc,oldr,begr,begc,res ;to be removed
     DrawPieceDB  PrimaryC,SecondaryC,0,0,currtype,newr,newc,begr,begc,endr,endc,res ;drawing the piece at the new location
-    
+    promote newr,newc
 
 
 popa
