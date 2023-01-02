@@ -2,7 +2,7 @@ include DrawingM.inc
 include mymacros.inc
 
 movepiece MACRO row,col,RecievedFlag
-local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9,blck,disptimer,nopromotion
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9,blck,disptimer
 pusha
 ;RecievedFlag if 1  then skip validations and go replace it directly
 ;----
@@ -111,7 +111,7 @@ Drawtim 3
 pop ax
 SendData:
 ;/******/
-; promote row, col
+
 mov BX,RecievedFlag
 cmp BX,1
 JNE CONT6
@@ -781,15 +781,15 @@ mov head,0
 popa
 ENDM deselectp
 
-checkformate MACRO playertpye,threat,rowcheck,colcheck,steps
-    local lop,kingndown,kingn,kingnup,kingnright,kingnleft,exitup,exitdown,exitleft,exitright,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5up,cont5down,cont5right,cont5left,queennchup,queennchdown,rooknchup,rooknchdown,leaveall
+checkformate MACRO playertpye,threat,row,col,steps
+    local lop,kingndown,kingn,exitup,exitdown,exitleft,exitright,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5,queennchup,queennchdown,rooknchup,rooknchdown,leaveall
 ;this macro checks if the king is in a threat or not
 ;check above
 ;//up///////////////////////////////////////////////////////
 ;///////////////////////////////////////////////////////////
 pusha
 mov threat,0
-getdb rowcheck,colcheck
+getdb row,col
 mov ax,0
 mov al,chezzT[bx]
 cmp ax,0Ah
@@ -800,8 +800,8 @@ typup:
 mov currtype,1
 typ2up:
 mov dx,0 ;counter
-mov cx,rowcheck
-mov ax,colcheck
+mov cx,row
+mov ax,col
 lopup:
 dec cx
 cmp cx,0
@@ -831,10 +831,10 @@ getdb tmpr,tmpc
 
 mov ax,0
 mov al,chezzT[bx]
-cmp al,-1
-jne cont5up
-jmp far ptr kingnup
-cont5up:
+; cmp al,-1
+; jne cont5
+; jmp far ptr highlightG
+; cont5:
 cmp ax,0Ah
 ja typnup ;to be removed if needed
 mov nexttype,0
@@ -852,16 +852,16 @@ jne highlightRup
 jmp far ptr exitup
 highlightRup:
 getdb tmpr,tmpc
-; mov chezzC[bx],4h
+mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
 cmp al,1
-jnz queennchup
+jz queennchup
 mov threat,1
 jmp far ptr leaveall 
 queennchup:
 cmp al,2
-jnz rooknchup
+jz rooknchup
 mov threat,1
 jmp far ptr leaveall 
 rooknchup:
@@ -882,7 +882,7 @@ exitup:
 ;///////////////////////////////////////////////////////////////////////////////
 pusha
 mov threat,0
-getdb rowcheck,colcheck
+getdb row,col
 mov ax,0
 mov al,chezzT[bx]
 cmp ax,0Ah
@@ -893,8 +893,8 @@ typdown:
 mov currtype,1
 typ2down:
 mov dx,0 ;counter
-mov cx,rowcheck
-mov ax,colcheck
+mov cx,row
+mov ax,col
 lopdown:
 inc cx
 cmp cx,0
@@ -924,10 +924,10 @@ getdb tmpr,tmpc
 
 mov ax,0
 mov al,chezzT[bx]
-cmp al,-1
-jne cont5down
-jmp far ptr kingndown
-cont5down:
+; cmp al,-1
+; jne cont5
+; jmp far ptr highlightG
+; cont5:
 cmp ax,0Ah
 ja typndown ;to be removed if needed
 mov nexttype,0
@@ -949,12 +949,12 @@ mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
 cmp al,1
-jnz queennchdown
+jz queennchdown
 mov threat,1
 jmp far ptr leaveall 
 queennchdown:
 cmp al,2
-jnz rooknchdown
+jz rooknchdown
 mov threat,1
 jmp far ptr leaveall 
 rooknchdown:
@@ -975,7 +975,7 @@ exitdown:
 ;///////////////////////////////////////////////////////////////////////////////
 pusha
 mov threat,0
-getdb rowcheck,colcheck
+getdb row,col
 mov ax,0
 mov al,chezzT[bx]
 cmp ax,0Ah
@@ -986,8 +986,8 @@ typleft:
 mov currtype,1
 typ2left:
 mov dx,0 ;counter
-mov cx,rowcheck
-mov ax,colcheck
+mov cx,row
+mov ax,col
 lopleft:
 dec ax
 cmp ax,0
@@ -1017,10 +1017,10 @@ getdb tmpr,tmpc
 
 mov ax,0
 mov al,chezzT[bx]
-cmp al,-1
-jne cont5left
-jmp far ptr kingnleft
-cont5left:
+; cmp al,-1
+; jne cont5
+; jmp far ptr highlightG
+; cont5:
 cmp ax,0Ah
 ja typnleft;to be removed if needed
 mov nexttype,0
@@ -1042,12 +1042,12 @@ mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
 cmp al,1
-jnz queennchleft
+jz queennchleft
 mov threat,1
 jmp far ptr leaveall 
 queennchleft:
 cmp al,2
-jnz rooknchleft
+jz rooknchleft
 mov threat,1
 jmp far ptr leaveall 
 rooknchleft:
@@ -1067,7 +1067,7 @@ exitleft:
 ;///////////////////////////////////////////////////////////////////////////////
 pusha
 mov threat,0
-getdb rowcheck,colcheck
+getdb row,col
 mov ax,0
 mov al,chezzT[bx]
 cmp ax,0Ah
@@ -1078,8 +1078,8 @@ typright:
 mov currtype,1
 typ2right:
 mov dx,0 ;counter
-mov cx,rowcheck
-mov ax,colcheck
+mov cx,row
+mov ax,col
 lopright:
 inc ax
 cmp ax,0
@@ -1109,10 +1109,10 @@ getdb tmpr,tmpc
 
 mov ax,0
 mov al,chezzT[bx]
-cmp al,-1
-jne cont5right
-jmp far ptr kingnright
-cont5right:
+; cmp al,-1
+; jne cont5
+; jmp far ptr highlightG
+; cont5:
 cmp ax,0Ah
 ja typnright ;to be removed if needed
 mov nexttype,0
@@ -1134,12 +1134,12 @@ mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
 cmp al,1
-jnz queennchright
+jz queennchright
 mov threat,1
 jmp far ptr leaveall 
 queennchright:
 cmp al,2
-jnz rooknchright
+jz rooknchright
 mov threat,1
 jmp far ptr leaveall 
 rooknchright:
@@ -1161,100 +1161,6 @@ exitright:
 leaveall:
 popa
 
-ENDM checkformate
-
-deinitAll MACRO 
-mov keystrokeF , 0
-
-mov SendROLD , -1
-mov SendCOLD , -1
-
-mov SendRNEW , -1
-mov SendCNEW , -1
-
-mov begr , 0
-mov begc , 0
-mov endr , 0
-mov endc , 0
-mov res , 0
-
-mov tmpx , 0
-mov tmpy , 0
-
-mov row , 0
-mov col , 0
-
-mov rowx , 0
-mov colx , 0
-
-mov killWC , 0 ;counter for killed white
-
-mov killBC , 0 ;counter for killed black
-
-mov prevR , 0
-mov prevC , 0
-
-mov wkingR , 0
-mov wkingC , 0
-
-mov bkingR , 0
-mov bkingC , 0
-
-mov wkingdead , 0
-mov bkingdead , 0
- 
-mov threat , 0
-
-mov chooseR , 0
-mov chooseC , 0
-
-mov NUMCOLOR , 0Bh;color for timer number
-mov backc , 06h ;color for background of timer
-;temp variables first general, second for row, tird for col
-mov tmpdb , 0
-mov tmpdbr , 0
-mov tmpdbc , 0
-mov tmptype , 0
-mov currtype , 0
-mov nexttype , 0
-mov tmpr , 0
-mov tmpc , 0
-mov movr , 0
-mov movc , 0
-mov tmpdb2 , 0
-mov tmpnumber , 0h  ;number for timer put number in this variable before calling timer function proc
-mov passer , 0h ;variable to be passed to procs
-;selected variables and colors
-mov selectedr , -1
-mov selectedc , -1
-mov selected , 0
-mov selectAtrec , 0
-mov moveavailc , 0Ah
-mov takeavailc , 4h 
-
-mov success , 0 ;0 for fail 1 for success
-mov AvoidLp , 0
-mov head , 0
-mov VALUE  , 0     ;VALUE which will be sent or Received by user
-mov initxS , 25     ;initial position for sender column
-mov inityS , 9     ;initial position for sender row
-mov initxR , 25     ;initial position for receiver column
-mov inityR , 18    ;initial position for receiver row
-mov rowInitChezz , 0
-mov colInitChezz ,  0
-mov typeInitChezz , 0
-mov picInitChezz   , 0
-;/*****************************************/
-mov colorD , 0
-mov rowD , 0
-mov colD , 0
-mov datalocD , 0
-
-mov playtime , 0
-mov playtimeS , 0
-mov playtimeH , 0
-mov counter , 0
-;/*****************************************/
 ENDM
 
 deinitAll MACRO 
@@ -1350,50 +1256,3 @@ mov playtimeH , 0
 mov counter , 0
 ;/*****************************************/
 ENDM
-
-
-promote macro row,col
-local nopromotion,promotion1,promotion2,mightpromomte,promotion3
-;//////////////////////////////////////////
-;check for promotion
-;ispawn?
-getdb row,col
-mov al,chezzT[bx]
-and al,0fh
-cmp al,5
-jz promotion1
-jmp far ptr nopromotion
-promotion1:
-cmp row,0
-jz promotion2
-jmp far ptr mightpromomte
-promotion2:
-;///////////////////white promote to queen
-mov promotflag,1
-mov al,chezzT[BX]
-sub al,4
-mov chezzT[bx],al
-mov ax,chezzP[bx]
-mov ax,offset queenData;//might not work
-add bx,bx
-mov chezzP[bx],ax
-DrawPieceDB PrimaryC,SecondaryC,0,0,0Fh,row,col,begr,begc,endr,endc,res ;drawing the piece at the new location
-jmp far ptr nopromotion
-mightpromomte:
-cmp row,7
-jz promotion3
-jmp far ptr nopromotion
-
-promotion3:
-;///////////////////black promote to queen
-mov promotflag,1
-mov al,chezzT[BX]
-sub al,4
-mov chezzT[bx],al
-mov ax,chezzP[bx]
-mov ax,offset queenData;//might not work
-add bx,bx
-mov chezzP[bx],ax
-DrawPieceDB PrimaryC,SecondaryC,0,0,0,row,col,begr,begc,endr,endc,res ;drawing the piece at the new location
-nopromotion:
-endm promote

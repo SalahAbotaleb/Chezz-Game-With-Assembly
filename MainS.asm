@@ -2,13 +2,14 @@ EXTRN SUBPROG1:FAR
 EXTRN Main:FAR
 EXTRN MAINC:FAR
 
-PUBLIC MSG1, MSG2, INPUT_NAME,first_name,second_name
+PUBLIC MSG1, MSG2, INPUT_NAME,first_name,second_name,playertpye
 include mymacros.inc 
 .286
 .MODEL MEDIUM
 .STACK 64
 .DATA
 
+playertpye db 0
 initalF DB 0
 MSG1  DB  "Please Enter Your Name: $"
 MSG2  DB  13,"Invalid! Re-Enter your Name: $"
@@ -65,17 +66,18 @@ ret
 endpros endp 
 
 Chatp proc
-	
+        mov f2f,0
         cmp F1F,0
         je contp
         jmp play
         contP:
+             call endpros
          AGAIN22:  
         mov dx , 3FDH
         In al , dx 			;Read Line Status
   		AND al , 00100000b
         JZ AGAIN22
- 
+        
   		mov dx , 3F8H		; Transmit data register
         mov al,1
         out dx , al
@@ -106,7 +108,47 @@ ret
 chatp endp
  
 gamep proc
+        mov f1f,0
+        cmp F2F,0
+        je contp1
+        jmp play1
+        contP1:
+         call endpros
+         AGAIN221:  
+        mov dx , 3FDH
+        In al , dx 			;Read Line Status
+  		AND al , 00100000b
+        JZ AGAIN221
+       
+  		mov dx , 3F8H		; Transmit data register
+        mov al,3
+        out dx , al
+        mov F2F,1
+        mov sender,1
+        mov playertpye,0
+        ;Gotograpicsmode
+        movecursorlocation 0,23d,0
+        DisplayString disp2
+        jmp exitch1
+        play1: 
+        
+        cmp sender,1
+        je exitch1
+        AGAIN2231:  
+        mov dx , 3FDH
+        In al , dx 			;Read Line Status
+  		AND al , 00100000b
+        JZ AGAIN2231
  
+  		mov dx , 3F8H		; Transmit data register
+        mov al,3
+        out dx , al
+        mov F2F,1
+        mov playertpye,1
+        call main
+        GotoTextmode
+        call endpros
+        exitch1:
 ret
 gamep endp
 
@@ -336,6 +378,7 @@ mov dx , 3FDH		; Line Status Register
     nGcheck:
     cmp F1F,0
     jne contChkCht
+    call endpros
     mov reciever,1
     mov F1F,1
     movecursorlocation 0,23d,0
@@ -363,8 +406,38 @@ mov dx , 3FDH		; Line Status Register
     DisplayString clearline
     
     mov F2F,0
-
+    jmp contloop
     Gcheck:
+    ;---------
+    cmp al,3
+    je contg 
+    jmp far ptr contloop
+    contg:cmp F2F,0
+    jne contChkCht1
+    call endpros
+    mov reciever,1
+     mov playertpye,1
+    mov F2F,1
+    movecursorlocation 0,23d,0
+    DisplayString clearline
+    movecursorlocation 0,23d,0
+    DisplayString disp4
+    
+    mov F1F,0
+    jmp contloop
+    contChkCht1:
+
+    call main
+     GotoTextmode
+    call endpros
+    mov F2F,0
+    movecursorlocation 0,23d,0
+    DisplayString clearline
+    
+    mov F1F,0
+    jmp contloop
+
+    ;---------
 contloop:
 movecursorlocation 0,0d,0
 
@@ -410,11 +483,8 @@ jmp looptillesc
 GAME: 
 CMP AH,3CH
 jnz EXIT
-DisplayString sendgame         ;CALL Game
-DisplayString INPUT_NAME+2
-;Call MAIN
-GotoTextmode
-clearscreen
+call gamep
+
 jmp looptillesc
 
 EXIT:
