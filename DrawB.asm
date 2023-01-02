@@ -63,6 +63,9 @@ bkingdead db 0
  
 threat db 0
 
+rowcheck DW 0
+colcheck DW 0
+
 chooseR DW 0
 chooseC DW 0
 
@@ -1084,7 +1087,7 @@ MAIN PROC FAR
     jmp far ptr blackkingdead
     bkingisalive:
     popa
-    ;//check for chekcmate
+    ;//check for checkmate
     pusha
     mov bx,0
     mov bl,playertpye
@@ -1096,19 +1099,19 @@ MAIN PROC FAR
     mov ax,chezznrev[bx]
     mov cx,0
     mov cl,ah
-    mov roww,cx
+    mov rowcheck,cx
     mov cx,0
     mov cl,al
-    mov colw,cx
-    ;checkformate playertpye,threat,roww,colw,7
-    ;cmp threat,1
+    mov colcheck,cx
+    checkformate playertpye,threat,rowcheck,colcheck,7
+    cmp threat,1
     jne notcheckmateend
     ;something needs to happen when his is checked
-    ;gototextmode
+    DisplayStringGraphicMode checkmate_msg,9,26,6
     notcheckmateend:
     popa
     ;//check for chekcmate end
-    ;////////////////////////
+    ;/////////////////////////
     updatetime
      pusha
     mov ax,2c00h
