@@ -530,3 +530,59 @@ mov cx,1
 int  10h
 popa
 ENDM printcharGraphicsR
+
+scrollupperC MACRO
+   
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 7               ; attribute
+mov ch, 1               ; row top
+mov cl, 0               ; col left
+mov dh, 10              ; row bottom
+mov dl, 79              ; col right
+int 10h 
+  
+ENDM scrollupperC 
+
+scrolllowerC MACRO
+   
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 7               ; attribute
+mov ch, 13              ; row top
+mov cl, 0               ; col left
+mov dh, 22              ; row bottom
+mov dl, 79              ; col right
+int 10h 
+  
+ENDM scrolllowerC
+
+saveCursorSC MACRO
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxS,dl
+mov inityS,dh
+ENDM saveCursorSC
+
+saveCursorRC MACRO
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxR,dl
+mov inityR,dh
+ENDM saveCursorRC
+
+setCursorC MACRO x,y
+mov ah,2
+mov bh,0
+mov dl,x
+mov dh,y
+int 10h
+ENDM setCursorC
+
+printcharC MACRO x
+mov ah,2          ; printing the char
+mov dl,x
+int 21h
+ENDM printcharC
