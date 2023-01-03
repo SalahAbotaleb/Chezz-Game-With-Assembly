@@ -1189,6 +1189,8 @@ ENDM deselectp
 ; ENDM
 
 deinitAll MACRO 
+local lbl1,lbl2,lbl3
+mov goOutY,0
 mov keystrokeF , 0
 
 mov SendROLD , -1
@@ -1280,6 +1282,42 @@ mov playtimeS , 0
 mov playtimeH , 0
 mov counter , 0
 ;/*****************************************/
+; chezzP DW 64 dup(-1)
+; chezzT DB 64 dup(-1)
+; chezzC DB 64 dup(-1)
+; chezzN DB 64 dup(-1) ;numbering of each piece
+; chezznrev Dw 32 dup(-1) ;reverse numbering of each piece
+; Timer  DB 32 dup(-1)
+; time DB 32 dup(0) 
+
+mov si,0
+mov cx,128
+lbl3:
+mov chezzP[si],-1
+inc si
+loop lbl3
+
+mov si,0
+mov cx,64
+lbl1:
+mov chezzT[si],-1
+mov chezzC[si],-1
+mov chezzN[si],-1
+mov chezzNrev[si],-1
+inc si
+loop lbl1
+
+
+mov si,0
+mov cx,32
+lbl2:
+mov Timer[si],-1
+mov Time[si],0
+inc si
+loop lbl2
+
+
+
 ENDM deinitAll
 
 

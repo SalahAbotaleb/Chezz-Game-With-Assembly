@@ -1624,10 +1624,22 @@ popa
 ENDM kill
 
 replace MACRO oldr,oldc,newr,newc
-local sec,con,typ,typ2,setTimer,noset,white,blck,contRepl,set,whitetimersetthere,blacktimersetthere
+local sec,con,typ,typ2,setTimer,noset,white,blck,contRepl,set,whitetimersetthere,blacktimersetthere,nwking,nbking
 ;-1 means empty location
 pusha
 
+pusha
+getdb newr,newc
+mov al,chezzT[bx]
+cmp al,00h
+jnz nwking
+mov wkingdead,1
+nwking:
+cmp al,10h
+jnz nbking
+mov bkingdead,1
+nbking:
+popa
 
 getdb oldr,oldc
 mov ax,0
