@@ -1316,7 +1316,15 @@ mov Time[si],0
 inc si
 loop lbl2
 
-
+mov blacktimer ,3
+mov whitetimer , 3
+mov tmptimer , 0
+;;;;;;;;;;
+mov clockbr ,0
+mov clockbc , 0
+mov clockkilled, 0
+mov clockbalive , 0
+mov powerupcolor , 1
 
 ENDM deinitAll
 
