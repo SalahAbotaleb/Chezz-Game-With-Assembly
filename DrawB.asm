@@ -9,6 +9,9 @@ EXTRN Exist:BYTE
 EXTRN INPUT_NAME:BYTE
 EXTRN VALUER: BYTE
 EXTRN playertpye:BYTE
+EXTRN first_name:BYTE
+EXTRN second_name:BYTE
+EXTRN goOutY:BYTE
 
 PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW,main
 
@@ -199,14 +202,15 @@ coffsetW DW 0
 
 status_msg DB "Status:-$"
 checkmate_msg DB "CheckMate$"
-black_win_msg DB "Black Win$$"
-white_win_msg DB "White Win$$"
+black_win_msg DB 30 dup('$')
+white_win_msg DB 30 dup('$')
+win DB "Win$"
 black_killed_msg DB "Black Kill: $$$"
 white_killed_msg DB "White Kill: $$$"
 seperation_line DB "---------------$"
 notification_msg DB "Notification:-$"
-first_name DB "First Name:-$"
-second_name DB "Second Name:-$"
+;first_name DB "First Name:-$"
+;second_name DB "Second Name:-$"
 Timer_Counter DB "Timer: $"
 empty_string DB "           $"
 
@@ -1062,8 +1066,20 @@ MAIN PROC FAR
     DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,7,begr,begc,endr,endc,res
 
    
-    ;-------
-    
+    ;------------
+    cmp playertpye,0
+    je OTHER_NAMENF
+    jmp OTHER_NAMEF
+    OTHER_NAMENF:
+    concatStr first_name,win,white_win_msg
+    concatStr second_name,win,black_win_msg
+    jmp contPro
+    OTHER_NAMEF:
+    concatStr second_name,win,white_win_msg
+    concatStr first_name,win,black_win_msg
+    contPro:
+    ;-------------
+
     DisplayStringGraphicMode status_msg,8,25,1
     DisplayStringGraphicMode white_killed_msg,12,26,2
     ;DisplaynumberGraphicMode killWC,37,2
@@ -1075,9 +1091,16 @@ MAIN PROC FAR
     ;DisplayStringGraphicMode black_win_msg,9,27,6
     ;DisplayStringGraphicMode white_win_msg,9,27,6
     DisplayStringGraphicMode seperation_line,15,25,7
-    DisplayStringGraphicMode first_name,12,25,8
+
+    movecursorlocation 25,8,0
+    DisplayString first_name
+
+    ;DisplayStringGraphicMode first_name,12,25,8
+    
     DisplayStringGraphicMode seperation_line,15,25,16
-    DisplayStringGraphicMode second_name,13,25,17
+    movecursorlocation 25,17,0
+    DisplayString second_name
+    ;DisplayStringGraphicMode second_name,13,25,17
     pusha
     mov ax,2c00h
     int 21h
@@ -1141,48 +1164,48 @@ MAIN PROC FAR
      DisplaynumberGraphicMode killWC,37,2
     cmp wkingdead,1
     jne wkingisalive
-    jmp far ptr whitekingdead
+    jmp far ptr RegularLoop
     wkingisalive:
     cmp bkingdead,1
     jne bkingisalive
-    jmp far ptr blackkingdead
+    jmp far ptr RegularLoop
     bkingisalive:
     popa
     ;//check for checkmate
     pusha
-    mov bx,0
-    mov bl,playertpye
-    ;/////////////////////////
-    cmp playertpye,0
-    jz checkforwhitemate
-    mov bx,028d
-    jmp checkforblackmate
-    checkforwhitemate:
-    mov bx,05d
-    checkforblackmate:
-    ;/////////////////////////
-    mov ax,chezznrev[bx]
-    mov cx,0
-    mov cl,ah
-    mov rowcheck,cx
-    mov cx,0
-    mov cl,al
-    mov colcheck,cx
-    ;checkformate playertpye,threat,rowcheck,colcheck,7
-    cmp threat,1
-    ;jne notcheckmateend
-    ;something needs to happen when his is checked
-    ; DisplayStringGraphicMode checkmate_msg,9,26,6
-    ; jmp checkmated
-    ; notcheckmateend:
-    ; DisplayStringGraphicMode empty_string,9,26,6
-    ; checkmated:
+    ; mov bx,0
+    ; mov bl,playertpye
+    ; ;/////////////////////////
+    ; cmp playertpye,0
+    ; jz checkforwhitemate
+    ; mov bx,028d
+    ; jmp checkforblackmate
+    ; checkforwhitemate:
+    ; mov bx,05d
+    ; checkforblackmate:
+    ; ;/////////////////////////
+    ; mov ax,chezznrev[bx]
+    ; mov cx,0
+    ; mov cl,ah
+    ; mov rowcheck,cx
+    ; mov cx,0
+    ; mov cl,al
+    ; mov colcheck,cx
+    ; ;checkformate playertpye,threat,rowcheck,colcheck,7
+    ; cmp threat,1
+    ; ;jne notcheckmateend
+    ; ;something needs to happen when his is checked
+    ; ; DisplayStringGraphicMode checkmate_msg,9,26,6
+    ; ; jmp checkmated
+    ; ; notcheckmateend:
+    ; ; DisplayStringGraphicMode empty_string,9,26,6
+    ; ; checkmated:
     popa
     ;//check for chekcmate end
     ;/////////////////////////drawing the object
-    drawrandomobject
+    ;drawrandomobject
     ;/////////////////////////
-
+    RegularLoop:
     updatetime
     pusha
     mov ax,2c00h
@@ -1212,15 +1235,23 @@ MAIN PROC FAR
     
     mov ah,0
     mov al,valueR
+    cmp goOutY,1
+    jne cont99
+    jmp far ptr finalext
     ;movecursorlocation 1,1,0
     ;Displaynumber 
-    call IN_GAME_CHATTING_recieve
+    
+    cont99:call IN_GAME_CHATTING_recieve
     
     jmp far ptr NoUpdate
     recCorr:cmp EXIST,4
     JE ContUpdate
     jmp far ptr NoUpdate
     ContUpdate:
+    cmp goOutY,1
+    jne cont999
+    jmp far ptr finalext
+    cont999:
     ;
     ; mov ax,selectedr
     ; Displaynumber
@@ -1235,6 +1266,16 @@ MAIN PROC FAR
     mov selectAtrec,al
     movepiece RecievedRNEW,RecievedCNEW,1
     ;-----------------------------------------------promote RecievedRNEW,RecievedCNEW
+    
+    cmp wkingdead,1
+    jne wkingisalive1
+    jmp far ptr whitekingdead
+    wkingisalive1:
+    cmp bkingdead,1
+    jne bkingisalive1
+    jmp far ptr blackkingdead
+    bkingisalive1:
+
     mov AvoidLp,1
     jmp far ptr Reselectp
     ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,selectedr,selectedc,success,begr,begc,endr,endc,res
@@ -1261,7 +1302,15 @@ MAIN PROC FAR
     jmp far ptr right
    ;/****************************************************************************************/
     doQ:
-    ;/****/ here error
+    ;/****/ check if game ended
+    cmp wkingdead,1
+    jne wkingisalive2
+    jmp far ptr whitekingdead
+    wkingisalive2:
+    cmp bkingdead,1
+    jne bkingisalive2
+    jmp far ptr blackkingdead
+    bkingisalive2:
 
     getdb prevR,prevC
     mov dx,0
@@ -1285,6 +1334,15 @@ MAIN PROC FAR
     push row
     push col
     movepiece row,col,0
+    
+    cmp wkingdead,1
+    jne wkingisalive3
+    jmp far ptr whitekingdead
+    wkingisalive3:
+    cmp bkingdead,1
+    jne bkingisalive3
+    jmp far ptr blackkingdead
+    bkingisalive3:
     ;------------------------------------------------------promote row,col
     pop col
     pop row
@@ -1402,6 +1460,11 @@ MAIN PROC FAR
     cmp ah,50H   ;down condition
     JE skipthis 
     
+    cmp ah,03Eh
+    jne rretmain
+    jmp far ptr finalext
+    rretmain:
+
     cmp ah,0Eh
     je chat
     cmp al,'Z'
@@ -1416,7 +1479,8 @@ MAIN PROC FAR
     Ascii3:cmp ah,39h
     jne retMain
     chat:call IN_GAME_CHATTING_send
-    retMain:jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
+    retMain:
+    jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
     skipthis:
     inc row
 
@@ -1558,22 +1622,66 @@ MAIN PROC FAR
     ;/****************************************************************************************/
     death1:
     ;Press any key to exit
-    DisplayStringGraphicMode black_win_msg,9,27,6
+    movecursorlocation 30,6,0
+    DisplayString black_win_msg
+    ;DisplayStringGraphicMode black_win_msg,9,27,6
     ssa:
-    mov ah,0
-    int 16h 
-    cmp ah,1
+    ;------**
+    mov ax,0
+    MOV AH,1;every time looping we check here whether a key was selected or not
+    INT 16h
+    jz noflush3
+    push ax
+    mov ah,0Ch
+    INT 21h
+    pop ax
+    noflush3:
+    ;-------**
+    cmp ah,03Eh
+    jne chkr
+    jmp far ptr finalext
+    chkr:
+    ;-----
+    call RECIEVE
+    cmp goOutY,1
     jne ssa
+
     push StackPB
     push StackPA
     ret
     death2:
-    DisplayStringGraphicMode white_win_msg,9,27,6
+    movecursorlocation 30,6,0
+    DisplayString white_win_msg
+    ;DisplayStringGraphicMode white_win_msg,9,27,6
     ssb:
-    mov ah,0
-    int 16h 
-    cmp ah,1
+    ;------**
+    mov ax,0
+    MOV AH,1;every time looping we check here whether a key was selected or not
+    INT 16h
+    jz noflush4
+    push ax
+    mov ah,0Ch
+    INT 21h
+    pop ax
+    noflush4:
+    ;-------** 
+    cmp ah,03EH
+    jne chkr2
+    jmp far ptr finalext
+    chkr2:
+    ;-----
+    call RECIEVE
+    mov ax,0
+    mov al,goOutY
+    cmp goOutY,1
     jne ssb
+    ;-----
+    push StackPB
+    push StackPA
+    ret
+    finalext:
+    	mov al,03Eh
+        call IN_GAME_CHATTING_send
     push StackPB
     push StackPA
     ret

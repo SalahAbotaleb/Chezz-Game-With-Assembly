@@ -44,6 +44,9 @@ disp5 db 150 dup('$')
 prevR db 7
 prevS db 0
 
+plocA DW 0
+plocB DW 0
+
 flush db 1
 F1F db 0
 F2F db 0
@@ -108,6 +111,9 @@ ret
 chatp endp
  
 gamep proc
+        pop plocA
+        pop plocB
+
         mov f1f,0
         cmp F2F,0
         je contp1
@@ -149,6 +155,8 @@ gamep proc
         GotoTextmode
         call endpros
         exitch1:
+        push plocB
+        push plocA
 ret
 gamep endp
 
