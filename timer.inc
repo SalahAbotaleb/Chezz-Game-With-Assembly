@@ -67,7 +67,7 @@ popa
 ENDM updatetime
 
 drawrandomobject macro
-local dontdraw,continuedraw1,continuedraw2
+local dontdraw,continuedraw1,continuedraw2,continuedraw3,continuedraw4,untillaemptyposarrives
 
 pusha
 cmp clockbalive,1
@@ -84,17 +84,29 @@ cmp ah,12
 ja continuedraw2
 jmp far ptr dontdraw
 continuedraw2:
-untillaemptyposarrives:
 ;drawandsetposition
 mov ax,2c00h
 int 21h
-mov al,dh
+; mov al,dh
+; mov ah,0
+; and al,0fh
+; add al,1
+; mov cx,7d
+; div cl
+; mov ah,cl
+; mov dl,dh
+; mov dh,0
+add dh,dl
+mov al,dl
 mov ah,0
-and al,0fh
-mov cx,7d
+mov cx,7
 div cl
-mov ah,cl
-mov dl,dh
+mov cl,ah
+mov ah,0
+mov al,dh
+mov bx,7
+div bl
+mov dl,ah
 mov dh,0
 ;dx row
 ;cx col
@@ -104,11 +116,14 @@ getdb tmpr,tmpc
 
 
 cmp chezzT[bx],-1
-jnz untillaemptyposarrives
+jz untillaemptyposarrives
+jmp far ptr dontdraw
+untillaemptyposarrives:
 mov clockbr,dl
 mov clockbc,cl
 mov clockbalive,1
-drawpowerup clockbr,clockbc
+drawpowerup
 dontdraw:
+
 popa
 endm drawrandomobject

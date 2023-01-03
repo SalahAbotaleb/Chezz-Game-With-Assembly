@@ -71,9 +71,10 @@ mov colx,ax
 ;this part is for the time bonus
 pusha
 getdb movr,movc
+mov ax,0
 cmp chezzT[BX],10h
 jae blacktimersetthere
-mov ax,blacktimer
+mov ax,whiteTimer
 jmp whitetimersetthere
 blacktimersetthere:
 mov ax,blacktimer
@@ -122,9 +123,11 @@ mov ax,col
 mov colx,ax
 ;this part is for the time bonus
 pusha
+getdb movr,movc
+mov ax,0
 cmp chezzT[BX],10h
 jae blacktimersethere
-mov ax,blacktimer
+mov ax,whitetimer
 jmp whitetimersethere
 blacktimersethere:
 mov ax,blacktimer
