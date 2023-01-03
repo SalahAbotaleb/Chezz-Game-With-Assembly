@@ -1203,7 +1203,7 @@ MAIN PROC FAR
     popa
     ;//check for chekcmate end
     ;/////////////////////////drawing the object
-    ;drawrandomobject
+    drawrandomobject
     ;/////////////////////////
     RegularLoop:
     updatetime
