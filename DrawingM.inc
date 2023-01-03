@@ -429,7 +429,6 @@ mov bx,coffset
 mov coffsetW,bx
 
 call DrawPieceW
-
 pop bx
 ENDM DrawPieceDB
 
@@ -1624,7 +1623,7 @@ popa
 ENDM kill
 
 replace MACRO oldr,oldc,newr,newc
-local sec,con,typ,typ2,setTimer,noset,white,blck,contRepl,set,whitetimersetthere,blacktimersetthere
+local sec,con,typ,typ2,setTimer,noset,white,blck,contRepl,set,whitetimersetthere,blacktimersetthere,donothing,checkclock1,checkclock2,checkclock3,checkclock4,ctypeb,ctypew
 ;-1 means empty location
 pusha
 
@@ -1678,24 +1677,30 @@ mov cl,chezzN[bx]
 mov bx,0
 mov bl,cl
 ;this part is for the time bonus
-pusha
+;pusha
+mov ax,0
+getdb newr,newc
 cmp chezzT[BX],10h
 jae blacktimersetthere
-mov ax,blacktimer
+mov ax,whitetimer
 jmp whitetimersetthere
 blacktimersetthere:
 mov ax,blacktimer
 whitetimersetthere:
-mov tmptimer,ax
-popa
-push ax
-mov ax,tmptimer
+;mov tmptimer,ax
+;popa
+;push ax
+;mov ax,tmptimer
 ;////////////////////////////////
+mov cl,chezzN[bx]
+mov bx,0
+mov bl,cl
 mov time[bx],al
-pop AX
+;pop AX
 ;;;;;;;;;;;;;;;both using it
 add bx,bx
 mov chezznrev[BX],dx
+;;;;;;;;;;;;;;;;;
 ;;;
 ; add bx,bx
 ; mov chezznrev[BX],dx
@@ -1782,8 +1787,42 @@ mov chezzP[si],-1
     Drawsquare oldc,oldr,begr,begc,res ;to be removed
     DrawPieceDB  PrimaryC,SecondaryC,0,0,currtype,newr,newc,begr,begc,endr,endc,res ;drawing the piece at the new location
     promote newr,newc
-
-
+    ;timer bonus part
+    
+    pusha
+    mov ax,0
+    cmp clockbalive,1
+    jz checkclock1
+    jmp far ptr donothing
+    checkclock1:
+    cmp clockkilled,0
+    jz checkclock4
+    jmp far ptr donothing
+    checkclock4:
+    mov al,clockbr
+    cmp ax,newr
+    jz checkclock2
+    jmp far ptr donothing
+    checkclock2:
+    mov al,clockbc
+    cmp ax,newc
+    jz checkclock3
+    jmp far ptr donothing
+    checkclock3:
+    ;the clock is taken
+    mov clockkilled,1
+    ;inc currtype
+    cmp currtype,0
+    jnz ctypew
+    jmp ctypeb
+    ctypew:
+    mov whitetimer,2
+    jmp far ptr donothing
+    ctypeb:
+    mov blacktimer,2
+    donothing:
+    popa
+;///////////////////////////////////////////////////
 popa
 ENDM replace
 
@@ -1812,7 +1851,7 @@ pop ax
 exitttt:
 ENDM drawtim
 
-drawpowerup macro clockbr,clockbc
+drawpowerup macro 
 local theultimateloopb1,theultimateloopb2,theultimateloopb3,theultimateloopb4,theultimateloopb5,theultimateloopb6,theultimateloopb7,theultimateloopb8,theultimateloopb9,theultimateloopb10,theultimateloopb11,theultimateloopb12
     pusha
     mov ax,0
@@ -1823,15 +1862,17 @@ local theultimateloopb1,theultimateloopb2,theultimateloopb3,theultimateloopb4,th
 
     mov ax,0
     mov al,clockbc
+    mov cx,25d
     mul cl
-    add cl,3
+    mov cx,ax
+    ;add cl,3
     ;mov cx,60 ;Column
     ;mov dx,120 ;Row
     mov al,powerupcolor ;Pixel color
 
     ;end of initial conditions
-    add cx,00
-    add dx,00
+    add cx,08
+    add dx,4h
     mov ah,0ch ;Draw Pixel Command
 
     mov bx,7

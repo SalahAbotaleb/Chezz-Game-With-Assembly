@@ -71,9 +71,10 @@ mov colx,ax
 ;this part is for the time bonus
 pusha
 getdb movr,movc
+mov ax,0
 cmp chezzT[BX],10h
 jae blacktimersetthere
-mov ax,blacktimer
+mov ax,whiteTimer
 jmp whitetimersetthere
 blacktimersetthere:
 mov ax,blacktimer
@@ -122,9 +123,11 @@ mov ax,col
 mov colx,ax
 ;this part is for the time bonus
 pusha
+getdb movr,movc
+mov ax,0
 cmp chezzT[BX],10h
 jae blacktimersethere
-mov ax,blacktimer
+mov ax,whitetimer
 jmp whitetimersethere
 blacktimersethere:
 mov ax,blacktimer
@@ -806,6 +809,9 @@ mov head,0
 popa
 ENDM deselectp
 
+
+
+;not working
 checkformate MACRO playertpye,threat,row,col,steps
     local lop,kingndown,kingn,exitup,exitdown,exitleft,exitright,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5,queennchup,queennchdown,rooknchup,rooknchdown,leaveall
 ;this macro checks if the king is in a threat or not
