@@ -129,7 +129,8 @@ whitetimer Dw 3
 tmptimer Dw 0
 ;;;;;;;;;;
 clockbr db 0
-clockbc db 1
+clockbc db 0
+clockkilled db 0
 clockbalive db 0
 powerupcolor db 1
 ;;;;;;;;;;
@@ -805,13 +806,64 @@ DrawPieceW PROC
     Drawtim passer
     pop ax
 
-    ;////////////////////
     exitw:
+    ;  ;/////////////////////part of the timer bonus
+    ; pusha
+    ; mov ax,0
+    ; mov al,clockbr
+    ; cmp ax,rowx
+    ; jz drawclock
+    ; jmp far ptr dontdrawclock
+    ; drawclock:
+    ; mov al,clockbc
+    ; cmp ax,colx
+    ; jz drawclock1
+    ; jmp far ptr dontdrawclock
+    ; drawclock1:
+    ; cmp clockbalive,1
+    ; jz drawclock2
+    ; jmp far ptr dontdrawclock
+    ; drawclock2:
+    ; cmp clockkilled,0
+    ; jz drawclock3
+    ; jmp far ptr dontdrawclock
+    ; drawclock3:
+    ; ;gototextmode
+    ; drawpowerup
+    ; dontdrawclock:
+    ; popa
+    ; ;////////////////////
     popa
     mov al,constPrim
     mov PrimaryC ,al
     mov al,constSec
     mov SecondaryC,al
+    ;/////////////////////part of the timer bonus
+    pusha
+    mov ax,0
+    mov al,clockbr
+    cmp ax,rowW
+    jz drawclock
+    jmp far ptr dontdrawclock
+    drawclock:
+    mov al,clockbc
+    cmp ax,colW
+    jz drawclock1
+    jmp far ptr dontdrawclock
+    drawclock1:
+    cmp clockbalive,1
+    jz drawclock2
+    jmp far ptr dontdrawclock
+    drawclock2:
+    cmp clockkilled,0
+    jz drawclock3
+    jmp far ptr dontdrawclock
+    drawclock3:
+    ;gototextmode
+    drawpowerup
+    dontdrawclock:
+    popa
+    ;////////////////////
     ret
 DrawPieceW ENDP
 
@@ -1078,7 +1130,7 @@ MAIN PROC FAR
 
 
     ;/******************test area***************************/
-        drawpowerup 4,4
+         ;drawpowerup 
          ;replace 6,7,5,4
          ;replace 6,3,2,3
 
@@ -1151,7 +1203,7 @@ MAIN PROC FAR
     popa
     ;//check for chekcmate end
     ;/////////////////////////drawing the object
-    ;drawrandomobject
+    drawrandomobject
     ;/////////////////////////
     RegularLoop:
     updatetime
