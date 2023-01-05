@@ -27,6 +27,8 @@ test3        DB  "Exit $"
 recievedinv1 DB "You Send and invitation to$"
 OTHER_NAME DB "Omar$"
 waitUntill DB ",The Other User is disconnedted, Please Connect$"
+FIRST_NAME DB 30 dup('$')
+SECOND_NAME DB 30 dup('$')
 disp db 150 dup('$')
 disp1 db 150 dup('$')
 disp2 db 150 dup('$')
@@ -72,7 +74,7 @@ recieveName1:
     mov al,INCOME_SIZE
     cmp bx,ax
     JNE contRec
-    jmp recieveName1
+    jmp exit2
 	contRec:
     mov dx , 3FDH		; Line Status Register
 	CHK1:	in al , dx 
@@ -188,7 +190,10 @@ mov dx , 3F8H		; Transmit data register
 mov  AX,6
 out dx , AX
 
-;call exchangeSize2
+call exchangeSize2
+mov INPUT_SIZE,15
+mov INCOME_SIZE,15
+
 call recieveName
 call sendName
 
@@ -235,7 +240,7 @@ mov ch, 1
 mov ah, 1
 int 10h ;remove the display of cursor
 concatStr CURR_NAME,waitUntill,disp
-;call RhandShake
+call RhandShake
 loopconnectOther:
 movecursorlocation 19h,7h,0h    ;moves cursor to the middle of the page 
 
@@ -266,8 +271,12 @@ call handshake
 jmp chckfirst
 firstTime:
 cmp initalF,2
-JNE sureFirst
+JNE sureSECO
 jmp looptillesc
+sureSECO:
+cmp initalF,1
+JNE sureFirst
+JMP looptillesc
 ;--scroll the screen--
 sureFirst:
 mov initalF,1
@@ -280,14 +289,20 @@ mov dl,79
 INT 10h 
 ;--end scroll the screen--
 
-;call exchangeSize1
+call exchangeSize1
+
+mov INPUT_SIZE,15
+mov INCOME_SIZE,15
+
 call sendName
 call recieveName
 
 ;---------
 looptillesc:;to keep lopping until the user press esc
 movecursorlocation 0,0d,0
-DisplayString INCOME_NAME
+filtername INCOME_NAME,second_name
+DisplayString second_name
+;DisplayString INCOME_NAME
 movecursorlocation 1,1d,0
 DisplayString CURR_NAME
 ;mov dx , 03F8H

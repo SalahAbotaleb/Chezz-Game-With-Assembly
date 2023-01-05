@@ -1,7 +1,9 @@
 ;DisplayString STR -----displays string location STR
+;DisplayStringGraphicMode ----- displays string location STR in graphics mode using string size and choosing which row and column
 ;ReadstringMsg PromptMsg,Outputloc----- takes string location promtmsg and displays it then ,puts it in location Outputloc
 ;Readstring Outputloc ----- puts string in location Outputloc
 ;Displaynumber ----- displays number stored in ax as decimal number
+;DisplaynumberGraphicMode ----- displays decimal number in graphics mode
 ;ReadNumberMsg PromptMsg,outputloc ----- read a number and stores in ax with a message PromptMsg,also puts it in location Outputloc as ascii
 ;ReadNumber outputloc ----- read a number and stores in ax with no message output,also puts it in location Outputloc as ascii,no output msg on screen
 ;printnewline ----- goes to the next line
@@ -18,6 +20,9 @@
 ;getcursorlocation MACRO ----- This function returns cursor location 
 ;printchar ----- print a character in text mode
 ;setCursor ----- sets cursor to a position x and y and pagenumber (0)
+;saveCursor ----- gets the cursor position and put it in initx & inity for sender & receiver
+;scrollupper ----- used to scroll the upper part (sender) by one line
+;scrolllower ----- used to scroll the lower part (receiver) by one line
 DisplayString MACRO STR
 push ax
 mov ah,9
@@ -25,6 +30,22 @@ mov dx,offset STR
 int 21h 
 pop ax
 ENDM STR
+
+DisplayStringGraphicMode MACRO STR,Size,Column,Row
+pusha
+mov si,@data;moves to si the location in memory of the data segment
+mov ah,13h;service to print string in graphic mode
+mov al,0;sub-service 0 all the characters will be in the same color(bl) and cursor position is not updated after the string is written
+mov bh,0;Display page
+mov bl,0Fh;color of the text
+mov cx,Size;size of string
+mov dl,Column
+mov dh,Row
+mov es,si;moves to es the location in memory of the data segment
+mov bp,offset STR;mov bp the offset of the string
+int 10h
+popa
+ENDM DisplayStringGraphicMode
 
 ReadstringMsg MACRO PromptMsg,Outputloc
 push ax
@@ -70,6 +91,61 @@ loop lbl2
 popa
 
 ENDM Displaynumber
+
+DisplaynumberGraphicMode Macro num,Column,Row
+local equalsixteen,unitth,lessnine,ENDDD
+pusha
+mov  dl, Column  
+mov  dh, Row   
+mov  bh, 0    ;Display page
+mov  ah, 02h  ;SetCursorPosition
+int  10h
+
+mov al, num
+cmp num, 9
+jbe lessnine
+cmp num, 16
+je equalsixteen
+
+mov  al, num
+shr  al, 3
+add  al, '0'
+mov  bl, 0Fh  ;Color is white
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
+jmp unitth
+
+equalsixteen:
+mov  al, num
+shr  al, 4
+add  al, '0'
+mov  bl, 0Fh  ;Color is white
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
+
+unitth: 
+inc dl
+mov  al, num
+sub  al, 10
+add  al, '0'
+mov  bl, 0Fh  ;Color is white
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
+jmp ENDDD
+
+lessnine: 
+mov  al, num
+add  al, '0'
+mov  bl, 0Fh  ;Color is white
+mov  bh, 0    ;Display page
+mov  ah, 0Eh  ;Teletype
+int  10h
+ENDDD:
+popa
+ENDM DisplaynumberGraphicMode
 
 ReadNumberMsg MACRO PromptMsg,outputloc ;read a number and stores in ax with a message output
 pusha
@@ -376,3 +452,214 @@ mov dl,x
 mov dh,y
 int 10h
 ENDM setCursor
+
+scrollupper MACRO
+pusha
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 0               ; attribute
+mov ch, 9              ; row top
+mov cl, 25               ; col left
+mov dh, 15             ; row bottom
+mov dl, 39              ; col right
+int 10h 
+popa
+ENDM scrollupper 
+
+
+scrolllower MACRO
+pusha
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 0               ; attribute
+mov ch, 18              ; row top
+mov cl, 25              ; col left
+mov dh, 24              ; row bottom
+mov dl, 39              ; col right
+int 10h 
+popa
+ENDM scrolllower
+
+saveCursorS MACRO
+pusha
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxS,dl
+mov inityS,dh
+popa
+ENDM saveCursorS  
+
+saveCursorR MACRO
+pusha
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxR,dl
+mov inityR,dh
+popa
+ENDM saveCursorR 
+
+setCursor MACRO x,y
+pusha
+mov ah,2
+mov bh,0
+mov dl,x
+mov dh,y
+int 10h
+popa
+ENDM setCursor
+
+printcharGraphics MACRO x,color
+pusha
+mov  al, x
+mov  bl, color
+mov  bh, 0    ;Display page
+mov  ah, 0Eh
+int  10h
+popa
+ENDM printcharGraphics
+
+printcharGraphicsR MACRO x,color
+pusha
+mov  al, x
+mov  bl, color
+mov  bh, 0    ;Display page
+mov  ah, 9
+mov cx,1
+int  10h
+popa
+ENDM printcharGraphicsR
+
+concatStr MACRO str1,str2,dest
+local newstr,newstr2,chck2,ext
+pusha
+mov si,0
+mov bx,0
+
+newstr:
+mov al,str1[si]
+mov dest[bx],al
+inc si
+inc bx
+mov al,0
+cmp str1[si],'$'
+je chck2
+cmp str1[si],13d
+je chck2
+jmp newstr
+chck2:
+
+mov dest[bx],' '
+inc bx
+mov si,0
+
+newstr2:
+mov al,str2[si]
+mov dest[bx],al
+inc si
+inc bx
+cmp str2[si],'$'
+je ext
+cmp str2[si],13d
+je ext
+jmp newstr2
+ext:
+popa
+endm concatStr
+
+filtername MACRO origin,dest
+local newstr,incr,Lcheck,ext,fext,repeat,goout
+mov si,0
+mov bx,0
+newstr2:
+mov al,origin[si]
+cmp al,64
+jbe incr
+mov dest[bx],al
+inc bx
+incr:inc si
+cmp origin[si],'$'
+je Lcheck
+ 
+jmp newstr2
+Lcheck:
+dec bx
+dec si
+mov al,dest
+cmp al,dest[bx]
+je ext
+mov al,dest[bx]
+mov si,bx
+dec si
+repeat:
+cmp si,-1
+je fext
+mov ah,dest[si]
+mov dest[bx],ah
+dec bx
+dec si
+jmp repeat
+ext:
+mov dest[bx],'$'
+jmp goout
+fext:
+mov dest[bx],al
+goout:
+ENDM
+
+scrollupperC MACRO
+   
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 7               ; attribute
+mov ch, 1               ; row top
+mov cl, 0               ; col left
+mov dh, 10              ; row bottom
+mov dl, 79              ; col right
+int 10h 
+  
+ENDM scrollupperC 
+
+scrolllowerC MACRO
+   
+mov ah, 6               
+mov al, 1               ; number of lines to scroll
+mov bh, 7               ; attribute
+mov ch, 13              ; row top
+mov cl, 0               ; col left
+mov dh, 22              ; row bottom
+mov dl, 79              ; col right
+int 10h 
+  
+ENDM scrolllowerC
+
+saveCursorSC MACRO
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxS,dl
+mov inityS,dh
+ENDM saveCursorSC
+
+saveCursorRC MACRO
+mov ah,3h
+mov bh,0h
+int 10h
+mov initxR,dl
+mov inityR,dh
+ENDM saveCursorRC
+
+setCursorC MACRO x,y
+mov ah,2
+mov bh,0
+mov dl,x
+mov dh,y
+int 10h
+ENDM setCursorC
+
+printcharC MACRO x
+mov ah,2          ; printing the char
+mov dl,x
+int 21h
+ENDM printcharC

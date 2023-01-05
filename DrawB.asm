@@ -6,8 +6,14 @@ EXTRN RecievedCOLD:WORD
 EXTRN RecievedRNEW:WORD
 EXTRN RecievedCNEW:WORD
 EXTRN Exist:BYTE
+EXTRN INPUT_NAME:BYTE
+EXTRN VALUER: BYTE
+EXTRN playertpye:BYTE
+EXTRN first_name:BYTE
+EXTRN second_name:BYTE
+EXTRN goOutY:BYTE
 
-PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW
+PUBLIC SendROLD,SendCOLD,SendRNEW,SendCNEW,main
 
 include mymacros.inc
 include DrawingM.inc
@@ -17,9 +23,10 @@ include timer.inc
 .286
 .Stack 64
 .Data
-org(1000)
 boardWidth EQU 200
 boardHeight EQU 200
+
+keystrokeF DB 0
 
 SendROLD DW -1
 SendCOLD DW -1
@@ -43,6 +50,7 @@ rowx DW 0
 colx DW 0
 
 killWC DB 0 ;counter for killed white
+
 killBC DB 0 ;counter for killed black
 
 prevR DW 0
@@ -58,6 +66,9 @@ wkingdead db 0
 bkingdead db 0
  
 threat db 0
+
+rowcheck DW 0
+colcheck DW 0
 
 chooseR DW 0
 chooseC DW 0
@@ -88,6 +99,9 @@ pieceh EQU 25
 PrimaryC DB 6h
 SecondaryC DB 7h
 
+constPrim DB 6h
+constSec DB 7h
+
 NUMCOLOR DB 0Bh;color for timer number
 backc DB 06h ;color for background of timer
 ;temp variables first general, second for row, tird for col
@@ -110,8 +124,16 @@ selectedc DW -1
 selected DB 0
 selectAtrec DB 0
 
-
-
+blacktimer DW 3
+whitetimer Dw 3
+tmptimer Dw 0
+;;;;;;;;;;
+clockbr db 0
+clockbc db 0
+clockkilled db 0
+clockbalive db 0
+powerupcolor db 1
+;;;;;;;;;;
 moveavailc DB 0Ah
 takeavailc db 4h 
 
@@ -137,7 +159,7 @@ kingData DB piecew*pieceh dup(0)
 soliderData DB piecew*pieceh dup(0)
 errormsg db 'canot laod image file$'
 
-;chezzP array of pointer for chezz pictures, chezzT array of type of each piece, chezzT array for chezz box color
+;chezzP array of pointer for chezz pictures, chezzT array of type of each piece, chezzC array for chezz box color
 chezzP DW 64 dup(-1)
 chezzT DB 64 dup(-1)
 chezzC DB 64 dup(-1)
@@ -145,11 +167,14 @@ chezzN DB 64 dup(-1) ;numbering of each piece
 chezznrev Dw 32 dup(-1) ;reverse numbering of each piece
 Timer  DB 32 dup(-1)
 time DB 32 dup(0) 
+
+timerBeg dw 0
+timerEnd dw 32
 ;0 to 15 black pieces
 ;16 to 31 white pieces
 ;cronologicaly from left to right and top to bottom
 ;///////////////////////////////////////////
-playertpye DB 0;0 for white 1 for Black
+;playertpye DB 1;0 for white 1 for Black
 ;probably serial port
 ;you need to set player type
 
@@ -174,6 +199,26 @@ endcW DW 0
 roffsetW DW 0
 coffsetW DW 0
 ;/*****************************************/
+
+status_msg DB "Status:-$"
+checkmate_msg DB "CheckMate$"
+black_win_msg DB 30 dup('$')
+white_win_msg DB 30 dup('$')
+win DB "Win$"
+black_killed_msg DB "Black Kill: $$$"
+white_killed_msg DB "White Kill: $$$"
+seperation_line DB "---------------$"
+notification_msg DB "Notification:-$"
+;first_name DB "First Name:-$"
+;second_name DB "Second Name:-$"
+Timer_Counter DB "Timer: $"
+empty_string DB "           $"
+
+VALUE  db ?     ;VALUE which will be sent or Received by user
+initxS db 25     ;initial position for sender column
+inityS db 9     ;initial position for sender row
+initxR db 25     ;initial position for receiver column
+inityR db 18    ;initial position for receiver row
 rowInitChezz DB ?
 colInitChezz DB  ?
 typeInitChezz DB ?
@@ -183,7 +228,16 @@ colorD DB ?
 rowD DW 0
 colD DW 0
 datalocD DW 0
+
+playtime DB 0
+playtimeS DB 0
+playtimeH DB 0
+counter DB 0
+
+promotflag DB 0
 ;/*****************************************/
+StackPA DW 0
+StackPB DW 0
 .Code
 
 ;/*****************************************/
@@ -191,6 +245,7 @@ datalocD DW 0
 Drawtimp PROC
 ; local num1,num2,num3,notnum1,notnum2,notnum3,lop1,lop2,lop3,lop22,lop33,lop23,lop32,lop12,lop13
 pusha
+    
     mov ax,tmpnumber
     cmp ax,1
     je num1
@@ -612,84 +667,11 @@ pusha
 
     notnum3:
     popa
+    exittt:
     ret;
 
 Drawtimp ENDP
-; ;/*******/
-; DrawPieceDW proc
-;     pusha
-;      ;***********Drawing the pixels
-;     mov ax,rowD
-;     mov cx,25d
-;     mul cl
-;     mov bx,ax
 
-;     mov ax,colD
-;     mul cl
-;     ;now we have begging stored at ax for colD begging
-;     ;and bx for rowD begging
-
-;     mov begr,0
-;     add begr,0
-;     add begr,bx
-
-;     mov begc,0
-;     add begc,0
-;     add begc,ax
-     
-;     mov endr,bx
-;     mov endc,ax
-
-;     add endr,25d
-;     add endc,25d
-
-;     mov cx,0
-;     mov ah,0
-;     mov ax,rowD
-;     mov bx,2
-;     div bl
-;     xor cl,ah
-
-;     mov ah,0
-;     mov ax,colD
-;     mov bx,2
-;     div bl
-;     xor cl,ah
-    
-;     mov res,cl
-
-
-;     mov BX , datalocD ; BL contains index at the current drawn pixel
-;     MOV CX,begc
-;     MOV DX,begr
-;     MOV AH,0ch
-;     drawLoopd:
-;     MOV AL,[BX]
-;     cmp al,5
-;     ja filterd
-;     cmp res,0
-;     jnz lblsecd 
-;     lblprimd:mov al,PrimaryC
-;     jmp contind
-;     lblsecd:mov al,SecondaryC
-;     jmp contind
-;     filterd: mov al,colorD
-;     contind:
-;     INT 10h 
-;     INC CX
-;     INC BX
-;     CMP CX,endc
-;     JNE drawLoopd 
-	
-;     MOV CX ,begc
-;     INC DX
-;     CMP DX ,endr
-;     JNE drawLoopd
-;     ;************end drawing the pixels
-;     popa
-; DrawPieceDW endp
-
-;/*******/
 DrawPieceW PROC
     ;local drawLoop,noerror,lblprim,lblsec,filter,contin,Nempty,exit,sec,con
     ;primaryC is primary Color for the board which is at top left coener 
@@ -701,6 +683,14 @@ DrawPieceW PROC
     ;roffset for row offset
     ;coffset for col offset
     pusha
+    getdb rowW,colW
+    cmp chezzC[bx],-1
+    je contDra
+    mov al,chezzC[bx]
+    mov PrimaryC,al
+    mov al,chezzC[bx]
+    mov SecondaryC,al
+    contDra:
     cmp rowW,0FFh
     jne nn
     ;returntoconsole
@@ -816,9 +806,64 @@ DrawPieceW PROC
     Drawtim passer
     pop ax
 
-    ;////////////////////
     exitw:
+    ;  ;/////////////////////part of the timer bonus
+    ; pusha
+    ; mov ax,0
+    ; mov al,clockbr
+    ; cmp ax,rowx
+    ; jz drawclock
+    ; jmp far ptr dontdrawclock
+    ; drawclock:
+    ; mov al,clockbc
+    ; cmp ax,colx
+    ; jz drawclock1
+    ; jmp far ptr dontdrawclock
+    ; drawclock1:
+    ; cmp clockbalive,1
+    ; jz drawclock2
+    ; jmp far ptr dontdrawclock
+    ; drawclock2:
+    ; cmp clockkilled,0
+    ; jz drawclock3
+    ; jmp far ptr dontdrawclock
+    ; drawclock3:
+    ; ;gototextmode
+    ; drawpowerup
+    ; dontdrawclock:
+    ; popa
+    ; ;////////////////////
     popa
+    mov al,constPrim
+    mov PrimaryC ,al
+    mov al,constSec
+    mov SecondaryC,al
+    ;/////////////////////part of the timer bonus
+    pusha
+    mov ax,0
+    mov al,clockbr
+    cmp ax,rowW
+    jz drawclock
+    jmp far ptr dontdrawclock
+    drawclock:
+    mov al,clockbc
+    cmp ax,colW
+    jz drawclock1
+    jmp far ptr dontdrawclock
+    drawclock1:
+    cmp clockbalive,1
+    jz drawclock2
+    jmp far ptr dontdrawclock
+    drawclock2:
+    cmp clockkilled,0
+    jz drawclock3
+    jmp far ptr dontdrawclock
+    drawclock3:
+    ;gototextmode
+    drawpowerup
+    dontdrawclock:
+    popa
+    ;////////////////////
     ret
 DrawPieceW ENDP
 
@@ -849,15 +894,73 @@ ret
 inittChezzW ENDP
 
 
+IN_GAME_CHATTING_recieve proc far
+    pusha
 
+    mov al,valueR
+    CMP al, 08h   ; check backpace
+    jz bckspace2
+    jmp ContLineR
+    bckspace2:
+    dec initxR
+    cmp initxR, 24d
+    JE backliner   ; check if it is the last column in the left, so that we don't remove parts of the board
+    setCursor initxR,inityR
+    printcharGraphicsR ' ',0h    ; to delete when backspacing
+    setCursor initxR,inityR
+    jmp IgnoreR
+
+    backliner:
+    cmp inityR,18
+    JNE contback
+    inc initxR
+    jmp IgnoreR
+    contback:
+    dec inityR
+    mov initxr,39d
+    setCursor 39d,inityR
+    printcharGraphicsR ' ',0h    ; to delete when backspacing
+    setCursor 39d,inityR
+    JMP IgnoreR
+
+    ContLineR:
+    setCursor initxR,inityR     ; setting the cursor after newlineR
+    printcharGraphicsR VALUEr, 0fh             ; printing the char
+    
+    inc initxR
+    cmp initxR,40d
+    JE resolveEnd
+    jmp IgnoreR
+    resolveEnd:
+    mov initxR,25d
+
+    cmp inityR,24d   ;check if the cursor is in the bottom of the lower screen to scrollup one line
+    jNE okY  ;just new line
+    scrolllower
+    mov initxR,25d
+    mov inityR,24d
+
+    jmp IgnoreR
+
+    okY:inc inityR
+    IgnoreR:
+    popa
+    ret
+IN_GAME_CHATTING_recieve ENDP
 MAIN PROC FAR
     MOV AX , @DATA
     MOV DS , AX
     MOV AH, 0
     MOV AL, 13h
     INT 10h
-    ;/*********/
-    ;intializations
+    pop StackPA
+    pop StackPB
+    deinitAll
+	;DrawBoard  PrimaryC,SecondaryC,boardFilename,Filehandle,boardData,boardHeight,boardWidth
+    
+
+
+
     ;1x for black 
     ;0x for white
     ;0 for king
@@ -963,7 +1066,75 @@ MAIN PROC FAR
     DrawPieceDB  PrimaryC,SecondaryC,0,0,0Fh,6,7,begr,begc,endr,endc,res
 
    
+    ;------------
+    cmp playertpye,0
+    je OTHER_NAMENF
+    jmp OTHER_NAMEF
+    OTHER_NAMENF:
+    concatStr first_name,win,white_win_msg
+    concatStr second_name,win,black_win_msg
+    jmp contPro
+    OTHER_NAMEF:
+    concatStr second_name,win,white_win_msg
+    concatStr first_name,win,black_win_msg
+    contPro:
+    ;-------------
+
+    DisplayStringGraphicMode status_msg,8,25,1
+    DisplayStringGraphicMode white_killed_msg,12,26,2
+    ;DisplaynumberGraphicMode killWC,37,2
+    DisplayStringGraphicMode black_killed_msg,12,26,3
+    DisplayStringGraphicMode Timer_Counter,7,26,5
+
+    ;DisplaynumberGraphicMode killBC,37,3
+    ;DisplayStringGraphicMode checkmate_msg,9,27,5
+    ;DisplayStringGraphicMode black_win_msg,9,27,6
+    ;DisplayStringGraphicMode white_win_msg,9,27,6
+    DisplayStringGraphicMode seperation_line,15,25,7
+
+    movecursorlocation 25,8,0
+    DisplayString first_name
+
+    ;DisplayStringGraphicMode first_name,12,25,8
     
+    DisplayStringGraphicMode seperation_line,15,25,16
+    movecursorlocation 25,17,0
+    DisplayString second_name
+    ;DisplayStringGraphicMode second_name,13,25,17
+    pusha
+    mov ax,2c00h
+    int 21h
+    ; mov playtimes,dh
+    ; mov playtimeH,Cl
+    mov Al,cl
+    mov bl,3Ch
+    mul bl
+    add Al,dh
+    mov playtime,al
+    popa
+    ;-------initializations
+
+    ; cmp playertpye,0
+
+    ; JE whiteb
+    ; jmp blck
+    ; whiteb:
+    ; mov timerBeg,16
+    ; mov timerend,32
+    ; jmp initEnd
+    ; blck:
+    ; mov timerBeg,0
+    ; mov timerend,16
+    initEnd:
+    ;-------
+
+
+    ;/******************test area***************************/
+         ;drawpowerup 
+         ;replace 6,7,5,4
+         ;replace 6,3,2,3
+
+    ;/******************end of test area***************************/
     
     ;/******************test area***************************/
         
@@ -981,75 +1152,106 @@ MAIN PROC FAR
     lea si,chezzP
     lea di,chezzT
     DrawPieceDB  0EH,0EH,0,0,0h,row,col,begr,begc,endr,endc,res
-
-
    ;/****************************************************************************************/
    CALL INITCONECT
    ;Q means the user wants to select
     Q:
-    ;saving king coordinates
-    ; pusha
-    ; mov ax,chezznrev[4h]
-    ; mov bx,00h
-    ; mov bl,ah
-    ; mov bkingr,bx
-    ; mov bl,al
-    ; mov bkingC,bx
-    ; mov ax,chezznrev[14h]
-    ; mov bx,00h
-    ; mov bl,ah
-    ; mov bkingr,bx
-    ; mov bl,al
-    ; mov bkingC,bx
-    
-    
-    ;
     ;check king dead condition
     pusha
+    mov keystrokeF,0
+      DisplaynumberGraphicMode killBC,37,3
+     ;;comment
+     DisplaynumberGraphicMode killWC,37,2
     cmp wkingdead,1
     jne wkingisalive
-    jmp far ptr whitekingdead
+    jmp far ptr RegularLoop
     wkingisalive:
     cmp bkingdead,1
     jne bkingisalive
-    jmp far ptr blackkingdead
+    jmp far ptr RegularLoop
     bkingisalive:
     popa
-    ;//check for chekcmate
+    ;//check for checkmate
     pusha
-    mov bx,0
-    mov bl,playertpye
-    shr bl,1
-    shr bl,1
-    shr bl,1
-    shr bl,1
-    add bl,5
-    mov ax,chezznrev[bx]
-    mov cx,0
-    mov cl,ah
-    mov roww,cx
-    mov cx,0
-    mov cl,al
-    mov colw,cx
-    ;checkformate playertpye,threat,roww,colw,7
-    ;cmp threat,1
-    jne notcheckmateend
-    ;something needs to happen when his is checked
-    ;gototextmode
-    notcheckmateend:
+    ; mov bx,0
+    ; mov bl,playertpye
+    ; ;/////////////////////////
+    ; cmp playertpye,0
+    ; jz checkforwhitemate
+    ; mov bx,028d
+    ; jmp checkforblackmate
+    ; checkforwhitemate:
+    ; mov bx,05d
+    ; checkforblackmate:
+    ; ;/////////////////////////
+    ; mov ax,chezznrev[bx]
+    ; mov cx,0
+    ; mov cl,ah
+    ; mov rowcheck,cx
+    ; mov cx,0
+    ; mov cl,al
+    ; mov colcheck,cx
+    ; ;checkformate playertpye,threat,rowcheck,colcheck,7
+    ; cmp threat,1
+    ; ;jne notcheckmateend
+    ; ;something needs to happen when his is checked
+    ; ; DisplayStringGraphicMode checkmate_msg,9,26,6
+    ; ; jmp checkmated
+    ; ; notcheckmateend:
+    ; ; DisplayStringGraphicMode empty_string,9,26,6
+    ; ; checkmated:
     popa
     ;//check for chekcmate end
-    ;////////////////////////
+    ;/////////////////////////drawing the object
+    drawrandomobject
+    ;/////////////////////////
+    RegularLoop:
     updatetime
+    pusha
+    mov ax,2c00h
+    int 21h
+
+    mov al,cl
+    mov bl,3Ch
+    mul bl
+    add al,dh
+    sub al,playtime
+    mov counter,al
+
+    movecursorlocation 33,5,0
+    mov ax,0
+    mov al,counter
+    Displaynumber
+    popa
      ;/**********/
     push selectedr
     push selectedc
     mov AvoidLp,0
+    mov exist,0
+    mov valueR,-1
     CALL RECIEVE
-    cmp EXIST,4
+    cmp valueR,-1
+    JE recCorr
+    
+    mov ah,0
+    mov al,valueR
+    cmp goOutY,1
+    jne cont99
+    jmp far ptr finalext
+    ;movecursorlocation 1,1,0
+    ;Displaynumber 
+    
+    cont99:call IN_GAME_CHATTING_recieve
+    
+    jmp far ptr NoUpdate
+    recCorr:cmp EXIST,4
     JE ContUpdate
     jmp far ptr NoUpdate
     ContUpdate:
+    cmp goOutY,1
+    jne cont999
+    jmp far ptr finalext
+    cont999:
     ;
     ; mov ax,selectedr
     ; Displaynumber
@@ -1063,26 +1265,52 @@ MAIN PROC FAR
     mov al,selected
     mov selectAtrec,al
     movepiece RecievedRNEW,RecievedCNEW,1
+    ;-----------------------------------------------promote RecievedRNEW,RecievedCNEW
+    
+    cmp wkingdead,1
+    jne wkingisalive1
+    jmp far ptr whitekingdead
+    wkingisalive1:
+    cmp bkingdead,1
+    jne bkingisalive1
+    jmp far ptr blackkingdead
+    bkingisalive1:
+
     mov AvoidLp,1
     jmp far ptr Reselectp
     ;choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,selectedr,selectedc,success,begr,begc,endr,endc,res
     ;/**********/
     NoUpdate:
+    mov ax,0
     MOV AH,1;every time looping we check here whether a key was selected or not
     INT 16h
     push ax
     jz noflush
     mov ah,0Ch
     INT 21h
+    mov keystrokeF,1
     
     noflush:
     pop ax
-    cmp ah,1Ch  ;press Q condition
+    ;****
+    ;cmp ah,3fH ; press Fn+F5 to start in game chatting
+    ;JNE skip
+    ;****
+    ;call IN_GAME_CHATTING
+    SKIP:cmp ah,1ch  ;press Q condition
     JE doQ
     jmp far ptr right
    ;/****************************************************************************************/
     doQ:
-    ;/****/ here error
+    ;/****/ check if game ended
+    cmp wkingdead,1
+    jne wkingisalive2
+    jmp far ptr whitekingdead
+    wkingisalive2:
+    cmp bkingdead,1
+    jne bkingisalive2
+    jmp far ptr blackkingdead
+    bkingisalive2:
 
     getdb prevR,prevC
     mov dx,0
@@ -1106,6 +1334,16 @@ MAIN PROC FAR
     push row
     push col
     movepiece row,col,0
+    
+    cmp wkingdead,1
+    jne wkingisalive3
+    jmp far ptr whitekingdead
+    wkingisalive3:
+    cmp bkingdead,1
+    jne bkingisalive3
+    jmp far ptr blackkingdead
+    bkingisalive3:
+    ;------------------------------------------------------promote row,col
     pop col
     pop row
     jmp far ptr DrawBckGnd ;need to be modified ;;
@@ -1133,6 +1371,7 @@ MAIN PROC FAR
     push row
     push col
     choosepiece PrimaryC,SecondaryC,chezzP,chezzT,chezzC,playertpye,moveavailc,takeavailc,chooseR,chooseC,success,begr,begc,endr,endc,res
+    ;updatetime
     pop col
     pop row
     cmp avoidlp,0
@@ -1220,6 +1459,27 @@ MAIN PROC FAR
     down:
     cmp ah,50H   ;down condition
     JE skipthis 
+    
+    cmp ah,03Eh
+    jne rretmain
+    jmp far ptr finalext
+    rretmain:
+
+    cmp ah,0Eh
+    je chat
+    cmp al,'Z'
+    ja Ascii2
+    cmp al,'A'
+    jae chat
+    ;jmp retMain
+    Ascii2:cmp al,'z'
+    ja Ascii3
+    cmp al,'a'
+    jae chat
+    Ascii3:cmp ah,39h
+    jne retMain
+    chat:call IN_GAME_CHATTING_send
+    retMain:
     jmp far ptr Q ;if no key is pressed here we go to the beggining of the loop again
     skipthis:
     inc row
@@ -1328,43 +1588,171 @@ MAIN PROC FAR
 
     ;black wins the game
     ;drawkingdead
-    pusha
-    mov cx,60 ;Column
-    mov dx,120 ;Row
-    mov al,5 ;Pixel color
-    mov ah,0ch ;Draw Pixel Command
-    theultimateloopb:int 10h 
-    inc cx
-    cmp cx,120
-    jne theultimateloopb
-    mov cx,60 ;Column
-    inc dx
-    cmp dx,150
-    jne theultimateloopb
-    popa
-    jmp far ptr death
+    ; pusha
+    ; mov cx,60 ;Column
+    ; mov dx,120 ;Row
+    ; mov al,5 ;Pixel color
+    ; mov ah,0ch ;Draw Pixel Command
+    ; theultimateloopb:int 10h 
+    ; inc cx
+    ; cmp cx,120
+    ; jne theultimateloopb
+    ; mov cx,60 ;Column
+    ; inc dx
+    ; cmp dx,150
+    ; jne theultimateloopb
+    ; popa
+    jmp far ptr death1
     ;/****************************************************************************************/
     ;black king dead
     blackkingdead:
-    pusha
-    mov cx,60 ;Column
-    mov dx,120 ;Row
-    mov al,3  ;Pixel color
-    mov ah,0ch ;Draw Pixel Command
-    theultimateloopw:int 10h 
-    inc cx
-    cmp cx,120
-    jne theultimateloopw
-    popa
-    jmp far ptr death
+    ; pusha
+    ; mov cx,60 ;Column
+    ; mov dx,120 ;Row
+    ; mov al,3  ;Pixel color
+    ; mov ah,0ch ;Draw Pixel Command
+    ; theultimateloopw:int 10h 
+    ; inc cx
+    ; cmp cx,120
+    ; jne theultimateloopw
+    ; popa
+    jmp far ptr death2
     ;white wins the game
 
     ;/****************************************************************************************/
-    death:
+    death1:
     ;Press any key to exit
-    mov  ah, 3eh
-    lea  bx, debugFilename
-    int  21h 
-    returntoconsole
+    movecursorlocation 30,6,0
+    DisplayString black_win_msg
+    ;DisplayStringGraphicMode black_win_msg,9,27,6
+    ssa:
+    ;------**
+    mov ax,0
+    MOV AH,1;every time looping we check here whether a key was selected or not
+    INT 16h
+    jz noflush3
+    push ax
+    mov ah,0Ch
+    INT 21h
+    pop ax
+    noflush3:
+    ;-------**
+    cmp ah,03Eh
+    jne chkr
+    jmp far ptr finalext
+    chkr:
+    ;-----
+    call RECIEVE
+    cmp goOutY,1
+    jne ssa
+
+    push StackPB
+    push StackPA
+    ret
+    death2:
+    movecursorlocation 30,6,0
+    DisplayString white_win_msg
+    ;DisplayStringGraphicMode white_win_msg,9,27,6
+    ssb:
+    ;------**
+    mov ax,0
+    MOV AH,1;every time looping we check here whether a key was selected or not
+    INT 16h
+    jz noflush4
+    push ax
+    mov ah,0Ch
+    INT 21h
+    pop ax
+    noflush4:
+    ;-------** 
+    cmp ah,03EH
+    jne chkr2
+    jmp far ptr finalext
+    chkr2:
+    ;-----
+    call RECIEVE
+    mov ax,0
+    mov al,goOutY
+    cmp goOutY,1
+    jne ssb
+    ;-----
+    push StackPB
+    push StackPA
+    ret
+    finalext:
+    	mov al,03Eh
+        call IN_GAME_CHATTING_send
+    push StackPB
+    push StackPA
+    ret
 MAIN ENDP
+
+
+IN_GAME_CHATTING_send proc near
+    pusha
+    mov value,al
+    CMP al, 08h   ; check backpace
+    jz bckspace2S
+    jmp ContLineS
+    bckspace2S:
+    dec initxS
+    cmp initxS, 24d
+    JE backlinerS   ; check if it is the last column in the left, so that we don't remove parts of the board
+    setCursor initxS,inityS
+    printcharGraphicsR ' ',0h    ; to delete when backspacing
+    setCursor initxS,inityS
+    jmp IgnoreS
+
+    backlinerS:
+    cmp inityS,9
+    JNE contbackS
+    inc initxS
+    jmp IgnoreS
+    contbackS:
+    dec inityS
+    mov initxS,39d
+    setCursor 39d,inityS
+    printcharGraphicsR ' ',0h    ; to delete when backspacing
+    setCursor 39d,inityS
+    JMP IgnoreS
+
+    ContLineS:
+    setCursor initxS,inityS    ; setting the cursor after newlineR
+    printcharGraphicsR VALUE, 0fh             ; printing the char
+    
+    inc initxS
+    cmp initxS,40d
+    JE resolveEndS
+    jmp IgnoreS
+    resolveEndS:
+    mov initxS,25d
+
+    cmp inityS,15d   ;check if the cursor is in the bottom of the lower screen to scrollup one line
+    jNE okYS  ;just new line
+    scrollupper
+    mov initxS,25d
+    mov inityS,15D
+
+    jmp IgnoreS
+
+    okYS:inc inityS  
+    IgnoreS:
+    ;Check that Transmitter Holding Register is Empty
+
+    mov dx,3FDH 		; Line Status Register
+    AGAIN:In al , dx 	;Read Line Status
+    and al , 00100000b
+    jz AGAIN          ; Not empty
+
+    ;If empty put the VALUE in Transmit data register
+
+    mov dx , 3F8H		; Transmit data register
+    mov al,VALUE        
+    out dx , al    
+
+    EXITT:
+    popa
+RET
+IN_GAME_CHATTING_send ENDP
+
 end main

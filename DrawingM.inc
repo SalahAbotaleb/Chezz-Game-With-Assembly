@@ -429,7 +429,6 @@ mov bx,coffset
 mov coffsetW,bx
 
 call DrawPieceW
-
 pop bx
 ENDM DrawPieceDB
 
@@ -1624,10 +1623,22 @@ popa
 ENDM kill
 
 replace MACRO oldr,oldc,newr,newc
-local sec,con,typ,typ2
+local sec,con,typ,typ2,setTimer,noset,white,blck,contRepl,set,whitetimersetthere,blacktimersetthere,donothing,checkclock1,checkclock2,checkclock3,checkclock4,ctypeb,ctypew,nwking,nbking
 ;-1 means empty location
 pusha
 
+pusha
+getdb newr,newc
+mov al,chezzT[bx]
+cmp al,00h
+jnz nwking
+mov wkingdead,1
+nwking:
+cmp al,10h
+jnz nbking
+mov bkingdead,1
+nbking:
+popa
 
 getdb oldr,oldc
 mov ax,0
@@ -1677,10 +1688,63 @@ getdb newr,newc
 mov cl,chezzN[bx]
 mov bx,0
 mov bl,cl
-
-mov time[bx],3
+;this part is for the time bonus
+;pusha
+mov ax,0
+getdb newr,newc
+cmp chezzT[BX],10h
+jae blacktimersetthere
+mov ax,whitetimer
+jmp whitetimersetthere
+blacktimersetthere:
+mov ax,blacktimer
+whitetimersetthere:
+;mov tmptimer,ax
+;popa
+;push ax
+;mov ax,tmptimer
+;////////////////////////////////
+mov cl,chezzN[bx]
+mov bx,0
+mov bl,cl
+mov time[bx],al
+;pop AX
+;;;;;;;;;;;;;;;both using it
 add bx,bx
 mov chezznrev[BX],dx
+;;;;;;;;;;;;;;;;;
+;;;
+; add bx,bx
+; mov chezznrev[BX],dx
+
+; getdb oldr,oldc
+; cmp playertpye,1
+
+; JE white
+; jmp blck
+; white:
+; cmp chezzT[BX],10h
+; jb settimer
+; jmp noset
+; blck:
+; cmp chezzT[BX],10h
+; jae setTimer
+; jmp noSet
+
+; setTimer:
+
+; getdb newr,newc
+; mov cl,chezzN[bx]
+; mov bx,0
+; mov bl,cl
+; mov time[bx],3
+; jmp set
+
+; noset:
+; popa
+; jmp contRepl
+
+; set:
 popa
 ;under checking
 ;;;///////////////////////
@@ -1696,13 +1760,16 @@ mov Timer[bx],dh
 popa
 
 
-
+contRepl:
 getdw oldr,oldc
 mov si,bx
 getdw newr,newc
 mov cx,chezzP[si]
 mov chezzP[bx],cx
 mov chezzP[si],-1
+;trying promotion
+
+
 ;/*****end replacing data*****/
     mov cx,0
     mov ah,0
@@ -1731,19 +1798,197 @@ mov chezzP[si],-1
     con:mov res,al
     Drawsquare oldc,oldr,begr,begc,res ;to be removed
     DrawPieceDB  PrimaryC,SecondaryC,0,0,currtype,newr,newc,begr,begc,endr,endc,res ;drawing the piece at the new location
+    promote newr,newc
+    ;timer bonus part
     
-
-
+    pusha
+    mov ax,0
+    cmp clockbalive,1
+    jz checkclock1
+    jmp far ptr donothing
+    checkclock1:
+    cmp clockkilled,0
+    jz checkclock4
+    jmp far ptr donothing
+    checkclock4:
+    mov al,clockbr
+    cmp ax,newr
+    jz checkclock2
+    jmp far ptr donothing
+    checkclock2:
+    mov al,clockbc
+    cmp ax,newc
+    jz checkclock3
+    jmp far ptr donothing
+    checkclock3:
+    ;the clock is taken
+    mov clockkilled,1
+    ;inc currtype
+    cmp currtype,0
+    jnz ctypew
+    jmp ctypeb
+    ctypew:
+    mov whitetimer,2
+    jmp far ptr donothing
+    ctypeb:
+    mov blacktimer,2
+    donothing:
+    popa
+;///////////////////////////////////////////////////
 popa
 ENDM replace
 
 
 drawtim MACRO number
+local exitttt,contDraw,blckx
 ;this was a macro now it only cals the proc
+getdb rowx,colx
+    cmp playertpye,0
+
+    JNE blckx
+    cmp chezzT[BX],10h
+    jb contDraw
+    jmp far ptr exitttt
+    blckx:
+    cmp chezzT[BX],10h
+    jae contDraw
+    jmp far ptr exitttt
+
+    contDraw:
 push ax 
 mov ax,number
 mov tmpnumber,ax
 call Drawtimp 
 pop ax
+exitttt:
 ENDM drawtim
 
+drawpowerup macro 
+local theultimateloopb1,theultimateloopb2,theultimateloopb3,theultimateloopb4,theultimateloopb5,theultimateloopb6,theultimateloopb7,theultimateloopb8,theultimateloopb9,theultimateloopb10,theultimateloopb11,theultimateloopb12
+    pusha
+    mov ax,0
+    mov al,clockbr
+    mov cx,25d
+    mul cl
+    mov dx,ax
+
+    mov ax,0
+    mov al,clockbc
+    mov cx,25d
+    mul cl
+    mov cx,ax
+    ;add cl,3
+    ;mov cx,60 ;Column
+    ;mov dx,120 ;Row
+    mov al,powerupcolor ;Pixel color
+
+    ;end of initial conditions
+    add cx,08
+    add dx,4h
+    mov ah,0ch ;Draw Pixel Command
+
+    mov bx,7
+    theultimateloopb1:int 10h 
+    inc cx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb1
+
+    mov bx,5
+    theultimateloopb2:int 10h 
+    inc cx
+    int 10h 
+    inc dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb2
+
+    mov bx,7
+    theultimateloopb3:int 10h 
+    inc dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb3
+
+    mov bx,5
+    theultimateloopb4:int 10h 
+    dec cx
+    int 10h 
+    inc dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb4
+
+    mov bx,7
+    theultimateloopb5:int 10h 
+    dec cx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb5    
+
+    mov bx,5
+    theultimateloopb6:int 10h 
+    dec cx
+    int 10h 
+    dec dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb6
+
+    mov bx,7
+    theultimateloopb7:int 10h 
+    dec dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb7
+
+    mov bx,5
+    theultimateloopb8:int 10h 
+    inc cx
+    int 10h 
+    dec dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb8
+    ;;;;the plus sign
+
+    add dx,8
+    sub cx,3
+    
+    mov bx,14
+    theultimateloopb9:int 10h 
+    inc cx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb9   
+
+    inc dx
+    dec cx
+    mov bx,14
+    theultimateloopb10:int 10h 
+    dec cx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb10  
+
+    add dx,6d
+    add cx,8d
+
+    mov bx,14
+    theultimateloopb11:int 10h 
+    dec dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb11  
+
+    inc dx
+    dec cx
+    mov bx,14
+    theultimateloopb12:int 10h 
+    inc dx
+    dec bx
+    cmp bx,0
+    jnz theultimateloopb12  
+    
+    popa
+ENDM drawpowerup

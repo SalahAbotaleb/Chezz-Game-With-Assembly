@@ -2,7 +2,7 @@ include DrawingM.inc
 include mymacros.inc
 
 movepiece MACRO row,col,RecievedFlag
-local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7
+local lbl,sec,con,exit,cont1,resume,dexit,fexit,cont3,cont2,cont4,CONT6,white,black,movValidate,ChangeRecieved,SendData,cont5,cont7,anotherr,ccc,cont9,blck,disptimer,nopromotion,blacktimersethere,blacktimersetthere,whitetimersethere,whitetimersetthere
 pusha
 ;RecievedFlag if 1  then skip validations and go replace it directly
 ;----
@@ -68,12 +68,26 @@ mov ax,row
 mov rowx,ax
 mov ax,col
 mov colx,ax
-Drawtim 3
+;this part is for the time bonus
+pusha
+getdb movr,movc
+mov ax,0
+cmp chezzT[BX],10h
+jae blacktimersetthere
+mov ax,whiteTimer
+jmp whitetimersetthere
+blacktimersetthere:
+mov ax,blacktimer
+whitetimersetthere:
+mov tmptimer,ax
+popa
+;////////////////////////////////
+Drawtim tmptimer;;;;;;
 pop ax
 jmp far ptr SendData
 cont2:
 cmp ax,0AH
-ja black
+jae black
 jmp far ptr white
 black:
 ;now the one to be killed is balck
@@ -89,12 +103,39 @@ kill movr,movc
 cont3: 
 ;replace and timer
 replace selectedr,selectedc,movr,movc
+getdb movr,movc
+cmp playertpye,0
+
+JNE blck
+cmp chezzT[BX],10h
+jb disptimer
+jmp SendData
+blck:
+cmp chezzT[BX],10h
+jae disptimer
+jmp SendData
+
+disptimer:
 push ax
 mov ax,row
 mov rowx,ax
 mov ax,col
 mov colx,ax
-Drawtim 3
+;this part is for the time bonus
+pusha
+getdb movr,movc
+mov ax,0
+cmp chezzT[BX],10h
+jae blacktimersethere
+mov ax,whitetimer
+jmp whitetimersethere
+blacktimersethere:
+mov ax,blacktimer
+whitetimersethere:
+mov tmptimer,ax
+popa
+;////////////////////////////////
+Drawtim tmptimer;;;;;;;
 pop ax
 SendData:
 ;/******/
@@ -141,13 +182,36 @@ jmp far ptr exit
 ChangeRecieved:
 ; mov al,selected
 ; mov selectAtrec,al
-replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
-deselectp
+getdb RecievedRNEW,RecievedCNEW
+mov al,chezzT[bx]
+cmp al,-1
+jne cont9
+jmp far ptr ccc
+cont9:
+mov al,playertpye
+cmp al,1
+jne anotherr
+inc killbc
+jmp ccc
+anotherr:
+inc killwc
+ccc:replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
 ; pop selectedc
 ; cmp selectedc,-1
 ; push selectedc
 ; je exit
 ; mov selected,1
+mov ax,selectedr
+xor RecievedRNEW,ax
+mov ax,selectedc
+xor RecievedCNEW,ax
+mov ax,RecievedCNEW
+
+deselectp
+or ax,RecievedRNEW
+JNZ exit
+mov selected,0
+mov selectAtrec,0
 jmp far ptr exit
 ;cont7:
 ;replace RecievedROLD,RecievedCOLD,RecievedRNEW,RecievedCNEW
@@ -745,384 +809,571 @@ mov head,0
 popa
 ENDM deselectp
 
-checkformate MACRO playertpye,threat,row,col,steps
-    local lop,kingndown,kingn,exitup,exitdown,exitleft,exitright,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5,queennchup,queennchdown,rooknchup,rooknchdown,leaveall
-;this macro checks if the king is in a threat or not
-;check above
-;//up///////////////////////////////////////////////////////
-;///////////////////////////////////////////////////////////
-pusha
-mov threat,0
+; checkformate MACRO playertpye,threat,row,col,steps
+;     local lop,kingndown,kingn,exitup,exitdown,exitleft,exitright,validate,typ,typ2,highlightg,highlightr,typn,typn2,cont1,cont2,cont3,cont4,cont5,queennchup,queennchdown,rooknchup,rooknchdown,leaveall
+; ;this macro checks if the king is in a threat or not
+; ;check above
+; ;//up///////////////////////////////////////////////////////
+; ;///////////////////////////////////////////////////////////
+; pusha
+; mov threat,0
+; getdb row,col
+; mov ax,0
+; mov al,chezzT[bx]
+; cmp ax,0Ah
+; ja typup ;to be removed if needed
+; mov currtype,0
+; jmp typ2up
+; typup:
+; mov currtype,1
+; typ2up:
+; mov dx,0 ;counter
+; mov cx,row
+; mov ax,col
+; lopup:
+; dec cx
+; cmp cx,0
+; jae cont1up
+; jmp far ptr exitup
+
+; cont1up:
+; cmp cx,8
+; jb cont2up
+; jmp far ptr exitup
+
+; cont2up:
+; cmp ax,0
+; jae cont3up
+; jmp far ptr exitup
+
+; cont3up:
+; cmp ax,8
+; jb cont4up
+; jmp far ptr exitup
+
+; cont4up:
+; mov tmpr,cx
+; mov tmpc,ax
+
+; getdb tmpr,tmpc
+
+; mov ax,0
+; mov al,chezzT[bx]
+; ; cmp al,-1
+; ; jne cont5
+; ; jmp far ptr highlightG
+; ; cont5:
+; cmp ax,0Ah
+; ja typnup ;to be removed if needed
+; mov nexttype,0
+; jmp typn2up
+; typnup:
+; mov nexttype,1
+; typn2up:
+; mov bx,0
+; mov bl,currtype
+; mov bh,nexttype
+; xor bl,bh
+; cmp bl,0
+
+; jne highlightRup
+; jmp far ptr exitup
+; highlightRup:
+; getdb tmpr,tmpc
+; mov chezzC[bx],4h
+; mov al,chezzT[bx]
+; and al,0fh
+; cmp al,1
+; jz queennchup
+; mov threat,1
+; jmp far ptr leaveall 
+; queennchup:
+; cmp al,2
+; jz rooknchup
+; mov threat,1
+; jmp far ptr leaveall 
+; rooknchup:
+; cmp dx,1
+; jne kingnup
+; cmp al,0
+; jnz kingnup
+; mov threat,1
+; jmp far ptr leaveall 
+; kingnup:
+; inc dx
+; cmp dx,steps
+; je exitup
+; jmp far ptr lopup
+; exitup:
+
+; ;/down///////////////////////////////////////////////////////////////////////////
+; ;///////////////////////////////////////////////////////////////////////////////
+; pusha
+; mov threat,0
+; getdb row,col
+; mov ax,0
+; mov al,chezzT[bx]
+; cmp ax,0Ah
+; ja typdown ;to be removed if needed
+; mov currtype,0
+; jmp typ2down
+; typdown:
+; mov currtype,1
+; typ2down:
+; mov dx,0 ;counter
+; mov cx,row
+; mov ax,col
+; lopdown:
+; inc cx
+; cmp cx,0
+; jae cont1down
+; jmp far ptr exitdown
+
+; cont1down:
+; cmp cx,8
+; jb cont2down
+; jmp far ptr exitdown
+
+; cont2down:
+; cmp ax,0
+; jae cont3down
+; jmp far ptr exitdown
+
+; cont3down:
+; cmp ax,8
+; jb cont4down
+; jmp far ptr exitdown
+
+; cont4down:
+; mov tmpr,cx
+; mov tmpc,ax
+
+; getdb tmpr,tmpc
+
+; mov ax,0
+; mov al,chezzT[bx]
+; ; cmp al,-1
+; ; jne cont5
+; ; jmp far ptr highlightG
+; ; cont5:
+; cmp ax,0Ah
+; ja typndown ;to be removed if needed
+; mov nexttype,0
+; jmp typn2down
+; typndown:
+; mov nexttype,1
+; typn2down:
+; mov bx,0
+; mov bl,currtype
+; mov bh,nexttype
+; xor bl,bh
+; cmp bl,0
+
+; jne highlightRdown
+; jmp far ptr exitdown
+; highlightRdown:
+; getdb tmpr,tmpc
+; mov chezzC[bx],4h
+; mov al,chezzT[bx]
+; and al,0fh
+; cmp al,1
+; jz queennchdown
+; mov threat,1
+; jmp far ptr leaveall 
+; queennchdown:
+; cmp al,2
+; jz rooknchdown
+; mov threat,1
+; jmp far ptr leaveall 
+; rooknchdown:
+; cmp dx,1
+; jne kingndown
+; cmp al,0
+; jnz kingndown
+; mov threat,1
+; jmp far ptr leaveall 
+; kingndown:
+; inc dx
+; cmp dx,steps
+; je exitdown
+; jmp far ptr lopdown
+; exitdown:
+
+; ;/left///////////////////////////////////////////////////////////////////////////
+; ;///////////////////////////////////////////////////////////////////////////////
+; pusha
+; mov threat,0
+; getdb row,col
+; mov ax,0
+; mov al,chezzT[bx]
+; cmp ax,0Ah
+; ja typleft ;to be removed if needed
+; mov currtype,0
+; jmp typ2left
+; typleft:
+; mov currtype,1
+; typ2left:
+; mov dx,0 ;counter
+; mov cx,row
+; mov ax,col
+; lopleft:
+; dec ax
+; cmp ax,0
+; jae cont1left
+; jmp far ptr exitleft
+
+; cont1left:
+; cmp ax,8
+; jb cont2left
+; jmp far ptr exitleft
+
+; cont2left:
+; cmp cx,0
+; jae cont3left
+; jmp far ptr exitleft
+
+; cont3left:
+; cmp cx,8
+; jb cont4left
+; jmp far ptr exitleft
+
+; cont4left:
+; mov tmpr,cx
+; mov tmpc,ax
+
+; getdb tmpr,tmpc
+
+; mov ax,0
+; mov al,chezzT[bx]
+; ; cmp al,-1
+; ; jne cont5
+; ; jmp far ptr highlightG
+; ; cont5:
+; cmp ax,0Ah
+; ja typnleft;to be removed if needed
+; mov nexttype,0
+; jmp typn2left
+; typnleft:
+; mov nexttype,1
+; typn2left:
+; mov bx,0
+; mov bl,currtype
+; mov bh,nexttype
+; xor bl,bh
+; cmp bl,0
+
+; jne highlightRleft
+; jmp far ptr exitleft
+; highlightRleft:
+; getdb tmpr,tmpc
+; mov chezzC[bx],4h
+; mov al,chezzT[bx]
+; and al,0fh
+; cmp al,1
+; jz queennchleft
+; mov threat,1
+; jmp far ptr leaveall 
+; queennchleft:
+; cmp al,2
+; jz rooknchleft
+; mov threat,1
+; jmp far ptr leaveall 
+; rooknchleft:
+; cmp dx,1
+; jne kingnleft
+; cmp al,0
+; jnz kingnleft
+; mov threat,1
+; jmp far ptr leaveall 
+; kingnleft:
+; inc dx
+; cmp dx,steps
+; je exitleft
+; jmp far ptr lopleft
+; exitleft:
+; ;/right///////////////////////////////////////////////////////////////////////////
+; ;///////////////////////////////////////////////////////////////////////////////
+; pusha
+; mov threat,0
+; getdb row,col
+; mov ax,0
+; mov al,chezzT[bx]
+; cmp ax,0Ah
+; ja typright ;to be removed if needed
+; mov currtype,0
+; jmp typ2right
+; typright:
+; mov currtype,1
+; typ2right:
+; mov dx,0 ;counter
+; mov cx,row
+; mov ax,col
+; lopright:
+; inc ax
+; cmp ax,0
+; jae cont1right
+; jmp far ptr exitright
+
+; cont1right:
+; cmp ax,8
+; jb cont2right
+; jmp far ptr exitright
+
+; cont2right:
+; cmp cx,0
+; jae cont3right
+; jmp far ptr exitright
+
+; cont3right:
+; cmp cx,8
+; jb cont4right
+; jmp far ptr exitright
+
+; cont4right:
+; mov tmpr,cx
+; mov tmpc,ax
+
+; getdb tmpr,tmpc
+
+; mov ax,0
+; mov al,chezzT[bx]
+; ; cmp al,-1
+; ; jne cont5
+; ; jmp far ptr highlightG
+; ; cont5:
+; cmp ax,0Ah
+; ja typnright ;to be removed if needed
+; mov nexttype,0
+; jmp typn2right
+; typnright:
+; mov nexttype,1
+; typn2right:
+; mov bx,0
+; mov bl,currtype
+; mov bh,nexttype
+; xor bl,bh
+; cmp bl,0
+
+; jne highlightRright
+; jmp far ptr exitright
+; highlightRright:
+; getdb tmpr,tmpc
+; mov chezzC[bx],4h
+; mov al,chezzT[bx]
+; and al,0fh
+; cmp al,1
+; jz queennchright
+; mov threat,1
+; jmp far ptr leaveall 
+; queennchright:
+; cmp al,2
+; jz rooknchright
+; mov threat,1
+; jmp far ptr leaveall 
+; rooknchright:
+; cmp dx,1
+; jne kingnright
+; cmp al,0
+; jnz kingnright
+; mov threat,1
+; jmp far ptr leaveall 
+; kingnright:
+; inc dx
+; cmp dx,steps
+; je exitright
+; jmp far ptr lopright
+; exitright:
+
+
+
+; leaveall:
+; popa
+
+; ENDM
+
+deinitAll MACRO 
+local lbl1,lbl2,lbl3
+mov goOutY,0
+mov keystrokeF , 0
+
+mov SendROLD , -1
+mov SendCOLD , -1
+
+mov SendRNEW , -1
+mov SendCNEW , -1
+
+mov begr , 0
+mov begc , 0
+mov endr , 0
+mov endc , 0
+mov res , 0
+
+mov tmpx , 0
+mov tmpy , 0
+
+mov row , 0
+mov col , 0
+
+mov rowx , 0
+mov colx , 0
+
+mov killWC , 0 ;counter for killed white
+
+mov killBC , 0 ;counter for killed black
+
+mov prevR , 0
+mov prevC , 0
+
+mov wkingR , 0
+mov wkingC , 0
+
+mov bkingR , 0
+mov bkingC , 0
+
+mov wkingdead , 0
+mov bkingdead , 0
+ 
+mov threat , 0
+
+mov chooseR , 0
+mov chooseC , 0
+
+mov NUMCOLOR , 0Bh;color for timer number
+mov backc , 06h ;color for background of timer
+;temp variables first general, second for row, tird for col
+mov tmpdb , 0
+mov tmpdbr , 0
+mov tmpdbc , 0
+mov tmptype , 0
+mov currtype , 0
+mov nexttype , 0
+mov tmpr , 0
+mov tmpc , 0
+mov movr , 0
+mov movc , 0
+mov tmpdb2 , 0
+mov tmpnumber , 0h  ;number for timer put number in this variable before calling timer function proc
+mov passer , 0h ;variable to be passed to procs
+;selected variables and colors
+mov selectedr , -1
+mov selectedc , -1
+mov selected , 0
+mov selectAtrec , 0
+mov moveavailc , 0Ah
+mov takeavailc , 4h 
+
+mov success , 0 ;0 for fail 1 for success
+mov AvoidLp , 0
+mov head , 0
+mov VALUE  , 0     ;VALUE which will be sent or Received by user
+mov initxS , 25     ;initial position for sender column
+mov inityS , 9     ;initial position for sender row
+mov initxR , 25     ;initial position for receiver column
+mov inityR , 18    ;initial position for receiver row
+mov rowInitChezz , 0
+mov colInitChezz ,  0
+mov typeInitChezz , 0
+mov picInitChezz   , 0
+;/*****************************************/
+mov colorD , 0
+mov rowD , 0
+mov colD , 0
+mov datalocD , 0
+
+mov playtime , 0
+mov playtimeS , 0
+mov playtimeH , 0
+mov counter , 0
+;/*****************************************/
+; chezzP DW 64 dup(-1)
+; chezzT DB 64 dup(-1)
+; chezzC DB 64 dup(-1)
+; chezzN DB 64 dup(-1) ;numbering of each piece
+; chezznrev Dw 32 dup(-1) ;reverse numbering of each piece
+; Timer  DB 32 dup(-1)
+; time DB 32 dup(0) 
+
+mov si,0
+mov cx,128
+lbl3:
+mov chezzP[si],-1
+inc si
+loop lbl3
+
+mov si,0
+mov cx,64
+lbl1:
+mov chezzT[si],-1
+mov chezzC[si],-1
+mov chezzN[si],-1
+mov chezzNrev[si],-1
+inc si
+loop lbl1
+
+
+mov si,0
+mov cx,32
+lbl2:
+mov Timer[si],-1
+mov Time[si],0
+inc si
+loop lbl2
+
+mov blacktimer ,3
+mov whitetimer , 3
+mov tmptimer , 0
+;;;;;;;;;;
+mov clockbr ,0
+mov clockbc , 0
+mov clockkilled, 0
+mov clockbalive , 0
+mov powerupcolor , 1
+
+ENDM deinitAll
+
+
+promote macro row,col
+local nopromotion,promotion1,promotion2,mightpromomte,promotion3
+;//////////////////////////////////////////
+;check for promotion
+;ispawn?
 getdb row,col
-mov ax,0
-mov al,chezzT[bx]
-cmp ax,0Ah
-ja typup ;to be removed if needed
-mov currtype,0
-jmp typ2up
-typup:
-mov currtype,1
-typ2up:
-mov dx,0 ;counter
-mov cx,row
-mov ax,col
-lopup:
-dec cx
-cmp cx,0
-jae cont1up
-jmp far ptr exitup
-
-cont1up:
-cmp cx,8
-jb cont2up
-jmp far ptr exitup
-
-cont2up:
-cmp ax,0
-jae cont3up
-jmp far ptr exitup
-
-cont3up:
-cmp ax,8
-jb cont4up
-jmp far ptr exitup
-
-cont4up:
-mov tmpr,cx
-mov tmpc,ax
-
-getdb tmpr,tmpc
-
-mov ax,0
-mov al,chezzT[bx]
-; cmp al,-1
-; jne cont5
-; jmp far ptr highlightG
-; cont5:
-cmp ax,0Ah
-ja typnup ;to be removed if needed
-mov nexttype,0
-jmp typn2up
-typnup:
-mov nexttype,1
-typn2up:
-mov bx,0
-mov bl,currtype
-mov bh,nexttype
-xor bl,bh
-cmp bl,0
-
-jne highlightRup
-jmp far ptr exitup
-highlightRup:
-getdb tmpr,tmpc
-mov chezzC[bx],4h
 mov al,chezzT[bx]
 and al,0fh
-cmp al,1
-jz queennchup
-mov threat,1
-jmp far ptr leaveall 
-queennchup:
-cmp al,2
-jz rooknchup
-mov threat,1
-jmp far ptr leaveall 
-rooknchup:
-cmp dx,1
-jne kingnup
-cmp al,0
-jnz kingnup
-mov threat,1
-jmp far ptr leaveall 
-kingnup:
-inc dx
-cmp dx,steps
-je exitup
-jmp far ptr lopup
-exitup:
+cmp al,5
+jz promotion1
+jmp far ptr nopromotion
+promotion1:
+cmp row,0
+jz promotion2
+jmp far ptr mightpromomte
+promotion2:
+;///////////////////white promote to queen
+mov promotflag,1
+mov al,chezzT[BX]
+sub al,4
+mov chezzT[bx],al
+mov ax,chezzP[bx]
+mov ax,offset queenData;//might not work
+add bx,bx
+mov chezzP[bx],ax
+DrawPieceDB PrimaryC,SecondaryC,0,0,0Fh,row,col,begr,begc,endr,endc,res ;drawing the piece at the new location
+jmp far ptr nopromotion
+mightpromomte:
+cmp row,7
+jz promotion3
+jmp far ptr nopromotion
 
-;/down///////////////////////////////////////////////////////////////////////////
-;///////////////////////////////////////////////////////////////////////////////
-pusha
-mov threat,0
-getdb row,col
-mov ax,0
-mov al,chezzT[bx]
-cmp ax,0Ah
-ja typdown ;to be removed if needed
-mov currtype,0
-jmp typ2down
-typdown:
-mov currtype,1
-typ2down:
-mov dx,0 ;counter
-mov cx,row
-mov ax,col
-lopdown:
-inc cx
-cmp cx,0
-jae cont1down
-jmp far ptr exitdown
-
-cont1down:
-cmp cx,8
-jb cont2down
-jmp far ptr exitdown
-
-cont2down:
-cmp ax,0
-jae cont3down
-jmp far ptr exitdown
-
-cont3down:
-cmp ax,8
-jb cont4down
-jmp far ptr exitdown
-
-cont4down:
-mov tmpr,cx
-mov tmpc,ax
-
-getdb tmpr,tmpc
-
-mov ax,0
-mov al,chezzT[bx]
-; cmp al,-1
-; jne cont5
-; jmp far ptr highlightG
-; cont5:
-cmp ax,0Ah
-ja typndown ;to be removed if needed
-mov nexttype,0
-jmp typn2down
-typndown:
-mov nexttype,1
-typn2down:
-mov bx,0
-mov bl,currtype
-mov bh,nexttype
-xor bl,bh
-cmp bl,0
-
-jne highlightRdown
-jmp far ptr exitdown
-highlightRdown:
-getdb tmpr,tmpc
-mov chezzC[bx],4h
-mov al,chezzT[bx]
-and al,0fh
-cmp al,1
-jz queennchdown
-mov threat,1
-jmp far ptr leaveall 
-queennchdown:
-cmp al,2
-jz rooknchdown
-mov threat,1
-jmp far ptr leaveall 
-rooknchdown:
-cmp dx,1
-jne kingndown
-cmp al,0
-jnz kingndown
-mov threat,1
-jmp far ptr leaveall 
-kingndown:
-inc dx
-cmp dx,steps
-je exitdown
-jmp far ptr lopdown
-exitdown:
-
-;/left///////////////////////////////////////////////////////////////////////////
-;///////////////////////////////////////////////////////////////////////////////
-pusha
-mov threat,0
-getdb row,col
-mov ax,0
-mov al,chezzT[bx]
-cmp ax,0Ah
-ja typleft ;to be removed if needed
-mov currtype,0
-jmp typ2left
-typleft:
-mov currtype,1
-typ2left:
-mov dx,0 ;counter
-mov cx,row
-mov ax,col
-lopleft:
-dec ax
-cmp ax,0
-jae cont1left
-jmp far ptr exitleft
-
-cont1left:
-cmp ax,8
-jb cont2left
-jmp far ptr exitleft
-
-cont2left:
-cmp cx,0
-jae cont3left
-jmp far ptr exitleft
-
-cont3left:
-cmp cx,8
-jb cont4left
-jmp far ptr exitleft
-
-cont4left:
-mov tmpr,cx
-mov tmpc,ax
-
-getdb tmpr,tmpc
-
-mov ax,0
-mov al,chezzT[bx]
-; cmp al,-1
-; jne cont5
-; jmp far ptr highlightG
-; cont5:
-cmp ax,0Ah
-ja typnleft;to be removed if needed
-mov nexttype,0
-jmp typn2left
-typnleft:
-mov nexttype,1
-typn2left:
-mov bx,0
-mov bl,currtype
-mov bh,nexttype
-xor bl,bh
-cmp bl,0
-
-jne highlightRleft
-jmp far ptr exitleft
-highlightRleft:
-getdb tmpr,tmpc
-mov chezzC[bx],4h
-mov al,chezzT[bx]
-and al,0fh
-cmp al,1
-jz queennchleft
-mov threat,1
-jmp far ptr leaveall 
-queennchleft:
-cmp al,2
-jz rooknchleft
-mov threat,1
-jmp far ptr leaveall 
-rooknchleft:
-cmp dx,1
-jne kingnleft
-cmp al,0
-jnz kingnleft
-mov threat,1
-jmp far ptr leaveall 
-kingnleft:
-inc dx
-cmp dx,steps
-je exitleft
-jmp far ptr lopleft
-exitleft:
-;/right///////////////////////////////////////////////////////////////////////////
-;///////////////////////////////////////////////////////////////////////////////
-pusha
-mov threat,0
-getdb row,col
-mov ax,0
-mov al,chezzT[bx]
-cmp ax,0Ah
-ja typright ;to be removed if needed
-mov currtype,0
-jmp typ2right
-typright:
-mov currtype,1
-typ2right:
-mov dx,0 ;counter
-mov cx,row
-mov ax,col
-lopright:
-inc ax
-cmp ax,0
-jae cont1right
-jmp far ptr exitright
-
-cont1right:
-cmp ax,8
-jb cont2right
-jmp far ptr exitright
-
-cont2right:
-cmp cx,0
-jae cont3right
-jmp far ptr exitright
-
-cont3right:
-cmp cx,8
-jb cont4right
-jmp far ptr exitright
-
-cont4right:
-mov tmpr,cx
-mov tmpc,ax
-
-getdb tmpr,tmpc
-
-mov ax,0
-mov al,chezzT[bx]
-; cmp al,-1
-; jne cont5
-; jmp far ptr highlightG
-; cont5:
-cmp ax,0Ah
-ja typnright ;to be removed if needed
-mov nexttype,0
-jmp typn2right
-typnright:
-mov nexttype,1
-typn2right:
-mov bx,0
-mov bl,currtype
-mov bh,nexttype
-xor bl,bh
-cmp bl,0
-
-jne highlightRright
-jmp far ptr exitright
-highlightRright:
-getdb tmpr,tmpc
-mov chezzC[bx],4h
-mov al,chezzT[bx]
-and al,0fh
-cmp al,1
-jz queennchright
-mov threat,1
-jmp far ptr leaveall 
-queennchright:
-cmp al,2
-jz rooknchright
-mov threat,1
-jmp far ptr leaveall 
-rooknchright:
-cmp dx,1
-jne kingnright
-cmp al,0
-jnz kingnright
-mov threat,1
-jmp far ptr leaveall 
-kingnright:
-inc dx
-cmp dx,steps
-je exitright
-jmp far ptr lopright
-exitright:
-
-
-
-leaveall:
-popa
-
-ENDM
+promotion3:
+;///////////////////black promote to queen
+mov promotflag,1
+mov al,chezzT[BX]
+sub al,4
+mov chezzT[bx],al
+mov ax,chezzP[bx]
+mov ax,offset queenData;//might not work
+add bx,bx
+mov chezzP[bx],ax
+DrawPieceDB PrimaryC,SecondaryC,0,0,0,row,col,begr,begc,endr,endc,res ;drawing the piece at the new location
+nopromotion:
+endm promote
