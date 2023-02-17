@@ -1622,7 +1622,7 @@ MAIN PROC FAR
     ;/****************************************************************************************/
     death1:
     ;Press any key to exit
-    movecursorlocation 30,6,0
+    movecursorlocation 25,6,0
     DisplayString black_win_msg
     ;DisplayStringGraphicMode black_win_msg,9,27,6
     ssa:
@@ -1650,7 +1650,7 @@ MAIN PROC FAR
     push StackPA
     ret
     death2:
-    movecursorlocation 30,6,0
+    movecursorlocation 25,6,0
     DisplayString white_win_msg
     ;DisplayStringGraphicMode white_win_msg,9,27,6
     ssb:
